@@ -1,0 +1,21 @@
+# Don't keep  wind fields
+*.wnd
+*.hh
+*.sum
+*.csv
+*.mat
+*.bts
+
+# Ignore the folders with data
+OriginalWF/
+LidarOutput/
+ConstrainedWF/
+InputsForConstrainedTurb/
+Developer/
+
+# matlab asvs
+*.asv
+
+# Specific files
+Main/LidarSimulatorCOPY.m
+Main/InputParameters.m
