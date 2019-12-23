@@ -11,7 +11,7 @@
 # Ignore the folders with data
 OriginalWF/
 LidarOutput/
-#ConstrainedWF/
+ConstrainedWF/
 InputsForConstrainedTurb/
 Developer/
 
