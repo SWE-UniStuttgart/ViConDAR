@@ -6,8 +6,6 @@ Modular framework allowing to scan a numerical wind field with a virtual lidar a
 
 The aim of the framework is to provide an open source base for such tests but also to be used as a platform where other modules (e.g. different velocity vector reconstruction methods) can be easily added and tested. More information on motivation and possible applications can be found in [1].
 
-## Quick start guide
-
 ![flowchart](Pictures_repo/vicondar_overview.png)
 
 ## Code and folder structure
@@ -17,14 +15,18 @@ The framework is based around a wrapper script calling the different modules. Th
 ### Main folder
 
 #### InputParameters.m
+The main IO interface of ViConDAR. Here you can switch on/off flags, define parameters and request plots
 
 #### ViConDAR.m
+Main wrapper script to be executed
 
 ### Functions Folder
+All functions required for VIConDAR are gathered here. Any new additions should be added here.
 
 ### HelpfulStandAlone folder
-
+This folder contains scripts used for batch processing and other small useful tools. These run as stand alone and do not interface directly with ViConDAR
 ### Other directories
+The other directories are defined in the *InputParameters.m* and are created while the code is running. These directories include folders for lidar outputs, inputs to constrained turbulence generators as welll as outputs
 
 ## Run Test Case
 
