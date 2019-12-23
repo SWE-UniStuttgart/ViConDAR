@@ -1,0 +1,218 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>statisticsFun</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="statisticsFun.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Header</a></li><li><a href="#3">Outputs</a></li></ul></div><h2>Header<a name="1"></a></h2><pre class="codeinput"><span class="comment">%Calculate all statistics from the lidar measured time series and original wind</span>
+<span class="comment">%field to store them in the Output variable. This function can be modified to</span>
+<span class="comment">%introduce new desired outputs.</span>
+<span class="comment">%</span>
+<span class="comment">% V.Pettas/F.Costa</span>
+<span class="comment">% University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</span>
+
+
+<span class="keyword">function</span> [statisticsFunOut] = statisticsFun(Y,VFinalTotal_full,VFinalTotal_Lidar,slices,slicesTime)
+</pre><pre class="codeinput"><span class="keyword">for</span> indstat=1:length(Y)
+    <span class="comment">%Mean</span>
+    MeanTS(indstat,:)           = mean(VFinalTotal_full{indstat},<span class="string">'omitnan'</span>);      <span class="comment">%mean Of each full Time Series</span>
+    MeanTS_LiDAR(indstat,:)     = mean(VFinalTotal_Lidar{indstat},<span class="string">'omitnan'</span>); <span class="comment">%mean Of each LiDAR Time Series</span>
+
+    <span class="comment">%Error</span>
+    Error{indstat}        = (VFinalTotal_full{indstat} (slices(indstat,:))- VFinalTotal_Lidar{indstat}); <span class="comment">%#ok&lt;*AGROW&gt; %Error between TurbSim-Ts and each point in the Pattern-TS:</span>
+    RMSE(indstat)         = sqrt(sum( (VFinalTotal_full{indstat}(slices(indstat,:)) - VFinalTotal_Lidar{indstat}).^2) / length(VFinalTotal_Lidar{indstat}) ); <span class="comment">% RMSE for each TS of the pattern</span>
+    LidarTime{indstat}    = slicesTime(indstat,:);
+
+    ABSOLUT_Error{indstat}      = abs(Error{indstat}); <span class="comment">%Absolut error  %%%%%%%%%%%% I removed the abs</span>
+    MeanError(indstat)          = mean(Error{indstat}); <span class="comment">% mean error</span>
+    MeanAbsError(indstat)       = mean(ABSOLUT_Error{indstat});
+    Max_Error(indstat)          = max(Error{indstat}); <span class="comment">% Maximum of the error</span>
+    Min_Error(indstat)          = min(Error{indstat});<span class="comment">% Minimum of the error</span>
+    Variance_Error(indstat)     = var(Error{indstat});
+    STDV_Error(indstat)         = std(Error{indstat});
+    STDV_LiDAR(indstat)         = std(VFinalTotal_Lidar{indstat},<span class="string">'omitnan'</span>); <span class="comment">%STDV LiDAR Pattern-TS</span>
+    STDV_TS(indstat)            = std(VFinalTotal_full{indstat},<span class="string">'omitnan'</span>); <span class="comment">% STDV TurbSim-TS</span>
+    VAR_LiDAR(indstat)          = var(VFinalTotal_Lidar{indstat},<span class="string">'omitnan'</span>); <span class="comment">%VARIANCE LiDAR Pattern-TS</span>
+    VAR_TS(indstat)             = var(VFinalTotal_full{indstat},<span class="string">'omitnan'</span>); <span class="comment">% VARAIANCE TurbSim-TS</span>
+    TI_LiDAR(indstat)           = STDV_LiDAR(indstat) / MeanTS_LiDAR(indstat,:)    ;
+    TI_TS(indstat)              = STDV_TS(indstat) / MeanTS(indstat,:)    ; <span class="comment">%#ok&lt;*NASGU&gt;</span>
+<span class="keyword">end</span>
+MeanTotal_Full_TS   = mean(MeanTS); <span class="comment">%Mean of the LiDAR pattern</span>
+MeanTotal_LiDAR_TS  = mean(MeanTS_LiDAR); <span class="comment">%Mean of the LiDAR pattern</span>
+Mean_STDV_LiDAR     = mean(STDV_LiDAR(indstat));<span class="comment">% Mean STDV LiDAR pattern</span>
+Mean_STDV_Full_TS   = mean( STDV_TS(indstat));<span class="comment">% Mean STDV LiDAR pattern</span>
+TI_mean_LiDAR_TS    = Mean_STDV_LiDAR/MeanTotal_LiDAR_TS; <span class="comment">% TI LiDAR pattern</span>
+TI_mean_Full_TS     = Mean_STDV_Full_TS/MeanTotal_Full_TS;  <span class="comment">% TI Full TimeSerie</span>
+</pre><h2>Outputs<a name="3"></a></h2><pre class="codeinput"><span class="comment">% Error</span>
+statisticsFunOut.error.Error              = MeanError;
+statisticsFunOut.error.Error_TS           = Error;
+statisticsFunOut.error.Abs_Error          = ABSOLUT_Error;
+statisticsFunOut.error.Mean_Abs_Error     = MeanAbsError;
+statisticsFunOut.error.Max_error          = Max_Error;
+statisticsFunOut.error.Min_Error          = Min_Error;
+statisticsFunOut.error.STDV_Error         = STDV_Error;
+statisticsFunOut.error.Variance_Error     = Variance_Error;
+statisticsFunOut.error.error_time         = LidarTime;
+
+<span class="comment">% LiDAR</span>
+statisticsFunOut.lidar.Mean_all_LiDAR      = MeanTotal_LiDAR_TS;
+statisticsFunOut.lidar.Mean_Points_LiDAR  = MeanTS_LiDAR';
+statisticsFunOut.lidar.STDV_LiDAR         = STDV_LiDAR;
+statisticsFunOut.lidar.VAR_LiDAR          = VAR_LiDAR;
+statisticsFunOut.lidar.RMSE               = RMSE;
+statisticsFunOut.lidar.TI                 = TI_LiDAR;
+statisticsFunOut.lidar.TI_mean            = TI_mean_LiDAR_TS;
+statisticsFunOut.lidar.Mean_STDV          = Mean_STDV_LiDAR;
+
+<span class="comment">% FullWF</span>
+statisticsFunOut.fullWF.Mean_points_full  = MeanTS';
+statisticsFunOut.fullWF.Mean_all_full  = MeanTotal_Full_TS;
+statisticsFunOut.fullWF.STDV_TS = STDV_TS;
+statisticsFunOut.fullWF.VAR_TS  = VAR_TS;
+statisticsFunOut.fullWF.TI      = TI_LiDAR;
+statisticsFunOut.fullWF.TI_mean = TI_mean_Full_TS;
+statisticsFunOut.fullWF.Mean_STDV = Mean_STDV_Full_TS;
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Header
+%
+%Calculate all statistics from the lidar measured time series and original wind
+%field to store them in the Output variable. This function can be modified to
+%introduce new desired outputs.
+%
+% V.Pettas/F.Costa 
+% University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
+
+
+function [statisticsFunOut] = statisticsFun(Y,VFinalTotal_full,VFinalTotal_Lidar,slices,slicesTime)
+
+for indstat=1:length(Y)
+    %Mean
+    MeanTS(indstat,:)           = mean(VFinalTotal_full{indstat},'omitnan');      %mean Of each full Time Series
+    MeanTS_LiDAR(indstat,:)     = mean(VFinalTotal_Lidar{indstat},'omitnan'); %mean Of each LiDAR Time Series
+    
+    %Error
+    Error{indstat}        = (VFinalTotal_full{indstat} (slices(indstat,:))- VFinalTotal_Lidar{indstat}); %#ok<*AGROW> %Error between TurbSim-Ts and each point in the Pattern-TS:
+    RMSE(indstat)         = sqrt(sum( (VFinalTotal_full{indstat}(slices(indstat,:)) - VFinalTotal_Lidar{indstat}).^2) / length(VFinalTotal_Lidar{indstat}) ); % RMSE for each TS of the pattern
+    LidarTime{indstat}    = slicesTime(indstat,:);
+    
+    ABSOLUT_Error{indstat}      = abs(Error{indstat}); %Absolut error  %%%%%%%%%%%% I removed the abs
+    MeanError(indstat)          = mean(Error{indstat}); % mean error
+    MeanAbsError(indstat)       = mean(ABSOLUT_Error{indstat});
+    Max_Error(indstat)          = max(Error{indstat}); % Maximum of the error
+    Min_Error(indstat)          = min(Error{indstat});% Minimum of the error
+    Variance_Error(indstat)     = var(Error{indstat});
+    STDV_Error(indstat)         = std(Error{indstat});
+    STDV_LiDAR(indstat)         = std(VFinalTotal_Lidar{indstat},'omitnan'); %STDV LiDAR Pattern-TS
+    STDV_TS(indstat)            = std(VFinalTotal_full{indstat},'omitnan'); % STDV TurbSim-TS
+    VAR_LiDAR(indstat)          = var(VFinalTotal_Lidar{indstat},'omitnan'); %VARIANCE LiDAR Pattern-TS
+    VAR_TS(indstat)             = var(VFinalTotal_full{indstat},'omitnan'); % VARAIANCE TurbSim-TS
+    TI_LiDAR(indstat)           = STDV_LiDAR(indstat) / MeanTS_LiDAR(indstat,:)    ;
+    TI_TS(indstat)              = STDV_TS(indstat) / MeanTS(indstat,:)    ; %#ok<*NASGU>
+end
+MeanTotal_Full_TS   = mean(MeanTS); %Mean of the LiDAR pattern
+MeanTotal_LiDAR_TS  = mean(MeanTS_LiDAR); %Mean of the LiDAR pattern
+Mean_STDV_LiDAR     = mean(STDV_LiDAR(indstat));% Mean STDV LiDAR pattern
+Mean_STDV_Full_TS   = mean( STDV_TS(indstat));% Mean STDV LiDAR pattern
+TI_mean_LiDAR_TS    = Mean_STDV_LiDAR/MeanTotal_LiDAR_TS; % TI LiDAR pattern
+TI_mean_Full_TS     = Mean_STDV_Full_TS/MeanTotal_Full_TS;  % TI Full TimeSerie
+
+%% Outputs
+
+% Error
+statisticsFunOut.error.Error              = MeanError;
+statisticsFunOut.error.Error_TS           = Error;
+statisticsFunOut.error.Abs_Error          = ABSOLUT_Error;
+statisticsFunOut.error.Mean_Abs_Error     = MeanAbsError;
+statisticsFunOut.error.Max_error          = Max_Error;
+statisticsFunOut.error.Min_Error          = Min_Error;
+statisticsFunOut.error.STDV_Error         = STDV_Error;
+statisticsFunOut.error.Variance_Error     = Variance_Error;
+statisticsFunOut.error.error_time         = LidarTime;
+
+% LiDAR
+statisticsFunOut.lidar.Mean_all_LiDAR      = MeanTotal_LiDAR_TS;
+statisticsFunOut.lidar.Mean_Points_LiDAR  = MeanTS_LiDAR';
+statisticsFunOut.lidar.STDV_LiDAR         = STDV_LiDAR;
+statisticsFunOut.lidar.VAR_LiDAR          = VAR_LiDAR;
+statisticsFunOut.lidar.RMSE               = RMSE;
+statisticsFunOut.lidar.TI                 = TI_LiDAR;
+statisticsFunOut.lidar.TI_mean            = TI_mean_LiDAR_TS;
+statisticsFunOut.lidar.Mean_STDV          = Mean_STDV_LiDAR;
+
+% FullWF
+statisticsFunOut.fullWF.Mean_points_full  = MeanTS';
+statisticsFunOut.fullWF.Mean_all_full  = MeanTotal_Full_TS;
+statisticsFunOut.fullWF.STDV_TS = STDV_TS;
+statisticsFunOut.fullWF.VAR_TS  = VAR_TS;
+statisticsFunOut.fullWF.TI      = TI_LiDAR;
+statisticsFunOut.fullWF.TI_mean = TI_mean_Full_TS;
+statisticsFunOut.fullWF.Mean_STDV = Mean_STDV_Full_TS;
+
+
+end
+##### SOURCE END #####
+--></body></html>

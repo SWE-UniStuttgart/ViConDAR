@@ -1,0 +1,442 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>getFullWF_statistics</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="getFullWF_statistics.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Header</a></li><li><a href="#2">IO/parameter definition</a></li><li><a href="#3">Check if these files exist in turbsim and pycoturb folders</a></li><li><a href="#5">Load windfield file</a></li><li><a href="#7">Obtain and create data</a></li><li><a href="#8">Discretization</a></li><li><a href="#9">Calculate REWS</a></li><li><a href="#10">Calculate Shear power law exponent from full windfield</a></li><li><a href="#11">Mean wind speed</a></li><li><a href="#12">HH wind speed TS, mean and TI</a></li><li><a href="#13">Create and save .mat output and figures</a></li></ul></div><h2>Header<a name="1"></a></h2><p>Creating statistics from wind fields requested. They include mean Windspeed shear, REWS, hhTI, fullTI, hh wind speed TS.</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> StatisticsWF = getFullWF_statistics(input,curFileInfo)
+</pre><h2>IO/parameter definition<a name="2"></a></h2><p>Turbine parameters</p><pre class="codeinput">rotor_radius = input.rotor_radius; <span class="comment">% Radio of the Rotor [m]</span>
+Zh           = input.Zh;           <span class="comment">% HubHeight [m]</span>
+
+<span class="comment">%Processing REWS:</span>
+dist_REWS_nd = input.dist_REWS_nd; <span class="comment">% Non dimentional span position for rotor effective wind speed calculation [define from 0 to 1 inclusive]</span>
+Wi           = input.Wi;  <span class="comment">%Weight to be applied for rotor effective wind speed calculation</span>
+</pre><h2>Check if these files exist in turbsim and pycoturb folders<a name="3"></a></h2><pre class="codeinput"><span class="comment">% get pyconturb and turbsim constreind wind fields</span>
+pyconturbWFsFull = dir([input.PyconturbOut_dir <span class="string">'*.mat'</span>]);
+<span class="keyword">if</span> ~isempty(pyconturbWFsFull)
+    pyconturbWF_names =  extractfield(pyconturbWFsFull,<span class="string">'name'</span>);
+    pyconWFsInd= ~cellfun(@isempty,strfind(pyconturbWF_names,curFileInfo.name)); <span class="comment">%</span>
+    pyconWF = [ input.PyconturbOut_dir pyconturbWF_names{pyconWFsInd}];
+    pyconWFname = pyconturbWF_names{pyconWFsInd};
+<span class="keyword">else</span>
+    pyconWF = [];
+    pyconWFname = [];
+<span class="keyword">end</span>
+
+turbsimWFsFull = dir([input.TurbSimOut_dir <span class="string">'*.mat'</span>]);
+<span class="keyword">if</span> ~isempty(turbsimWFsFull)
+    turbsimWF_names =  extractfield(turbsimWFsFull,<span class="string">'name'</span>);
+    turbsimWFsInd= ~cellfun(@isempty,strfind(turbsimWF_names,curFileInfo.name)); <span class="comment">%</span>
+    turbsimWF = [input.TurbSimOut_dir turbsimWF_names{turbsimWFsInd}];
+    turbsimWF_name=turbsimWF_names{turbsimWFsInd};
+<span class="keyword">else</span>
+    turbsimWF =[];
+    turbsimWF_name =[];
+<span class="keyword">end</span>
+
+OrWFsFull = dir([input.OriginalWF_dir <span class="string">'*.mat'</span>]);
+<span class="keyword">if</span> ~isempty(OrWFsFull)
+    OrWF_names =  extractfield(OrWFsFull,<span class="string">'name'</span>);
+    OrWFsInd= ~cellfun(@isempty,strfind(OrWF_names,curFileInfo.originalWF)); <span class="comment">%</span>
+    ORWF = [input.OriginalWF_dir OrWF_names{OrWFsInd}];
+    ORWF_name = curFileInfo.originalWF{1,1};
+<span class="keyword">else</span>
+    ORWF =[];
+    ORWF_name = [];
+<span class="keyword">end</span>
+
+AllWf = [{ORWF} {turbsimWF} {pyconWF};{<span class="string">'original'</span>} {<span class="string">'turbsim'</span>} {<span class="string">'pyconturb'</span>};{ORWF_name} {turbsimWF_name} {pyconWFname}];
+
+<span class="keyword">for</span> iWF = 1:length(AllWf)
+</pre><h2>Load windfield file<a name="5"></a></h2><pre class="codeinput">    <span class="keyword">if</span> ~isempty(AllWf{1,iWF})
+</pre><pre class="codeinput">        filenameWF =AllWf{1,iWF};
+        load (filenameWF); <span class="comment">% windfield variable is loaded</span>
+</pre><h2>Obtain and create data<a name="7"></a></h2><pre class="codeinput">        <span class="comment">%extract components from the windfield variable</span>
+
+        compU               =  windfield.u;
+        compV               =  windfield.v;
+        compW               =  windfield.w;
+        dt                  =  windfield.dt; <span class="comment">%time step</span>
+        gridtime            =  windfield.grid.nt;
+        gridny              =  windfield.grid.ny;
+        gridnz              =  windfield.grid.nz;
+        gridz               =  -windfield.grid.z;
+        gridy               =  windfield.grid.y;
+        Uref                =  windfield.URef; <span class="comment">% Mean velocity of the windfied (m/s)</span>
+        dz                  =  windfield.grid.dz;
+        dy                  =  windfield.grid.dy;
+
+        <span class="comment">% Manipulation of data before calculations:</span>
+        <span class="keyword">for</span> i=1:gridtime
+            SqueezeCompU{i}=squeeze(compU(:,i,:));
+            compU(:,i,:)=flipud(SqueezeCompU{i}');
+
+            SqueezeCompV{i}=squeeze(compV(:,i,:));
+            compV(:,i,:)=flipud(SqueezeCompV{i}');
+
+            SqueezeCompW{i}=squeeze(compW(:,i,:)); <span class="comment">%#ok&lt;*AGROW&gt;</span>
+            compW(:,i,:)=flipud(SqueezeCompW{i}');
+        <span class="keyword">end</span>
+</pre><h2>Discretization<a name="8"></a></h2><pre class="codeinput">        fullTime            =  (dt*gridtime)-dt; <span class="comment">%total time duration of the windfield</span>
+        fullslicesTime      =  0:dt:fullTime;
+        slicesDistance      =  fullslicesTime*Uref; <span class="comment">% vector with distance between slices(m)</span>
+</pre><h2>Calculate REWS<a name="9"></a></h2><pre class="codeinput">        <span class="comment">% distances of all points in the turbsim grid from center assuming hub center =0</span>
+        <span class="keyword">for</span> I=1:gridny
+            <span class="keyword">for</span> II=1:gridnz
+                Distances_of_Points_In_Plane(I,II)=sqrt((gridy(I)).^2+(gridz(II)).^2); <span class="comment">%Matrix of distances from center of rotor to each point in the grid</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+
+        <span class="keyword">if</span> input.flag_apply_weightREWS==1
+            dist_REWS = rotor_radius*[dist_REWS_nd 2]; <span class="comment">%convert ND spanwise to meters and treat the point outside with 0 weight</span>
+            Wi        = [Wi 0];
+            <span class="comment">% calculate weigths for all the turbsim  grid points</span>
+            <span class="keyword">for</span> I=1:gridny
+                <span class="keyword">for</span> II=1:gridnz
+                    Weights_of_Points_In_Plane(I,II)=interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(I,II)); <span class="comment">%Matrix of weights for all grid points</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            weigthTot_grid    = sum(sum(Weights_of_Points_In_Plane)); <span class="comment">%sum of weights needed for weighted average</span>
+        <span class="keyword">end</span>
+
+
+        <span class="comment">%Transform Slices</span>
+        rad_values=Distances_of_Points_In_Plane&lt;=rotor_radius;       <span class="comment">%keep only points inside the rotor</span>
+        <span class="keyword">for</span> ind_slicesDistance =1:length (slicesDistance) <span class="comment">% loop over all the slices</span>
+            <span class="comment">% Take complete slice from turbsim:</span>
+            ExSlice_U = squeeze(compU(:,ind_slicesDistance,:)); <span class="comment">% Values of the selected slice CompU</span>
+            ExSlice_U = ExSlice_U.*rad_values; <span class="comment">%remove points out of rotor</span>
+            <span class="keyword">if</span> input.flag_apply_weightREWS==1
+                ExSlice_U = ExSlice_U.*Weights_of_Points_In_Plane;         <span class="comment">%multiply with weights</span>
+                REWS.fullWF.TS(ind_slicesDistance) = sum(sum(ExSlice_U))/weigthTot_grid;
+            <span class="keyword">else</span>
+                noZeroSlice = nonzeros(ExSlice_U);
+                REWS.TS(ind_slicesDistance) = mean(noZeroSlice,<span class="string">'omitnan'</span>);
+            <span class="keyword">end</span>
+
+        <span class="keyword">end</span>
+        REWS.mean = mean(REWS.TS,<span class="string">'omitnan'</span>);
+        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+</pre><h2>Calculate Shear power law exponent from full windfield<a name="10"></a></h2><pre class="codeinput">        <span class="comment">%maybe add an option to calculate shear on every nth slice of the ful field to reduce time</span>
+
+        zero_valueY=find(gridy==0);
+        zero_valueZ=find(gridz==0);
+        z_vec_Shear = (gridz)+Zh;             <span class="comment">%create vector of heights</span>
+        Vhub_shear = compU(zero_valueZ,:,zero_valueY); <span class="comment">%#ok&lt;*FNDSB&gt; %Velocity u at the hub height</span>
+
+        <span class="comment">% calculate power law for full turbsim data:</span>
+        <span class="keyword">for</span> ind_sliceLaW = 1:gridtime  <span class="comment">%for slices</span>
+            V_slice = squeeze(compU(:,ind_sliceLaW,:)); <span class="comment">% velocity of point in slices</span>
+            v_hor = mean (V_slice,2);     <span class="comment">% take the average of all points in each horizontal line</span>
+
+            <span class="comment">% find least square fit for the average vertical line</span>
+            fcn = @(alphaPL) sum((Vhub_shear(ind_sliceLaW)*(z_vec_Shear/Zh).^(alphaPL) - v_hor').^2); <span class="comment">% least square defintion f</span>
+            [s,~,~] = fminsearch(fcn, 0.14);        <span class="comment">% Minimise Least-Squares error</span>
+            <span class="keyword">if</span> abs(s) &lt; 0.005
+                s=0;
+            <span class="keyword">end</span>
+            ShearPL.TS(ind_sliceLaW) = s; <span class="comment">%#ok&lt;*SAGROW&gt;</span>
+
+        <span class="keyword">end</span>
+        ShearPL.Mean=mean(ShearPL.TS); <span class="comment">% total shear of the wind field</span>
+</pre><h2>Mean wind speed<a name="11"></a></h2><pre class="codeinput">        <span class="keyword">for</span> iTim =1:size(compU,2)
+            UmeanTs(iTim) = mean(mean(squeeze(compU(:,iTim,:))));
+        <span class="keyword">end</span>
+        StatisticsWF.Umean.TS = UmeanTs;
+        StatisticsWF.Umean.mean = mean(StatisticsWF.Umean.TS);
+        StatisticsWF.Umean.TI =std(StatisticsWF.Umean.TS)/ mean(StatisticsWF.Umean.TS);
+</pre><h2>HH wind speed TS, mean and TI<a name="12"></a></h2><pre class="codeinput">        StatisticsWF.HH.TS = Vhub_shear;
+        StatisticsWF.HH.mean = mean(Vhub_shear);
+        StatisticsWF.HH.TI =std(Vhub_shear)/mean(Vhub_shear);
+</pre><h2>Create and save .mat output and figures<a name="13"></a></h2><pre class="codeinput">        StatisticsWF.REWS   = REWS;
+        StatisticsWF.Shear  = ShearPL;
+
+        StatisticsWF.time   = fullslicesTime;
+
+        StatisticsWF.Parameter.rotor_radius = rotor_radius; <span class="comment">% Radio of the Rotor [m]</span>
+        StatisticsWF.Parameter.Zh   = Zh;
+
+        StatisticsWF.grid.nGridY = gridny;
+        StatisticsWF.grid.nGridZ = gridnz;
+        StatisticsWF.grid.dy = dy;
+        StatisticsWF.grid.dz = dz;
+
+        <span class="comment">%save</span>
+        save_data_full_path=[input.fullWF_statistics_dir AllWf{3,iWF} <span class="string">'_statistics.mat'</span>];
+        save(save_data_full_path,<span class="string">'StatisticsWF'</span>)
+        disp([curFileInfo.name <span class="string">' has been processed ('</span> datestr(datetime) <span class="string">'):'</span> ])
+</pre><pre class="codeinput">    <span class="keyword">else</span>
+        disp([<span class="string">'No file with name '</span> curFileInfo.name <span class="string">' found in'</span> AllWf{2,iWF} <span class="string">'folder'</span>])
+
+    <span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Header
+%
+% Creating statistics from wind fields requested. They include mean Windspeed
+% shear, REWS, hhTI, fullTI, hh wind speed TS.
+%
+% V.Pettas/F.Costa
+% University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
+
+function StatisticsWF = getFullWF_statistics(input,curFileInfo)
+
+
+%% IO/parameter definition
+% Turbine parameters
+rotor_radius = input.rotor_radius; % Radio of the Rotor [m]
+Zh           = input.Zh;           % HubHeight [m]
+
+%Processing REWS:
+dist_REWS_nd = input.dist_REWS_nd; % Non dimentional span position for rotor effective wind speed calculation [define from 0 to 1 inclusive]
+Wi           = input.Wi;  %Weight to be applied for rotor effective wind speed calculation
+
+%% Check if these files exist in turbsim and pycoturb folders
+
+% get pyconturb and turbsim constreind wind fields
+pyconturbWFsFull = dir([input.PyconturbOut_dir '*.mat']);
+if ~isempty(pyconturbWFsFull)
+    pyconturbWF_names =  extractfield(pyconturbWFsFull,'name');
+    pyconWFsInd= ~cellfun(@isempty,strfind(pyconturbWF_names,curFileInfo.name)); %
+    pyconWF = [ input.PyconturbOut_dir pyconturbWF_names{pyconWFsInd}];
+    pyconWFname = pyconturbWF_names{pyconWFsInd};
+else
+    pyconWF = [];
+    pyconWFname = [];
+end
+
+turbsimWFsFull = dir([input.TurbSimOut_dir '*.mat']);
+if ~isempty(turbsimWFsFull)
+    turbsimWF_names =  extractfield(turbsimWFsFull,'name');
+    turbsimWFsInd= ~cellfun(@isempty,strfind(turbsimWF_names,curFileInfo.name)); %
+    turbsimWF = [input.TurbSimOut_dir turbsimWF_names{turbsimWFsInd}];
+    turbsimWF_name=turbsimWF_names{turbsimWFsInd};
+else
+    turbsimWF =[];
+    turbsimWF_name =[];
+end
+
+OrWFsFull = dir([input.OriginalWF_dir '*.mat']);
+if ~isempty(OrWFsFull)
+    OrWF_names =  extractfield(OrWFsFull,'name');
+    OrWFsInd= ~cellfun(@isempty,strfind(OrWF_names,curFileInfo.originalWF)); %
+    ORWF = [input.OriginalWF_dir OrWF_names{OrWFsInd}];
+    ORWF_name = curFileInfo.originalWF{1,1};
+else
+    ORWF =[];
+    ORWF_name = [];
+end
+
+AllWf = [{ORWF} {turbsimWF} {pyconWF};{'original'} {'turbsim'} {'pyconturb'};{ORWF_name} {turbsimWF_name} {pyconWFname}];
+
+for iWF = 1:length(AllWf)
+    
+    %% Load windfield file 
+    if ~isempty(AllWf{1,iWF})
+        filenameWF =AllWf{1,iWF};
+        load (filenameWF); % windfield variable is loaded
+        
+        %% Obtain and create data
+        %extract components from the windfield variable
+        
+        compU               =  windfield.u;
+        compV               =  windfield.v;
+        compW               =  windfield.w;
+        dt                  =  windfield.dt; %time step
+        gridtime            =  windfield.grid.nt;
+        gridny              =  windfield.grid.ny;
+        gridnz              =  windfield.grid.nz;
+        gridz               =  -windfield.grid.z;
+        gridy               =  windfield.grid.y;
+        Uref                =  windfield.URef; % Mean velocity of the windfied (m/s)
+        dz                  =  windfield.grid.dz;
+        dy                  =  windfield.grid.dy;
+               
+        % Manipulation of data before calculations:
+        for i=1:gridtime
+            SqueezeCompU{i}=squeeze(compU(:,i,:));
+            compU(:,i,:)=flipud(SqueezeCompU{i}');
+            
+            SqueezeCompV{i}=squeeze(compV(:,i,:));
+            compV(:,i,:)=flipud(SqueezeCompV{i}');
+            
+            SqueezeCompW{i}=squeeze(compW(:,i,:)); %#ok<*AGROW>
+            compW(:,i,:)=flipud(SqueezeCompW{i}');
+        end
+
+        
+        %% Discretization
+        
+        fullTime            =  (dt*gridtime)-dt; %total time duration of the windfield
+        fullslicesTime      =  0:dt:fullTime;
+        slicesDistance      =  fullslicesTime*Uref; % vector with distance between slices(m)
+        
+        %% Calculate REWS
+        
+        % distances of all points in the turbsim grid from center assuming hub center =0
+        for I=1:gridny
+            for II=1:gridnz
+                Distances_of_Points_In_Plane(I,II)=sqrt((gridy(I)).^2+(gridz(II)).^2); %Matrix of distances from center of rotor to each point in the grid
+            end
+        end
+        
+        
+        if input.flag_apply_weightREWS==1
+            dist_REWS = rotor_radius*[dist_REWS_nd 2]; %convert ND spanwise to meters and treat the point outside with 0 weight
+            Wi        = [Wi 0];
+            % calculate weigths for all the turbsim  grid points
+            for I=1:gridny
+                for II=1:gridnz
+                    Weights_of_Points_In_Plane(I,II)=interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(I,II)); %Matrix of weights for all grid points
+                end
+            end
+            weigthTot_grid    = sum(sum(Weights_of_Points_In_Plane)); %sum of weights needed for weighted average
+        end
+             
+        
+        %Transform Slices
+        rad_values=Distances_of_Points_In_Plane<=rotor_radius;       %keep only points inside the rotor
+        for ind_slicesDistance =1:length (slicesDistance) % loop over all the slices
+            % Take complete slice from turbsim:
+            ExSlice_U = squeeze(compU(:,ind_slicesDistance,:)); % Values of the selected slice CompU
+            ExSlice_U = ExSlice_U.*rad_values; %remove points out of rotor
+            if input.flag_apply_weightREWS==1
+                ExSlice_U = ExSlice_U.*Weights_of_Points_In_Plane;         %multiply with weights
+                REWS.fullWF.TS(ind_slicesDistance) = sum(sum(ExSlice_U))/weigthTot_grid;
+            else
+                noZeroSlice = nonzeros(ExSlice_U);
+                REWS.TS(ind_slicesDistance) = mean(noZeroSlice,'omitnan');
+            end
+            
+        end
+        REWS.mean = mean(REWS.TS,'omitnan');
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        %% Calculate Shear power law exponent from full windfield
+        %maybe add an option to calculate shear on every nth slice of the ful field to reduce time
+        
+        zero_valueY=find(gridy==0);
+        zero_valueZ=find(gridz==0);
+        z_vec_Shear = (gridz)+Zh;             %create vector of heights
+        Vhub_shear = compU(zero_valueZ,:,zero_valueY); %#ok<*FNDSB> %Velocity u at the hub height
+        
+        % calculate power law for full turbsim data:
+        for ind_sliceLaW = 1:gridtime  %for slices
+            V_slice = squeeze(compU(:,ind_sliceLaW,:)); % velocity of point in slices
+            v_hor = mean (V_slice,2);     % take the average of all points in each horizontal line
+            
+            % find least square fit for the average vertical line
+            fcn = @(alphaPL) sum((Vhub_shear(ind_sliceLaW)*(z_vec_Shear/Zh).^(alphaPL) - v_hor').^2); % least square defintion f
+            [s,~,~] = fminsearch(fcn, 0.14);        % Minimise Least-Squares error
+            if abs(s) < 0.005
+                s=0;
+            end
+            ShearPL.TS(ind_sliceLaW) = s; %#ok<*SAGROW>
+            
+        end
+        ShearPL.Mean=mean(ShearPL.TS); % total shear of the wind field
+        
+        %% Mean wind speed
+        for iTim =1:size(compU,2)
+            UmeanTs(iTim) = mean(mean(squeeze(compU(:,iTim,:))));
+        end
+        StatisticsWF.Umean.TS = UmeanTs;
+        StatisticsWF.Umean.mean = mean(StatisticsWF.Umean.TS);
+        StatisticsWF.Umean.TI =std(StatisticsWF.Umean.TS)/ mean(StatisticsWF.Umean.TS);
+        
+        %% HH wind speed TS, mean and TI
+        StatisticsWF.HH.TS = Vhub_shear;
+        StatisticsWF.HH.mean = mean(Vhub_shear);
+        StatisticsWF.HH.TI =std(Vhub_shear)/mean(Vhub_shear);
+        
+        %% Create and save .mat output and figures
+        
+        StatisticsWF.REWS   = REWS;
+        StatisticsWF.Shear  = ShearPL;
+        
+        StatisticsWF.time   = fullslicesTime;
+        
+        StatisticsWF.Parameter.rotor_radius = rotor_radius; % Radio of the Rotor [m]
+        StatisticsWF.Parameter.Zh   = Zh;
+        
+        StatisticsWF.grid.nGridY = gridny;
+        StatisticsWF.grid.nGridZ = gridnz;
+        StatisticsWF.grid.dy = dy;
+        StatisticsWF.grid.dz = dz;
+        
+        %save
+        save_data_full_path=[input.fullWF_statistics_dir AllWf{3,iWF} '_statistics.mat'];
+        save(save_data_full_path,'StatisticsWF')
+        disp([curFileInfo.name ' has been processed (' datestr(datetime) '):' ])
+    else
+        disp(['No file with name ' curFileInfo.name ' found in' AllWf{2,iWF} 'folder'])
+        
+    end
+end
+
+##### SOURCE END #####
+--></body></html>

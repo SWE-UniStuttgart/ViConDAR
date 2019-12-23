@@ -1,0 +1,147 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>RunTurbSimCon_WF</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="RunTurbSimCon_WF.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Header</a></li><li><a href="#3">Transform into .mat from .wnd and save it</a></li></ul></div><h2>Header<a name="1"></a></h2><p>Once we have obtained out output for TurbSim from LiDAR simluator, this script opens and runs turbsim for a specific time step to obtain the constrained .wnd adn after converts into .mat</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> RunTurbSimCon_WF(input,Filename)
+</pre><pre class="codeinput">inputfile =[Filename  <span class="string">'_ConTurbSim'</span> <span class="string">'.inp'</span>];
+
+<span class="comment">% Copy required files where Turbsim since it cannot work with relative paths</span>
+destination = input.pathToTurbSim  ;
+origen1 = [input.TurbSimInput_dir inputfile]; <span class="comment">% copying input file to turbsim folder</span>
+origen2 = [input.TurbSimInput_dir Filename  <span class="string">'.TimeSer'</span>]; <span class="comment">% copying timeseries file to turbsim folder</span>
+<span class="keyword">try</span>
+    copyfile ( origen1,  destination);
+    copyfile ( origen2,  destination);
+<span class="keyword">catch</span>
+    error([<span class="string">'Error loading Turbsim inputs '</span> Filename <span class="string">' for contrained turbulence. Check if the inputs exist and are in the correct folder.'</span>])
+<span class="keyword">end</span>
+
+<span class="comment">% Run Turbsim through DOS</span>
+[status,~]=dos([input.TurbSimExe_path <span class="string">' '</span> input.pathToTurbSim inputfile]); <span class="comment">%add path to turbsim from input</span>
+
+<span class="keyword">if</span> status~=0
+    error([<span class="string">'Error in Turbsim execution file'</span> inputfile <span class="string">'. Aborting...'</span>])
+<span class="keyword">else</span>
+    disp( [<span class="string">'.wnd '</span> inputfile <span class="string">' is done!'</span>])
+<span class="keyword">end</span>
+
+<span class="comment">%Delete the copied input files from the output folder</span>
+delete([input.pathToTurbSim Filename  <span class="string">'.TimeSer'</span>])
+delete([input.pathToTurbSim Filename  <span class="string">'_ConTurbSim'</span> <span class="string">'.inp'</span>])
+</pre><h2>Transform into .mat from .wnd and save it<a name="3"></a></h2><pre class="codeinput">[velocity, ~, ~, ~, ~, dz, dy, dt, ~, ~, SummVars] = readBLgrid([destination Filename <span class="string">'_ConTurbSim'</span>  <span class="string">'.wnd'</span>]); <span class="comment">% read the windfield .wnd</span>
+windfield = velocity2windfield(velocity,dz,dy,dt,SummVars); <span class="comment">%#ok&lt;*NASGU&gt; % Convert to .mat</span>
+parsave(<span class="string">'-v7.3'</span>,[input.TurbSimOut_dir Filename <span class="string">'_ConTurbSim'</span> <span class="string">'.mat'</span>],windfield)
+disp([Filename <span class="string">'_ConTurbSim'</span> <span class="string">' wind field is converted to .mat!'</span>])
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Header
+%
+% Once we have obtained out output for TurbSim from LiDAR simluator, this
+% script opens and runs turbsim for a specific time step to obtain the constrained
+% .wnd adn after converts into .mat
+%
+% V.Pettas/F.Costa 
+% University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
+
+function RunTurbSimCon_WF(input,Filename)
+
+inputfile =[Filename  '_ConTurbSim' '.inp'];
+
+% Copy required files where Turbsim since it cannot work with relative paths
+destination = input.pathToTurbSim  ;
+origen1 = [input.TurbSimInput_dir inputfile]; % copying input file to turbsim folder
+origen2 = [input.TurbSimInput_dir Filename  '.TimeSer']; % copying timeseries file to turbsim folder
+try
+    copyfile ( origen1,  destination);
+    copyfile ( origen2,  destination);
+catch
+    error(['Error loading Turbsim inputs ' Filename ' for contrained turbulence. Check if the inputs exist and are in the correct folder.'])
+end
+
+% Run Turbsim through DOS
+[status,~]=dos([input.TurbSimExe_path ' ' input.pathToTurbSim inputfile]); %add path to turbsim from input
+
+if status~=0
+    error(['Error in Turbsim execution file' inputfile '. Aborting...'])   
+else
+    disp( ['.wnd ' inputfile ' is done!'])
+end
+
+%Delete the copied input files from the output folder
+delete([input.pathToTurbSim Filename  '.TimeSer'])
+delete([input.pathToTurbSim Filename  '_ConTurbSim' '.inp'])
+
+%% Transform into .mat from .wnd and save it
+[velocity, ~, ~, ~, ~, dz, dy, dt, ~, ~, SummVars] = readBLgrid([destination Filename '_ConTurbSim'  '.wnd']); % read the windfield .wnd
+windfield = velocity2windfield(velocity,dz,dy,dt,SummVars); %#ok<*NASGU> % Convert to .mat
+parsave('-v7.3',[input.TurbSimOut_dir Filename '_ConTurbSim' '.mat'],windfield)
+disp([Filename '_ConTurbSim' ' wind field is converted to .mat!'])
+
+
+
+##### SOURCE END #####
+--></body></html>

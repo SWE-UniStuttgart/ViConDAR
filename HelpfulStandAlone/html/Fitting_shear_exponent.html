@@ -1,0 +1,198 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Fitting_shear_exponent</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="Fitting_shear_exponent.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Header</a></li><li><a href="#2">Inputs</a></li><li><a href="#3">just a quick example of how shear profile should look like</a></li><li><a href="#4">Fitting procedure with fminsearch</a></li><li><a href="#5">Plotting</a></li></ul></div><h2>Header<a name="1"></a></h2><p>fitting power law expoinent to measurements. Given some measurement data over heights we can calculate the alpha exponent the fits better the values</p><p>Vasilis Pettas, Univeersity of Stuttgart, Stuttgart Wind Energy (SWE) 23.05.2019</p><pre class="codeinput">clc,clear <span class="string">all</span>,close <span class="string">all</span> <span class="comment">%#ok&lt;CLALL&gt;</span>
+
+<span class="comment">% rng(10); % just fixing random numbers for reproducabilitty</span>
+</pre><h2>Inputs<a name="2"></a></h2><pre class="codeinput">h_h     = 110;         <span class="comment">% hub height meters (reference height)</span>
+heights = [70:5:150]; <span class="comment">% measurement heights</span>
+
+<span class="comment">% since we don't have measurements here examples will be created</span>
+speeds = [
+    (10.*(heights/h_h).^0.25)+0*randn(1,length(heights));
+    (7.*(heights/h_h).^0.14)+0.05*randn(1,length(heights));
+    (9.*(heights/h_h).^0.2)+0.4*randn(1,length(heights));
+    (15.*(heights/h_h).^0.3)+0.5*randn(1,length(heights));
+    (20.*(heights/h_h).^0.3)+0.5*randn(1,length(heights));
+    ]; <span class="comment">%#ok&lt;*NBRAK&gt;</span>
+speeds = repmat(speeds,1,1); <span class="comment">% checking scalability</span>
+
+<span class="comment">% find uref from heights...</span>
+<span class="keyword">for</span> i = 1:size(speeds,1)
+uref(i,1)=speeds(i,find(heights==h_h)); <span class="comment">%#ok&lt;FNDSB&gt;</span>
+<span class="keyword">end</span>
+</pre><h2>just a quick example of how shear profile should look like<a name="3"></a></h2><pre class="codeinput"><span class="comment">% heights_example = [0:5:200];</span>
+<span class="comment">% h_h_example     = 110;</span>
+<span class="comment">% alpha_example = 0.2;</span>
+<span class="comment">% uref_example  = 10;</span>
+<span class="comment">% example_u = uref_example.*(heights_example/h_h_example).^alpha_example;</span>
+<span class="comment">% noisyexample_u = example_u+0.7*randn(1,length(example_u));</span>
+<span class="comment">% awfn_u = awgn(example_u,0.01);</span>
+<span class="comment">% % awfn_u = example_u+1*randn(1,length(example_u));</span>
+<span class="comment">% figure, plot (example_u,heights_example)</span>
+<span class="comment">% hold on</span>
+<span class="comment">% plot (noisyexample_u,heights_example,'x')</span>
+<span class="comment">% hold on</span>
+<span class="comment">% plot (awfn_u,heights_example,'o')</span>
+<span class="comment">% grid on, xlabel ('Wind speed'), ylabel('Height'), legend ({'analytical solution' 'random noise' 'gausiian noise awgn'},'Location', 'Best')</span>
+<span class="comment">% xlim ([0 20])</span>
+<span class="comment">% set(gca,'FontSize',14)</span>
+<span class="comment">% hold off</span>
+</pre><h2>Fitting procedure with fminsearch<a name="4"></a></h2><pre class="codeinput">tic
+<span class="keyword">for</span> i =1:size(speeds,1)
+    fcn = @(alphaPL) sum(( uref(i)*(heights/h_h).^(alphaPL) - [speeds(i,:)]).^2); <span class="comment">% least square defintion f</span>
+    [s,~,~] = fminsearch(fcn, [0.14]);    <span class="comment">% Minimise Least-Squares error</span>
+    alphaPLfit(i) = s; <span class="comment">%#ok&lt;*SAGROW&gt;</span>
+<span class="keyword">end</span>
+toc
+</pre><h2>Plotting<a name="5"></a></h2><pre class="codeinput"><span class="keyword">for</span> i =1:size(speeds,1)
+    figure
+    plot (uref(i).*(heights/h_h).^alphaPLfit(i),heights)
+    hold <span class="string">on</span>
+    plot (speeds(i,:),heights,<span class="string">'o'</span>)
+    grid <span class="string">on</span>, xlabel (<span class="string">'Wind speed'</span>), ylabel(<span class="string">'Height'</span>), legend ({<span class="string">'fitted'</span> <span class="string">'data points'</span>},<span class="string">'Location'</span>, <span class="string">'Best'</span>)
+    hold <span class="string">off</span>
+    set(gca,<span class="string">'FontSize'</span>,14)
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Header
+%
+% fitting power law expoinent to measurements. Given some measurement data
+% over heights we can calculate the alpha exponent the fits better the
+% values
+%
+% Vasilis Pettas, Univeersity of Stuttgart, Stuttgart Wind Energy (SWE) 23.05.2019
+
+clc,clear all,close all %#ok<CLALL>
+
+% rng(10); % just fixing random numbers for reproducabilitty
+
+%% Inputs
+h_h     = 110;         % hub height meters (reference height)
+heights = [70:5:150]; % measurement heights
+
+% since we don't have measurements here examples will be created
+speeds = [
+    (10.*(heights/h_h).^0.25)+0*randn(1,length(heights));
+    (7.*(heights/h_h).^0.14)+0.05*randn(1,length(heights));
+    (9.*(heights/h_h).^0.2)+0.4*randn(1,length(heights));
+    (15.*(heights/h_h).^0.3)+0.5*randn(1,length(heights));
+    (20.*(heights/h_h).^0.3)+0.5*randn(1,length(heights));
+    ]; %#ok<*NBRAK>
+speeds = repmat(speeds,1,1); % checking scalability
+
+% find uref from heights...
+for i = 1:size(speeds,1)      
+uref(i,1)=speeds(i,find(heights==h_h)); %#ok<FNDSB>
+end
+
+%% just a quick example of how shear profile should look like
+
+% heights_example = [0:5:200];
+% h_h_example     = 110;
+% alpha_example = 0.2;
+% uref_example  = 10;
+% example_u = uref_example.*(heights_example/h_h_example).^alpha_example;
+% noisyexample_u = example_u+0.7*randn(1,length(example_u));
+% awfn_u = awgn(example_u,0.01);
+% % awfn_u = example_u+1*randn(1,length(example_u));
+% figure, plot (example_u,heights_example)
+% hold on
+% plot (noisyexample_u,heights_example,'x')
+% hold on
+% plot (awfn_u,heights_example,'o')
+% grid on, xlabel ('Wind speed'), ylabel('Height'), legend ({'analytical solution' 'random noise' 'gausiian noise awgn'},'Location', 'Best')
+% xlim ([0 20])
+% set(gca,'FontSize',14)
+% hold off
+
+%% Fitting procedure with fminsearch 
+tic
+for i =1:size(speeds,1)
+    fcn = @(alphaPL) sum(( uref(i)*(heights/h_h).^(alphaPL) - [speeds(i,:)]).^2); % least square defintion f
+    [s,~,~] = fminsearch(fcn, [0.14]);    % Minimise Least-Squares error
+    alphaPLfit(i) = s; %#ok<*SAGROW>
+end
+toc
+
+%% Plotting 
+for i =1:size(speeds,1)
+    figure
+    plot (uref(i).*(heights/h_h).^alphaPLfit(i),heights)
+    hold on
+    plot (speeds(i,:),heights,'o')  
+    grid on, xlabel ('Wind speed'), ylabel('Height'), legend ({'fitted' 'data points'},'Location', 'Best')    
+    hold off
+    set(gca,'FontSize',14)
+end
+
+
+
+##### SOURCE END #####
+--></body></html>

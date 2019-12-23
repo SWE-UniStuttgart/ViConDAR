@@ -1,0 +1,316 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="CreateInpTurbsim.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Header</h1><pre class="codeinput"><span class="comment">% Create .inp file from lidar measurements</span>
+<span class="comment">%</span>
+<span class="comment">% V.Pettas/F.Costa</span>
+<span class="comment">% University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</span>
+
+<span class="keyword">function</span> CreateInpTurbsim(SaveName,TimeSeriesName,AnalysisTime,input,lidarMeas)
+
+<span class="comment">% Change the name of the time series in order to obtain the .wnd of the constrained WF:</span>
+<span class="comment">% read the template for time series:</span>
+
+TurbsimFile=fileread(input.TurbSimInpTemplate);
+
+<span class="comment">% Look for the line I want to change</span>
+expr={ <span class="string">'[^\n]*UserFile[^\n]*'</span>,<span class="string">'[^\n]*RandSeed1[^\n]*'</span>,<span class="string">'[^\n]*NumGrid_Z[^\n]*'</span>,<span class="string">'[^\n]*NumGrid_Y[^\n]*'</span>,<span class="string">'[^\n]*TimeStep[^\n]*'</span>,<span class="string">'[^\n]*AnalysisTime[^\n]*'</span>,<span class="keyword">...</span>
+    <span class="string">'[^\n]*unless[^\n]*'</span>,<span class="string">'[^\n]*HubHt[^\n]*'</span>,<span class="string">'[^\n]*GridHeight[^\n]*'</span>,<span class="string">'[^\n]*GridWidth[^\n]*'</span>,<span class="string">'[^\n]*IECstandard[^\n]*'</span>,<span class="string">'[^\n]*IECturbc[^\n]*'</span>,<span class="keyword">...</span>
+    <span class="string">'[^\n]*WindProfileType[^\n]*'</span>,<span class="string">'[^\n]*RefHt[^\n]*'</span>,<span class="string">'[^\n]*total[^\n]*'</span>,<span class="string">'[^\n]*PLExp[^\n]*'</span>,<span class="string">'[^\n]*SCMod1[^\n]*'</span>};
+
+<span class="keyword">for</span> ind_exp=1:length(expr)
+    matches{ind_exp}= (regexp((TurbsimFile),expr{ind_exp},<span class="string">'match'</span>,<span class="string">'once'</span>));
+    matches{ind_exp}=char(matches{ind_exp});
+    exp{ind_exp} = strsplit(matches{1,ind_exp});
+<span class="keyword">end</span>
+
+<span class="comment">%Change name of time series:</span>
+expres= <span class="string">'"(.*?)"'</span>;<span class="comment">% text between quotation marks</span>
+matchStr0 = regexp(matches{1},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTimeSeries=[<span class="string">'"'</span> TimeSeriesName <span class="string">'"'</span>]; <span class="comment">%Name of the constrained Time series</span>
+NewTimeSeries = strrep(NewTimeSeries,<span class="string">'\'</span>,<span class="string">'/'</span>);
+NewTurbSimFile=regexprep(TurbsimFile,matchStr0,NewTimeSeries);
+
+<span class="comment">%Change the random seed:</span>
+
+matchStr1 = regexp(matches{2},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr1,num2str(input.RandSeed ));
+
+
+<span class="comment">%Change the GridZ:</span>
+matchStr2 = regexp(matches{3},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr2,num2str(lidarMeas.TS.fullWF.nGridZ),<span class="string">'once'</span>);
+
+<span class="comment">%Change the NumGrid_Y:</span>
+matchStr3 = regexp(matches{4},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr3,num2str(lidarMeas.TS.fullWF.nGridY),<span class="string">'once'</span>);
+
+<span class="comment">%Change the TimeStep:</span>
+matchStr4 = regexp(matches{5},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr4,num2str(lidarMeas.Pattern.timestep_pat_vec  ),<span class="string">'once'</span>);
+
+<span class="comment">%Change the AnalysisTime:</span>
+matchStr5 = regexp(matches{6},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr5,num2str(AnalysisTime(end)),<span class="string">'once'</span>);
+
+<span class="comment">%Change the UsableTime:</span>
+matchStr6 = regexp(matches{7},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+<span class="keyword">if</span> isnumeric(input.UsableTime)
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr6,num2str(input.UsableTime),<span class="string">'once'</span>);
+<span class="keyword">else</span>
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr6,(input.UsableTime),<span class="string">'once'</span>);
+<span class="keyword">end</span>
+
+<span class="comment">%Change the HubHt:</span>
+matchStr7 = regexp(matches{8},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr7,num2str(input.Zh ),<span class="string">'once'</span>);
+
+<span class="comment">%Change the GridHeight:</span>
+
+matchStr8 = regexp(matches{9},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr8,num2str((lidarMeas.TS.fullWF.nGridZ-1)*lidarMeas.TS.fullWF.dz),<span class="string">'once'</span>);
+
+<span class="comment">%Cahnge the GridWidth:</span>
+
+matchStr9 = regexp(matches{10},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr9,num2str((lidarMeas.TS.fullWF.nGridY-1)*lidarMeas.TS.fullWF.dy),<span class="string">'once'</span>);
+
+<span class="comment">%Cahnge the IECstandard:</span>
+matchStr10 = regexp(matches{11},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr10,input.IECstandard,<span class="string">'once'</span>);
+
+<span class="comment">%Cahnge the IECturbc:</span>
+matchStr11 = regexp(matches{12},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+<span class="keyword">if</span> isnumeric(lidarMeas.statistics.U.lidar.TI_mean)
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr11,[<span class="string">'"'</span>,num2str(100*lidarMeas.statistics.U.lidar.TI_mean),<span class="string">'"'</span>],<span class="string">'once'</span>);
+<span class="keyword">else</span>
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr11,(lidarMeas.statistics.U.lidar.TI_mean),<span class="string">'once'</span>);
+<span class="keyword">end</span>
+
+<span class="comment">%Cahnge the RefHt:</span>
+matchStr12 = regexp(matches{13},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr12,input.WindProfileType,<span class="string">'once'</span>);
+
+<span class="comment">%Cahnge the RefHt:</span>
+matchStr13 = regexp(matches{14},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr13,num2str(input.Zh),<span class="string">'once'</span>);
+
+<span class="comment">%Cahnge the URef:</span>
+matchStr14 = regexp(matches{15},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr14,num2str(lidarMeas.statistics.U.lidar.Mean_TS_LiDAR),<span class="string">'once'</span>);
+
+<span class="comment">%Cahnge the PLExp:</span>
+matchStr15 = regexp(matches{16},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+<span class="keyword">if</span> isnumeric (lidarMeas.Shear.lidar.Mean)
+    <span class="keyword">if</span>  lidarMeas.Shear.lidar.Mean&lt;0
+        lidarMeas.Shear.lidar.Mean=0;
+    <span class="keyword">end</span>
+    lidarMeas.Shear.lidar.Mean=sprintf(<span class="string">'%.3f'</span>,lidarMeas.Shear.lidar.Mean);
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr15,[<span class="string">'"'</span>,num2str(lidarMeas.Shear.lidar.Mean),<span class="string">'"'</span>],<span class="string">'once'</span>);
+<span class="keyword">else</span>
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr15,(lidarMeas.Shear.lidar.Mean),<span class="string">'once'</span>);
+<span class="keyword">end</span>
+<span class="comment">% Change SCMOD1:</span>
+
+matchStr16 = regexp(matches{17},expres,<span class="string">'match'</span>,<span class="string">'once'</span>);
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr16,input.SCMod1,<span class="string">'once'</span>);
+
+<span class="comment">%Write the file</span>
+fid = fopen(SaveName,<span class="string">'w'</span>);
+fwrite(fid,NewTurbSimFile);
+fclose(fid);
+
+
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Header
+
+% Create .inp file from lidar measurements
+%
+% V.Pettas/F.Costa 
+% University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
+
+function CreateInpTurbsim(SaveName,TimeSeriesName,AnalysisTime,input,lidarMeas)
+
+% Change the name of the time series in order to obtain the .wnd of the constrained WF:
+% read the template for time series:
+
+TurbsimFile=fileread(input.TurbSimInpTemplate);
+
+% Look for the line I want to change
+expr={ '[^\n]*UserFile[^\n]*','[^\n]*RandSeed1[^\n]*','[^\n]*NumGrid_Z[^\n]*','[^\n]*NumGrid_Y[^\n]*','[^\n]*TimeStep[^\n]*','[^\n]*AnalysisTime[^\n]*',...
+    '[^\n]*unless[^\n]*','[^\n]*HubHt[^\n]*','[^\n]*GridHeight[^\n]*','[^\n]*GridWidth[^\n]*','[^\n]*IECstandard[^\n]*','[^\n]*IECturbc[^\n]*',...
+    '[^\n]*WindProfileType[^\n]*','[^\n]*RefHt[^\n]*','[^\n]*total[^\n]*','[^\n]*PLExp[^\n]*','[^\n]*SCMod1[^\n]*'};
+
+for ind_exp=1:length(expr)
+    matches{ind_exp}= (regexp((TurbsimFile),expr{ind_exp},'match','once'));
+    matches{ind_exp}=char(matches{ind_exp});
+    exp{ind_exp} = strsplit(matches{1,ind_exp});
+end
+
+%Change name of time series:
+expres= '"(.*?)"';% text between quotation marks
+matchStr0 = regexp(matches{1},expres,'match','once');
+NewTimeSeries=['"' TimeSeriesName '"']; %Name of the constrained Time series
+NewTimeSeries = strrep(NewTimeSeries,'\','/');
+NewTurbSimFile=regexprep(TurbsimFile,matchStr0,NewTimeSeries);
+
+%Change the random seed:
+
+matchStr1 = regexp(matches{2},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr1,num2str(input.RandSeed ));
+
+
+%Change the GridZ:
+matchStr2 = regexp(matches{3},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr2,num2str(lidarMeas.TS.fullWF.nGridZ),'once');
+
+%Change the NumGrid_Y:
+matchStr3 = regexp(matches{4},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr3,num2str(lidarMeas.TS.fullWF.nGridY),'once');
+
+%Change the TimeStep:
+matchStr4 = regexp(matches{5},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr4,num2str(lidarMeas.Pattern.timestep_pat_vec  ),'once');
+
+%Change the AnalysisTime:
+matchStr5 = regexp(matches{6},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr5,num2str(AnalysisTime(end)),'once');
+
+%Change the UsableTime:
+matchStr6 = regexp(matches{7},expres,'match','once');
+if isnumeric(input.UsableTime)
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr6,num2str(input.UsableTime),'once');
+else
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr6,(input.UsableTime),'once');
+end
+
+%Change the HubHt:
+matchStr7 = regexp(matches{8},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr7,num2str(input.Zh ),'once');
+
+%Change the GridHeight:
+
+matchStr8 = regexp(matches{9},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr8,num2str((lidarMeas.TS.fullWF.nGridZ-1)*lidarMeas.TS.fullWF.dz),'once');
+
+%Cahnge the GridWidth:
+
+matchStr9 = regexp(matches{10},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr9,num2str((lidarMeas.TS.fullWF.nGridY-1)*lidarMeas.TS.fullWF.dy),'once');
+
+%Cahnge the IECstandard:
+matchStr10 = regexp(matches{11},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr10,input.IECstandard,'once');
+
+%Cahnge the IECturbc:
+matchStr11 = regexp(matches{12},expres,'match','once');
+if isnumeric(lidarMeas.statistics.U.lidar.TI_mean)
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr11,['"',num2str(100*lidarMeas.statistics.U.lidar.TI_mean),'"'],'once');
+else
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr11,(lidarMeas.statistics.U.lidar.TI_mean),'once');
+end
+
+%Cahnge the RefHt:
+matchStr12 = regexp(matches{13},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr12,input.WindProfileType,'once');
+
+%Cahnge the RefHt:
+matchStr13 = regexp(matches{14},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr13,num2str(input.Zh),'once');
+
+%Cahnge the URef:
+matchStr14 = regexp(matches{15},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr14,num2str(lidarMeas.statistics.U.lidar.Mean_TS_LiDAR),'once');
+
+%Cahnge the PLExp:
+matchStr15 = regexp(matches{16},expres,'match','once');
+if isnumeric (lidarMeas.Shear.lidar.Mean)
+    if  lidarMeas.Shear.lidar.Mean<0
+        lidarMeas.Shear.lidar.Mean=0;
+    end
+    lidarMeas.Shear.lidar.Mean=sprintf('%.3f',lidarMeas.Shear.lidar.Mean);
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr15,['"',num2str(lidarMeas.Shear.lidar.Mean),'"'],'once');
+else
+    NewTurbSimFile=regexprep(NewTurbSimFile,matchStr15,(lidarMeas.Shear.lidar.Mean),'once');
+end
+% Change SCMOD1:
+
+matchStr16 = regexp(matches{17},expres,'match','once');
+NewTurbSimFile=regexprep(NewTurbSimFile,matchStr16,input.SCMod1,'once');
+
+%Write the file
+fid = fopen(SaveName,'w');
+fwrite(fid,NewTurbSimFile);
+fclose(fid);
+
+
+end
+##### SOURCE END #####
+--></body></html>

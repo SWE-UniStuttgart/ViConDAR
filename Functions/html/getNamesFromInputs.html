@@ -1,0 +1,406 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="getNamesFromInputs.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Header</h1><p>function creating the names and relevant variables for all the files requested based on the input file</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> perm_cell = getNamesFromInputs(input)
+
+nameBase = input.nameBase ;
+freeInp  = input.freeInp  ;
+fixedInp = input.fixedInp ;
+AllFixed = input.AllFixed ;
+HiddenIndex= find(ismember(AllFixed,fixedInp(:,1))==0);
+Hidden.Names = AllFixed(HiddenIndex);
+<span class="comment">%assign values to the fixed inputs cell vector</span>
+<span class="keyword">for</span> iPat=1:numel(input.PatternNames)
+    <span class="keyword">for</span> i = 1:length(fixedInp)
+        curNam = fixedInp{i};
+        <span class="keyword">if</span> strcmp(curNam,<span class="string">'Pat'</span>)
+            fixedInp{i,2} = [iPat];
+        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'Pat'</span>)) &amp;&amp; length(input.PatternNames) ==1
+            index= find(strcmp(Hidden.Names,<span class="string">'Pat'</span>));
+            Hidden.Val{index,iPat} = input.PatternNames; <span class="comment">%#ok&lt;*FNDSB&gt;</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> ~isempty(HiddenIndex) &amp;&amp; any(strcmp(Hidden.Names,<span class="string">'Pat'</span>))
+                error(<span class="string">'There is an error with the input ''PatternNames'' '</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> strcmp(curNam,<span class="string">'Tp'</span>)
+            fixedInp{i,2} = [input.timestep_pat_vec{iPat}];
+        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'Tp'</span>)) &amp;&amp; length(input.timestep_pat_vec{1}) ==1
+            index= find(strcmp(Hidden.Names,<span class="string">'Tp'</span>));
+            Hidden.Val{index,iPat} = input.timestep_pat_vec{iPat}; <span class="comment">%#ok&lt;*FNDSB&gt;</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> ~isempty(HiddenIndex)  &amp;&amp; any(strcmp(Hidden.Names,<span class="string">'Tp'</span>))
+                error(<span class="string">'There is an error with one of input ''timestep_pat_vec'' '</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> strcmp(curNam,<span class="string">'Tm'</span>)
+            fixedInp{i,2} = [input.timeStep_Measurements{iPat}];
+        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'Tm'</span>)) &amp;&amp; length(input.timeStep_Measurements{1}) ==1
+            index= find(strcmp(Hidden.Names,<span class="string">'Tm'</span>));
+            Hidden.Val{index,iPat} = input.timeStep_Measurements{iPat}; <span class="comment">%#ok&lt;*FNDSB&gt;</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> ~isempty(HiddenIndex) &amp;&amp; any(strcmp(Hidden.Names,<span class="string">'Tm'</span>))
+                error(<span class="string">'There is an error with the input ''timeStep_Measurements'' '</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> strcmp(curNam,<span class="string">'Pos'</span>)
+            fixedInp{i,2} = [input.Pos_LiDAR(1)]; <span class="comment">%#ok&lt;*NBRAK&gt;</span>
+        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'Pos'</span>)) &amp;&amp; length(input.Pos_LiDAR) ==2
+            index= find(strcmp(Hidden.Names,<span class="string">'Pos'</span>));
+            Hidden.Val{index,iPat} = input.Pos_LiDAR; <span class="comment">%#ok&lt;*FNDSB&gt;</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> ~isempty(HiddenIndex) &amp;&amp; any(strcmp(Hidden.Names,<span class="string">'Pos'</span>))
+                error(<span class="string">'There is an error with the input ''Pos_LiDAR'' '</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> strcmp(curNam,<span class="string">'Fd'</span>)
+            fixedInp{i,2} = [input.ref_plane_dist];
+        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'Fd'</span>)) &amp;&amp; length(input.ref_plane_dist) ==1
+            index= find(strcmp(Hidden.Names,<span class="string">'Fd'</span>));
+            Hidden.Val{index,iPat} = input.ref_plane_dist; <span class="comment">%#ok&lt;*FNDSB&gt;</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> ~isempty(HiddenIndex)  &amp;&amp; any(strcmp(Hidden.Names,<span class="string">'Fd'</span>))
+                error(<span class="string">'There is an error with the input ''ref_plane_dist'' '</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> strcmp(curNam,<span class="string">'DAv'</span>)
+            fixedInp{i,2} = [input.distance_av_space];
+        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'DAv'</span>)) &amp;&amp; length(input.distance_av_space) ==1
+            index= find(strcmp(Hidden.Names,<span class="string">'DAv'</span>));
+            Hidden.Val{index,iPat} = input.distance_av_space; <span class="comment">%#ok&lt;*FNDSB&gt;</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> ~isempty(HiddenIndex)  &amp;&amp; any(strcmp(Hidden.Names,<span class="string">'DAv'</span>))
+                error(<span class="string">'There is an error with the input ''distance_av_space'' '</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> strcmp(curNam,<span class="string">'SlAv'</span>)
+            fixedInp{i,2} = [input.points_av_slice];
+        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'SlAv'</span>)) &amp;&amp; length(input.points_av_slice) ==1
+            index= find(strcmp(Hidden.Names,<span class="string">'SlAv'</span>));
+            Hidden.Val{index,iPat} = input.points_av_slice; <span class="comment">%#ok&lt;*FNDSB&gt;</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> ~isempty(HiddenIndex)  &amp;&amp; any(strcmp(Hidden.Names,<span class="string">'SlAv'</span>))
+                error(<span class="string">'There is an error with the input ''points_av_slice'' '</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> strcmp(curNam,<span class="string">'Ns'</span>)
+            fixedInp{i,2} = [input.noise_U];
+        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'Ns'</span>)) &amp;&amp; length(input.noise_U) ==1
+            index= find(strcmp(Hidden.Names,<span class="string">'Ns'</span>));
+            Hidden.Val{index,iPat} = input.noise_U; <span class="comment">%#ok&lt;*FNDSB&gt;</span>
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> ~isempty(HiddenIndex) &amp;&amp; any(strcmp(Hidden.Names,<span class="string">'Ns'</span>))
+                error(<span class="string">'There is an error with the input ''noise_U'' '</span>)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="comment">% check if something is commented out from fixed inputs and add the value</span>
+    UserFixed{iPat} =  fixedInp; <span class="comment">%#ok&lt;*AGROW&gt;</span>
+<span class="keyword">end</span>
+
+<span class="comment">%Create permutation names for all cases by adding the inputs together</span>
+<span class="comment">%Create names for lidar and processing</span>
+<span class="keyword">for</span> iPat=1:numel(input.PatternNames)
+    totalMat= [freeInp; UserFixed{iPat}];
+    [ArrayVar,VariationPerVariable] = GetVariationArray(totalMat);
+    TotalArrayVar{iPat} = ArrayVar;
+    <span class="keyword">for</span> iVary = 1:length(ArrayVar)
+        <span class="keyword">if</span> ~isempty(HiddenIndex)
+            TotalArrayVarVal{iVary,iPat} = [num2cell(ArrayVar{iVary}) Hidden.Val(:,iPat)'];
+        <span class="keyword">else</span>
+            TotalArrayVarVal{iVary,iPat} = [num2cell(ArrayVar{iVary})];
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%retrieve names of original windfields</span>
+totalMatWF= [freeInp];
+[ArrayVarWF,~] = GetVariationArray(totalMatWF);
+
+<span class="comment">%Create the total array for processing:</span>
+FinalArrayVar = {};
+<span class="keyword">for</span> i =1:length( TotalArrayVar)
+    FinalArrayVar = [FinalArrayVar ; TotalArrayVar{i}];
+<span class="keyword">end</span>
+
+<span class="comment">% Create the unoque names concatanating the vairables and assign the values</span>
+<span class="keyword">for</span> iAr =1:length(FinalArrayVar)
+    CurArray = FinalArrayVar{iAr};
+    CurNam =nameBase;
+    <span class="keyword">for</span>  iVar=1:length(CurArray)  <span class="comment">% in pattern we want tochange the numerical value to string</span>
+        <span class="keyword">if</span> strcmp(totalMat{iVar},<span class="string">'Pat'</span>)
+            CurNam = [CurNam <span class="string">'_'</span>  input.PatternNames{CurArray(iVar)} ];
+        <span class="keyword">else</span>
+            <span class="keyword">if</span> mod(CurArray(iVar),1)==0  <span class="comment">% check if the number is integer and change the notation accordingly</span>
+                CurNam = [CurNam <span class="string">'_'</span> totalMat{iVar} num2str(CurArray(iVar),<span class="string">'%02.f'</span>) ];
+            <span class="keyword">else</span>
+                CurNam = [CurNam <span class="string">'_'</span> totalMat{iVar} num2str(CurArray(iVar),<span class="string">'%02.1f'</span>) ];
+            <span class="keyword">end</span>
+            CurNam = strrep(CurNam,<span class="string">'.'</span>,<span class="string">'d'</span>);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    perm_cell.OutNames{iAr,1} =CurNam;
+<span class="keyword">end</span>
+TotalArrayVarVal = reshape(TotalArrayVarVal,numel(TotalArrayVarVal),1);
+<span class="keyword">for</span> i = 1:size(FinalArrayVar,1)
+<span class="comment">%     CurArrayCell = num2cell(CurArray);</span>
+    perm_cell.values(i,:) =TotalArrayVarVal(i,:);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> ~isempty(HiddenIndex)
+    perm_cell.variables{:,1} =[totalMat(:,1); Hidden.Names];
+<span class="keyword">else</span>
+    perm_cell.variables{:,1} =totalMat(:,1);
+<span class="keyword">end</span>
+
+<span class="comment">%Create the total array for creating original WF names:</span>
+<span class="keyword">for</span> iAroWF =1:length(ArrayVarWF)
+    CurArrayOWF = ArrayVarWF{iAroWF};
+    CurNamWF =nameBase;
+    <span class="keyword">for</span>  iVar=1:length(CurArrayOWF)  <span class="comment">% in pattern we want tochange the numerical value to string</span>
+        CurNamWF = [CurNamWF <span class="string">'_'</span> totalMatWF{iVar} num2str(CurArrayOWF(iVar),<span class="string">'%02.f'</span>) ];
+        CurNamWF = strrep(CurNamWF,<span class="string">'.'</span>,<span class="string">'d'</span>);
+    <span class="keyword">end</span>
+    perm_cell.namesOWF{iAroWF,1} =CurNamWF;
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Header
+%
+% function creating the names and relevant variables for all the files requested
+% based on the input file
+%
+% V.Pettas/F.Costa 
+% University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
+
+function perm_cell = getNamesFromInputs(input)
+
+nameBase = input.nameBase ; 
+freeInp  = input.freeInp  ;
+fixedInp = input.fixedInp ;
+AllFixed = input.AllFixed ;
+HiddenIndex= find(ismember(AllFixed,fixedInp(:,1))==0);
+Hidden.Names = AllFixed(HiddenIndex);
+%assign values to the fixed inputs cell vector
+for iPat=1:numel(input.PatternNames)
+    for i = 1:length(fixedInp)
+        curNam = fixedInp{i};
+        if strcmp(curNam,'Pat')
+            fixedInp{i,2} = [iPat];
+        elseif any(strcmp(Hidden.Names,'Pat')) && length(input.PatternNames) ==1
+            index= find(strcmp(Hidden.Names,'Pat'));
+            Hidden.Val{index,iPat} = input.PatternNames; %#ok<*FNDSB>
+        else
+            if ~isempty(HiddenIndex) && any(strcmp(Hidden.Names,'Pat'))
+                error('There is an error with the input ''PatternNames'' ')
+            end
+        end
+        if strcmp(curNam,'Tp')
+            fixedInp{i,2} = [input.timestep_pat_vec{iPat}];
+        elseif any(strcmp(Hidden.Names,'Tp')) && length(input.timestep_pat_vec{1}) ==1
+            index= find(strcmp(Hidden.Names,'Tp'));
+            Hidden.Val{index,iPat} = input.timestep_pat_vec{iPat}; %#ok<*FNDSB>
+        else
+            if ~isempty(HiddenIndex)  && any(strcmp(Hidden.Names,'Tp'))
+                error('There is an error with one of input ''timestep_pat_vec'' ')
+            end
+        end
+        if strcmp(curNam,'Tm')
+            fixedInp{i,2} = [input.timeStep_Measurements{iPat}];
+        elseif any(strcmp(Hidden.Names,'Tm')) && length(input.timeStep_Measurements{1}) ==1
+            index= find(strcmp(Hidden.Names,'Tm'));
+            Hidden.Val{index,iPat} = input.timeStep_Measurements{iPat}; %#ok<*FNDSB>
+        else
+            if ~isempty(HiddenIndex) && any(strcmp(Hidden.Names,'Tm'))
+                error('There is an error with the input ''timeStep_Measurements'' ')
+            end
+        end
+        if strcmp(curNam,'Pos')
+            fixedInp{i,2} = [input.Pos_LiDAR(1)]; %#ok<*NBRAK>
+        elseif any(strcmp(Hidden.Names,'Pos')) && length(input.Pos_LiDAR) ==2
+            index= find(strcmp(Hidden.Names,'Pos'));
+            Hidden.Val{index,iPat} = input.Pos_LiDAR; %#ok<*FNDSB>
+        else
+            if ~isempty(HiddenIndex) && any(strcmp(Hidden.Names,'Pos'))
+                error('There is an error with the input ''Pos_LiDAR'' ')
+            end
+        end
+        if strcmp(curNam,'Fd')
+            fixedInp{i,2} = [input.ref_plane_dist];
+        elseif any(strcmp(Hidden.Names,'Fd')) && length(input.ref_plane_dist) ==1
+            index= find(strcmp(Hidden.Names,'Fd'));
+            Hidden.Val{index,iPat} = input.ref_plane_dist; %#ok<*FNDSB>
+        else
+            if ~isempty(HiddenIndex)  && any(strcmp(Hidden.Names,'Fd'))
+                error('There is an error with the input ''ref_plane_dist'' ')
+            end
+        end
+        if strcmp(curNam,'DAv')
+            fixedInp{i,2} = [input.distance_av_space];
+        elseif any(strcmp(Hidden.Names,'DAv')) && length(input.distance_av_space) ==1
+            index= find(strcmp(Hidden.Names,'DAv'));
+            Hidden.Val{index,iPat} = input.distance_av_space; %#ok<*FNDSB>
+        else
+            if ~isempty(HiddenIndex)  && any(strcmp(Hidden.Names,'DAv'))
+                error('There is an error with the input ''distance_av_space'' ')
+            end
+        end
+        if strcmp(curNam,'SlAv')
+            fixedInp{i,2} = [input.points_av_slice];
+        elseif any(strcmp(Hidden.Names,'SlAv')) && length(input.points_av_slice) ==1
+            index= find(strcmp(Hidden.Names,'SlAv'));
+            Hidden.Val{index,iPat} = input.points_av_slice; %#ok<*FNDSB>
+        else
+            if ~isempty(HiddenIndex)  && any(strcmp(Hidden.Names,'SlAv'))
+                error('There is an error with the input ''points_av_slice'' ')
+            end
+        end
+        if strcmp(curNam,'Ns')
+            fixedInp{i,2} = [input.noise_U];
+        elseif any(strcmp(Hidden.Names,'Ns')) && length(input.noise_U) ==1
+            index= find(strcmp(Hidden.Names,'Ns'));
+            Hidden.Val{index,iPat} = input.noise_U; %#ok<*FNDSB>
+        else
+            if ~isempty(HiddenIndex) && any(strcmp(Hidden.Names,'Ns'))
+                error('There is an error with the input ''noise_U'' ')
+            end
+        end
+    end
+    % check if something is commented out from fixed inputs and add the value
+    UserFixed{iPat} =  fixedInp; %#ok<*AGROW>
+end
+
+%Create permutation names for all cases by adding the inputs together
+%Create names for lidar and processing
+for iPat=1:numel(input.PatternNames)
+    totalMat= [freeInp; UserFixed{iPat}];
+    [ArrayVar,VariationPerVariable] = GetVariationArray(totalMat);
+    TotalArrayVar{iPat} = ArrayVar;
+    for iVary = 1:length(ArrayVar)
+        if ~isempty(HiddenIndex)
+            TotalArrayVarVal{iVary,iPat} = [num2cell(ArrayVar{iVary}) Hidden.Val(:,iPat)'];
+        else
+            TotalArrayVarVal{iVary,iPat} = [num2cell(ArrayVar{iVary})];
+        end
+    end
+end
+
+%retrieve names of original windfields
+totalMatWF= [freeInp];
+[ArrayVarWF,~] = GetVariationArray(totalMatWF);
+
+%Create the total array for processing:
+FinalArrayVar = {};
+for i =1:length( TotalArrayVar)
+    FinalArrayVar = [FinalArrayVar ; TotalArrayVar{i}];  
+end
+
+% Create the unoque names concatanating the vairables and assign the values
+for iAr =1:length(FinalArrayVar)
+    CurArray = FinalArrayVar{iAr};
+    CurNam =nameBase;
+    for  iVar=1:length(CurArray)  % in pattern we want tochange the numerical value to string
+        if strcmp(totalMat{iVar},'Pat')
+            CurNam = [CurNam '_'  input.PatternNames{CurArray(iVar)} ];
+        else
+            if mod(CurArray(iVar),1)==0  % check if the number is integer and change the notation accordingly
+                CurNam = [CurNam '_' totalMat{iVar} num2str(CurArray(iVar),'%02.f') ];                
+            else
+                CurNam = [CurNam '_' totalMat{iVar} num2str(CurArray(iVar),'%02.1f') ];
+            end
+            CurNam = strrep(CurNam,'.','d');
+        end
+    end
+    perm_cell.OutNames{iAr,1} =CurNam; 
+end
+TotalArrayVarVal = reshape(TotalArrayVarVal,numel(TotalArrayVarVal),1);
+for i = 1:size(FinalArrayVar,1)
+%     CurArrayCell = num2cell(CurArray);
+    perm_cell.values(i,:) =TotalArrayVarVal(i,:); 
+end
+
+if ~isempty(HiddenIndex)
+    perm_cell.variables{:,1} =[totalMat(:,1); Hidden.Names];
+else
+    perm_cell.variables{:,1} =totalMat(:,1);    
+end
+
+%Create the total array for creating original WF names:
+for iAroWF =1:length(ArrayVarWF)
+    CurArrayOWF = ArrayVarWF{iAroWF};
+    CurNamWF =nameBase;
+    for  iVar=1:length(CurArrayOWF)  % in pattern we want tochange the numerical value to string
+        CurNamWF = [CurNamWF '_' totalMatWF{iVar} num2str(CurArrayOWF(iVar),'%02.f') ];
+        CurNamWF = strrep(CurNamWF,'.','d');
+    end
+    perm_cell.namesOWF{iAroWF,1} =CurNamWF;
+end
+
+
+##### SOURCE END #####
+--></body></html>

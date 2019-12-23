@@ -1,0 +1,594 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Testing_ConstVSOrig_SeparatedCases</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="Testing_ConstVSOrig_SeparatedCases.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#3">Save text with errors and figures</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> Testing_ConstVSOrig_SeparatedCases (Distance_Vector,MeanVstr,Pattern,index_shear,index_TI,timestep_pat,TSnam2,queryPointY,queryPointZ,Analysistime,OrWF,FolderName,flag_savecontours,flag_save_errors,flag_TS,flag_plot_contours,flag_read_TurbSim,flag_read_PyConTurb)
+</pre><pre class="codeinput"><span class="comment">% if flag_run_TurbSim==1</span>
+<span class="comment">%     %     TsWF=load(['X:\Documents\FranciscoCosta\NewGitHub\LidarSimulator\ConstrainedWindfields\TurbSim\Pattern_5P_Squared\TimeStp_pat1\testWindfield_HorzVariation_TurbSim_ConstrainedWF\testWindfield_HorzVariation_TurbSim_ConstrainedWF']);</span>
+<span class="comment">%     TsWF=load(['..\ConstrainedWindfields\TurbSim\Pattern_' Pattern '\TimeStp_pat' TSnam2 '\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_TurbSim_ConstrainedWF\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_TurbSim_ConstrainedWF']);</span>
+<span class="comment">% end</span>
+<span class="comment">% if flag_run_PyConTurb==1</span>
+<span class="comment">%     PyWF=load(['..\ConstrainedWindfields\PyConTurb\Pattern_' Pattern '\TimeStp_pat' TSnam2 '\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_PyConTurb_ConstrainedWF\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_PyConTurb']);</span>
+<span class="comment">% end</span>
+
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%TEST:%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+<span class="keyword">if</span> flag_read_TurbSim==1
+    cnt=0;
+    vec_rep =0:timestep_pat:(Analysistime-1); <span class="comment">% Check this (-1)</span>
+
+    TsWF=load([<span class="string">'C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\Constrained_TurbSim_Test\DTU10MW_Shear_'</span> index_shear <span class="string">'_SD1_'</span> MeanVstr <span class="string">'_TI'</span> index_TI <span class="string">'_'</span> Pattern <span class="string">'_TurbSim_ConstrainedWF'</span>]);
+    <span class="keyword">for</span> itime =vec_rep
+        queryTime=itime;
+        cnt =cnt+1;
+
+        QuerySlice_OrWF = find(abs(OrWF.windfield.grid.t-queryTime)&lt;.001);
+        QuerySlice_TsWF = find(abs(TsWF.windfield.grid.t-queryTime)&lt;.001);
+        OrSlice         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF,:)),90);
+        TsConsSlice    = imrotate(squeeze(TsWF.windfield.u(:,QuerySlice_TsWF,:)),90);
+        errori_Ts(cnt) = mean(mean(abs((OrSlice-TsConsSlice)./OrSlice))); <span class="comment">%#ok&lt;*AGROW&gt;</span>
+    <span class="keyword">end</span>
+    bestTS = find(errori_Ts==min(errori_Ts));
+    worstTS = find(errori_Ts==max(errori_Ts));
+    <span class="keyword">if</span> flag_TS==1
+        count_error_distance=1;
+        <span class="keyword">for</span> i_plot_TS=1:length(queryPointY)
+
+            count_error_distance=count_error_distance+1;
+            figure(<span class="string">'Name'</span>,[<span class="string">'Timeseries_ORVsTurbSIM_Shear'</span> index_shear <span class="string">'_TI'</span> index_TI <span class="string">'_POINT ['</span> num2str(queryPointY(i_plot_TS)) <span class="string">','</span> num2str(queryPointZ(i_plot_TS)) <span class="string">']'</span>],<span class="string">'visible'</span>,<span class="string">'on'</span>),
+            plot(OrWF.windfield.grid.t,(OrWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS))),<span class="keyword">...</span>
+                TsWF.windfield.grid.t,(TsWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS))),<span class="string">'Linewidth'</span>,1.3)
+            legend(<span class="string">'Original'</span>,<span class="string">'TurbSim'</span>),xlabel(<span class="string">'Time [s]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'Velocity [m/s]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'Point ['</span>  num2str(queryPointY(i_plot_TS)) <span class="string">','</span> num2str(queryPointZ(i_plot_TS)) <span class="string">']. TimeStep '</span> TSnam2 <span class="string">'s - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - Vmean'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span>],<span class="string">'Fontsize'</span>,15);
+            length_OrWF_TS=find(OrWF.windfield.grid.t==TsWF.windfield.grid.nt);
+<span class="comment">%             res_factor_TS=(length_OrWF_TS/TsWF.windfield.grid.nt);</span>
+<span class="comment">%</span>
+<span class="comment">%             Resampled_TsWF(i_plot_TS,:)=interpft(TsWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS)),TsWF.windfield.grid.nt*res_factor_TS); %#ok&lt;*AGROW&gt;</span>
+<span class="comment">%             Error_TS_turbsim(i_plot_TS,:)   = 100*(abs((OrWF.windfield.u(queryPointY(i_plot_TS),1:length(Resampled_TsWF),queryPointZ(i_plot_TS))-Resampled_TsWF(i_plot_TS,:))./(OrWF.windfield.u(queryPointY(i_plot_TS),1:length(Resampled_TsWF),queryPointZ(i_plot_TS)))));</span>
+<span class="comment">%             MeanError_Turbsim(i_plot_TS)   = mean((Error_TS_turbsim(i_plot_TS,:)));</span>
+<span class="comment">%             Distance_Vector1=[Distance_Vector(1,:);Distance_Vector(count_error_distance,:)];</span>
+<span class="comment">%             d(i_plot_TS) = pdist(Distance_Vector1,'euclidean');</span>
+        <span class="keyword">end</span>
+<span class="comment">%         fitTS=fit(d',MeanError_Turbsim','poly2');</span>
+<span class="comment">%         figure('Name', 'Error_distance')</span>
+<span class="comment">%         plotTS=plot(fitTS,d,MeanError_Turbsim,'*b');</span>
+<span class="comment">%         title('Error[%] TurbSim Time Series Vs Distance','Fontsize',20), xlabel('Distance [m]','Fontsize',24),ylabel('Error [%]','Fontsize',22);</span>
+
+<span class="comment">%</span>
+<span class="comment">%         set(plotTS,'color','b');</span>
+<span class="comment">%         legend('Data from TurbSim', 'fitted curve TurbSim')</span>
+    <span class="keyword">end</span>
+
+
+    <span class="keyword">if</span> flag_plot_contours==1
+        QuerySlice_OrWF_TS = find(abs(OrWF.windfield.grid.t-vec_rep(bestTS))&lt;.001);
+        QuerySlice_TsWF    = find(abs(TsWF.windfield.grid.t-vec_rep(bestTS))&lt;.001);
+        OrSlice_TS_best    = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF_TS,:)),90);
+        TsConsSlice_best   = imrotate(squeeze(TsWF.windfield.u(:,QuerySlice_TsWF,:)),90);
+
+<span class="comment">% specific time step slice</span>
+<span class="comment">%          slicess=50;</span>
+<span class="comment">%         QuerySlice_OrWF_TS = find(abs(OrWF.windfield.grid.t-vec_rep(slicess))&lt;.001);</span>
+<span class="comment">%         QuerySlice_TsWF    = find(abs(TsWF.windfield.grid.t-vec_rep(slicess))&lt;.001);</span>
+<span class="comment">%         OrSlice_TS_best         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF_TS,:)),90);</span>
+<span class="comment">%         TsConsSlice_best        = imrotate(squeeze(TsWF.windfield.u(:,QuerySlice_TsWF,:)),90);</span>
+
+        <span class="comment">%%%%%  This is made because the negative values       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">%         for inTSi=1:size(OrSlice_TS_best,1)</span>
+<span class="comment">%             for inTSj=1:size(OrSlice_TS_best,2)</span>
+                ErrorMatrixTS_best=abs(OrSlice_TS_best-TsConsSlice_best);
+<span class="comment">%             end</span>
+<span class="comment">%         end</span>
+        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+        gridY=TsWF.windfield.grid.y;
+        gridZ=TsWF.windfield.grid.z;
+
+        <span class="comment">% TurbSim best</span>
+        figure(<span class="string">'Name'</span>,<span class="string">'Original_TS_BEST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,flip(OrSlice_TS_best),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'Original Contour Best. TS t= '</span> num2str(TsWF.windfield.grid.t(QuerySlice_TsWF)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - V_m'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span> <span class="string">' Units:[m/s]'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        set(gca,<span class="string">'BoxStyle'</span>,<span class="string">'full'</span>,<span class="string">'CLim'</span>,[6.5 18],<span class="string">'Layer'</span>,<span class="string">'top'</span>);
+        colorbar(<span class="string">'peer'</span>,gca);
+        figure(<span class="string">'Name'</span>,<span class="string">'TurbSim_BEST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,flip(TsConsSlice_best),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'TurbSim Contour Best. t= '</span> num2str(TsWF.windfield.grid.t(QuerySlice_TsWF)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - V_m'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span> <span class="string">' Units: [m/s]'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        set(gca,<span class="string">'BoxStyle'</span>,<span class="string">'full'</span>,<span class="string">'CLim'</span>,[6.5 18],<span class="string">'Layer'</span>,<span class="string">'top'</span>);
+        colorbar(<span class="string">'peer'</span>,gca);
+        figure(<span class="string">'Name'</span>,<span class="string">'Error_TurbSim_BEST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,100*abs(flip((ErrorMatrixTS_best)./OrSlice_TS_best)),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'TurbSim Contour Error Best. t= '</span> num2str(TsWF.windfield.grid.t(QuerySlice_TsWF)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - V_m'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        colorbar(<span class="string">'peer'</span>,gca);
+
+        QuerySlice_OrWF_worst_TS = find(abs(OrWF.windfield.grid.t-vec_rep(worstTS))&lt;.001);
+        QuerySlice_TsWF_worst = find(abs(TsWF.windfield.grid.t-vec_rep(worstTS))&lt;.001);
+
+        OrSlice_TS_worst         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF_worst_TS,:)),-90);
+
+        TsConsSlice_worst     = imrotate(squeeze(TsWF.windfield.u(:,QuerySlice_TsWF_worst,:)),90);
+
+        ErrorMatrixTS_worst=abs(OrSlice_TS_worst-TsConsSlice_worst);
+        <span class="comment">% Turbsim worst</span>
+        figure(<span class="string">'Name'</span>,<span class="string">'Original_TurbSim_WORST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,(OrSlice_TS_worst),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'Original Contour Worst Ts. t= '</span> num2str(TsWF.windfield.grid.t(QuerySlice_TsWF_worst)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - Vmean'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span> <span class="string">' Units:[m/s]'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        set(gca,<span class="string">'BoxStyle'</span>,<span class="string">'full'</span>,<span class="string">'CLim'</span>,[6.5 18],<span class="string">'Layer'</span>,<span class="string">'top'</span>);
+        colorbar(<span class="string">'peer'</span>,gca);
+        figure(<span class="string">'Name'</span>,<span class="string">'TurbSim_WORST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,flip(TsConsSlice_worst),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'Turbsim Contour Worst. t= '</span> num2str(TsWF.windfield.grid.t(QuerySlice_TsWF_worst)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - Vmean'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span> <span class="string">' Units:[m/s]'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        set(gca,<span class="string">'BoxStyle'</span>,<span class="string">'full'</span>,<span class="string">'CLim'</span>,[6.5 18],<span class="string">'Layer'</span>,<span class="string">'top'</span>);
+        colorbar(<span class="string">'peer'</span>,gca);
+        figure(<span class="string">'Name'</span>,<span class="string">'Error_TurbSim_WORST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,100*abs(flip((ErrorMatrixTS_worst)./OrSlice_TS_worst)),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'TurbSim Contour Error Worst. t= '</span> num2str(TsWF.windfield.grid.t(QuerySlice_TsWF_worst)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - Vmean'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        colorbar(<span class="string">'peer'</span>,gca);
+
+        <span class="comment">%     figure('Name','Error','visible','on'),plot(0:timestep_pat:Analysistime,errori_Ts.*100,0:timestep_pat:Analysistime,errori_Py.*100),grid on,legend({'TS' 'PY'}),title('Error [%]'),xlabel('Time [s]'),ylabel('%')</span>
+        <span class="comment">%     figure('Name','Error','visible','on'),plot(1:timestep_pat:Analysistime,errori_Ts.*100),grid on,legend({'TS' 'PY'}),title('Error [%]'),xlabel('Time [s]'),ylabel('%')</span>
+
+    <span class="keyword">end</span>
+      toterrorTs=mean(errori_Ts)*100;
+<span class="keyword">end</span>
+<span class="keyword">if</span> flag_read_PyConTurb==1
+    cnt=0;
+    vec_rep =0:timestep_pat:(Analysistime-1); <span class="comment">% Check this (-1)</span>
+
+    <span class="comment">%Ancient: Turb_class=none</span>
+<span class="comment">%     PyWF=load(['C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\Constrained_PyConTurb_Test\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_' Pattern '_PyConTurb']);</span>
+    PyWF=load([<span class="string">'C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\ancient\Constrained_PyConTurb_TestA\DTU10MW_Shear_'</span> index_shear <span class="string">'_SD1_'</span> MeanVstr <span class="string">'_TI'</span> index_TI <span class="string">'_PyConTurb'</span>]);
+    <span class="keyword">for</span> itime =vec_rep
+        queryTime=itime;
+        cnt =cnt+1;
+        <span class="comment">% OrWF=load(['..\OriginalWindFields\V08_41_WF\Shear_' Shear '_SD1\DTU10MW_Shear_' Shear '_SD1_08_TI' TI]);</span>
+        <span class="comment">% PyWF=load(['..\ConstrainedWindfields\PyConTurb\Pattern_5P_Squared\TimeStp_pat' TimeStep '\DTU10MW_Shear_' Shear '_SD1_08_TI' TI '_PyConTurb_ConstrainedWF\DTU10MW_Shear_' Shear '_SD1_08_TI' TI '_PyConTurb']);</span>
+        <span class="comment">% TsWF=load(['..\ConstrainedWindfields\TurbSim\Pattern_5P_Squared\TimeStp_pat' TimeStep '\DTU10MW_Shear_' Shear '_SD1_08_TI' TI '_TurbSim_ConstrainedWF\DTU10MW_Shear_' Shear '_SD1_08_TI' TI '_TurbSim_ConstrainedWF']);</span>
+        <span class="comment">% figure,plot(OrWF.windfield.grid.t,squeeze(OrWF.windfield.u(queryPoint(1),:,queryPoint(2))),...</span>
+        <span class="comment">% PyWF.windfield.grid.t,squeeze(PyWF.windfield.u(queryPoint(1),:,queryPoint(2))),...</span>
+        <span class="comment">% TsWF.windfield.grid.t,squeeze(TsWF.windfield.u(queryPoint(1),:,queryPoint(2)))),legend('Original','Pyconturb','TurbSim'),title(['Point ['  num2str(queryPoint(1)) ',' num2str(queryPoint(2)) ']. TimeStep ' TimeStep 's'])</span>
+
+        QuerySlice_OrWF = find(abs(OrWF.windfield.grid.t-queryTime)&lt;.001);
+        QuerySlice_PyWF = find(abs(PyWF.windfield.grid.t-queryTime)&lt;.001);
+        OrSlice         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF,:)),90);
+        PyConsSlice     = (squeeze(PyWF.windfield.u(:,QuerySlice_PyWF,:))); <span class="comment">%#ok&lt;*FNDSB&gt;</span>
+
+        <span class="comment">% title(['Point [' num2str(queryPoint(1)) ',' num2str(queryPoint(2)) '] - TimeStep = 1.5s']),xlabel('time [s]','Fontsize',20),ylabel('wind velocity [m/s]','Fontsize',20)</span>
+        <span class="comment">% figure, contour(OrSlice,'Fill','on'),title('Original Contour')</span>
+        <span class="comment">% figure, contour(PyConsSlice,'Fill','on'),title('PyConTurb Contour')</span>
+        <span class="comment">% figure, contour(TsConsSlice,'Fill','on'),title('Turbsim Contour')</span>
+        errori_Py(cnt) = mean(mean(abs((OrSlice-PyConsSlice)./OrSlice)))
+
+    <span class="keyword">end</span>
+    bestPy = find(errori_Py==min(errori_Py));
+    worstPy = find(errori_Py==max(errori_Py));
+    <span class="keyword">if</span> flag_TS==1
+        count_error_distance=1;
+        <span class="keyword">for</span> i_plot_TS=1:length(queryPointY)
+
+            count_error_distance=count_error_distance+1;
+
+            figure(<span class="string">'Name'</span>,[<span class="string">'Timeseries_ORVsPyConTurb_Shear'</span> index_shear <span class="string">'_TI'</span> index_TI <span class="string">'_POINT ['</span> num2str(queryPointY(i_plot_TS)) <span class="string">','</span> num2str(queryPointZ(i_plot_TS)) <span class="string">']'</span>],<span class="string">'visible'</span>,<span class="string">'on'</span>),
+            plot(OrWF.windfield.grid.t,squeeze(OrWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS))),<span class="keyword">...</span>
+                PyWF.windfield.grid.t,squeeze(PyWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS))),<span class="string">'Linewidth'</span>,1.3),
+            legend(<span class="string">'Original'</span>,<span class="string">'PyConTurb'</span>),xlabel(<span class="string">'Time [s]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'Velocity [m/s]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'Point ['</span>  num2str(queryPointY(i_plot_TS)) <span class="string">','</span> num2str(queryPointZ(i_plot_TS)) <span class="string">']. TimeStep '</span> TSnam2 <span class="string">'s - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - Vmean'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span>],<span class="string">'Fontsize'</span>,15);
+
+<span class="comment">%             res_factor_PY=(OrWF.windfield.grid.nt/PyWF.windfield.grid.nt);</span>
+<span class="comment">%             Resampled_PyWF(i_plot_TS,:)=interpft(PyWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS)),PyWF.windfield.grid.nt*res_factor_PY);</span>
+<span class="comment">%             Error_TS_pyconturb(i_plot_TS,:) = 100*(abs((OrWF.windfield.u(queryPointY(i_plot_TS),1:length(Resampled_PyWF),queryPointZ(i_plot_TS))-Resampled_PyWF(i_plot_TS,:))./(OrWF.windfield.u(queryPointY(i_plot_TS),1:length(Resampled_PyWF),queryPointZ(i_plot_TS)))));</span>
+<span class="comment">%             MeanError_Pyconturb(i_plot_TS) = mean((Error_TS_pyconturb(i_plot_TS,:)));</span>
+<span class="comment">%             Distance_Vector1=[Distance_Vector(1,:);Distance_Vector(count_error_distance,:)];</span>
+<span class="comment">%             d(i_plot_TS) = pdist(Distance_Vector1,'euclidean');</span>
+        <span class="keyword">end</span>
+<span class="comment">%         fitPY = fit(d',MeanError_Pyconturb','poly2');</span>
+<span class="comment">%         figure('Name', 'Error_distance')</span>
+<span class="comment">%         plotPY=plot(fitPY,d,MeanError_Pyconturb,'*r');</span>
+<span class="comment">%         title('Error[%] PyConTurb Time Series Vs Distance','Fontsize',20), xlabel('Distance [m]','Fontsize',24),ylabel('Error [%]','Fontsize',22);</span>
+<span class="comment">%</span>
+<span class="comment">%         set(plotPY,'color','r');</span>
+<span class="comment">%</span>
+<span class="comment">%         legend('Data from PyConTurb' ,'fitted curve PyConTurb')</span>
+    <span class="keyword">end</span>
+
+
+    <span class="keyword">if</span> flag_plot_contours==1
+        QuerySlice_OrWF_PY = find(abs(OrWF.windfield.grid.t-vec_rep(bestPy))&lt;.001);
+        QuerySlice_PyWF = find(PyWF.windfield.grid.t==vec_rep(bestPy));
+
+        OrSlice_PY         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF_PY,:)),-90);
+        PyConsSlice     = (squeeze(PyWF.windfield.u(:,QuerySlice_PyWF,:)));
+        <span class="comment">%%%%%  This is made because the negative values       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+        <span class="keyword">for</span> inPYi=1:size(OrSlice,1)
+            <span class="keyword">for</span> inPYj=1:size(OrSlice,2)
+                ErrorMatrixPY(inPYi,inPYj)=dist(OrSlice(inPYi,inPYj),PyConsSlice(inPYi,inPYj));
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+        gridY=PyWF.windfield.grid.y;
+        gridZ=PyWF.windfield.grid.z;
+        <span class="comment">% PyCOnTurb best</span>
+        figure(<span class="string">'Name'</span>,<span class="string">'Original_PY_BEST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,(OrSlice_PY),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'Original Contour Best Py. t= '</span> num2str(PyWF.windfield.grid.t(QuerySlice_PyWF)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - V_m'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern '</span> <span class="string">'Units:[m/s]'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        set(gca,<span class="string">'BoxStyle'</span>,<span class="string">'full'</span>,<span class="string">'CLim'</span>,[6.5 18],<span class="string">'Layer'</span>,<span class="string">'top'</span>);
+        colorbar(<span class="string">'peer'</span>,gca);
+        figure(<span class="string">'Name'</span>,<span class="string">'PyConTurb_BEST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,(flip((PyConsSlice))),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'PyConTurb Contour Best. t= '</span> num2str(PyWF.windfield.grid.t(QuerySlice_PyWF)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - V_m'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span> <span class="string">' Units:[m/s]'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        set(gca,<span class="string">'BoxStyle'</span>,<span class="string">'full'</span>,<span class="string">'CLim'</span>,[6.5 18],<span class="string">'Layer'</span>,<span class="string">'top'</span>);
+        colorbar(<span class="string">'peer'</span>,gca);
+        figure(<span class="string">'Name'</span>,<span class="string">'Error_PyConturb_BEST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,100*abs(flip(ErrorMatrixPY)./OrSlice),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'PyConTurb Contour Error Best. t= '</span> num2str(PyWF.windfield.grid.t(QuerySlice_PyWF)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - V_m'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        colorbar(<span class="string">'peer'</span>,gca);
+        QuerySlice_OrWF_worst_PY = find(abs(OrWF.windfield.grid.t-vec_rep(worstPy))&lt;.001);
+        QuerySlice_PyWF_worst = find(PyWF.windfield.grid.t==vec_rep(worstPy));
+
+        OrSlice_PY         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF_worst_PY,:)),-90);
+
+        PyConsSlice     = (squeeze(PyWF.windfield.u(:,QuerySlice_PyWF_worst,:)));
+
+
+        <span class="comment">% PyConTurb worst</span>
+        figure(<span class="string">'Name'</span>,<span class="string">'Original_PyConTurb_WORST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,(OrSlice_PY),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'Original Contour Worst Py. t= '</span> num2str(PyWF.windfield.grid.t(QuerySlice_PyWF_worst)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - Vmean'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span> <span class="string">'  Units:[m/s]'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        set(gca,<span class="string">'BoxStyle'</span>,<span class="string">'full'</span>,<span class="string">'CLim'</span>,[6.5 18],<span class="string">'Layer'</span>,<span class="string">'top'</span>);
+        colorbar(<span class="string">'peer'</span>,gca);
+        figure(<span class="string">'Name'</span>,<span class="string">'PyConTurb_WORST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,flip(PyConsSlice),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'PyConTurb Contour Worst. t= '</span> num2str(PyWF.windfield.grid.t(QuerySlice_PyWF_worst)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - Vmean'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span> <span class="string">'  Units:[m/s]'</span>],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        set(gca,<span class="string">'BoxStyle'</span>,<span class="string">'full'</span>,<span class="string">'CLim'</span>,[6.5 18],<span class="string">'Layer'</span>,<span class="string">'top'</span>);
+        colorbar(<span class="string">'peer'</span>,gca);
+        figure(<span class="string">'Name'</span>,<span class="string">'Error_PyConTurb_WORST'</span>,<span class="string">'visible'</span>,<span class="string">'on'</span>), contour(gridY,gridZ,100*abs(flip((ErrorMatrixPY)./OrSlice)),<span class="string">'Fill'</span>,<span class="string">'on'</span>),xlabel(<span class="string">'width [m]'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'height [m]'</span>,<span class="string">'Fontsize'</span>,23),title([<span class="string">'PyConTurb Contour Error Worst. t= '</span> num2str(PyWF.windfield.grid.t(QuerySlice_PyWF_worst)) <span class="string">' [s] - TI'</span> index_TI <span class="string">' - Shear'</span> index_shear <span class="string">' - Vmean'</span> MeanVstr <span class="string">' - '</span> Pattern(1:2) <span class="string">'Pattern'</span> ],<span class="string">'Fontsize'</span>,11),grid <span class="string">on</span>
+        colorbar(<span class="string">'peer'</span>,gca);
+
+
+
+        toterrorPy=mean(errori_Py)*100;
+
+        <span class="comment">%     figure('Name','Error','visible','on'),plot(0:timestep_pat:Analysistime,errori_Ts.*100,0:timestep_pat:Analysistime,errori_Py.*100),grid on,legend({'TS' 'PY'}),title('Error [%]'),xlabel('Time [s]'),ylabel('%')</span>
+        <span class="comment">%     figure('Name','Error','visible','on'),plot(1:timestep_pat:Analysistime,errori_Ts.*100),grid on,legend({'TS' 'PY'}),title('Error [%]'),xlabel('Time [s]'),ylabel('%')</span>
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+</pre><h2>Save text with errors and figures<a name="3"></a></h2><pre class="codeinput"><span class="keyword">if</span> ~exist (FolderName,<span class="string">'dir'</span>)
+    mkdir(FolderName);
+<span class="keyword">end</span>
+addpath(genpath(FolderName));
+<span class="keyword">if</span> flag_plot_contours==1 &amp;&amp; flag_save_errors==1
+
+    myfilepath = [FolderName <span class="string">'_Errors.txt'</span>];
+
+    <span class="keyword">if</span> flag_read_TurbSim==1
+        fid = fopen(myfilepath, <span class="string">'wt'</span>);
+        fprintf(fid, [<span class="string">' Total Error TurbSim = '</span>,num2str(toterrorTs)]);  <span class="comment">% if var1 is double</span>
+        fclose(fid);
+    <span class="keyword">elseif</span> flag_read_PyConTurb==1
+        fid = fopen(myfilepath, <span class="string">'wt'</span>);
+        fprintf(fid, [<span class="string">'Total Error PyConTurb = '</span>, num2str(toterrorPy)]);  <span class="comment">% if var1 is double</span>
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+<span class="comment">% Save figures</span>
+<span class="keyword">if</span> flag_savecontours==1
+    FigList = findobj(allchild(0), <span class="string">'flat'</span>, <span class="string">'Type'</span>, <span class="string">'figure'</span>);
+    <span class="keyword">for</span> iFig = 1:length(FigList)
+        FigHandle = FigList(iFig);
+        FigName = get(FigHandle,<span class="string">'Name'</span>);
+        savefig(FigHandle, fullfile(FolderName, [FigName <span class="string">'.fig'</span>]));
+        saveas(FigHandle, fullfile(FolderName, [FigName <span class="string">'.png'</span>]));
+    <span class="keyword">end</span>
+
+    close <span class="string">all</span>
+<span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function Testing_ConstVSOrig_SeparatedCases (Distance_Vector,MeanVstr,Pattern,index_shear,index_TI,timestep_pat,TSnam2,queryPointY,queryPointZ,Analysistime,OrWF,FolderName,flag_savecontours,flag_save_errors,flag_TS,flag_plot_contours,flag_read_TurbSim,flag_read_PyConTurb)
+
+
+% if flag_run_TurbSim==1
+%     %     TsWF=load(['X:\Documents\FranciscoCosta\NewGitHub\LidarSimulator\ConstrainedWindfields\TurbSim\Pattern_5P_Squared\TimeStp_pat1\testWindfield_HorzVariation_TurbSim_ConstrainedWF\testWindfield_HorzVariation_TurbSim_ConstrainedWF']);
+%     TsWF=load(['..\ConstrainedWindfields\TurbSim\Pattern_' Pattern '\TimeStp_pat' TSnam2 '\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_TurbSim_ConstrainedWF\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_TurbSim_ConstrainedWF']);
+% end
+% if flag_run_PyConTurb==1
+%     PyWF=load(['..\ConstrainedWindfields\PyConTurb\Pattern_' Pattern '\TimeStp_pat' TSnam2 '\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_PyConTurb_ConstrainedWF\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_PyConTurb']);
+% end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%TEST:%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+if flag_read_TurbSim==1
+    cnt=0;
+    vec_rep =0:timestep_pat:(Analysistime-1); % Check this (-1)
+    
+    TsWF=load(['C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\Constrained_TurbSim_Test\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_' Pattern '_TurbSim_ConstrainedWF']);
+    for itime =vec_rep
+        queryTime=itime;
+        cnt =cnt+1;
+        
+        QuerySlice_OrWF = find(abs(OrWF.windfield.grid.t-queryTime)<.001);
+        QuerySlice_TsWF = find(abs(TsWF.windfield.grid.t-queryTime)<.001);
+        OrSlice         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF,:)),90);
+        TsConsSlice    = imrotate(squeeze(TsWF.windfield.u(:,QuerySlice_TsWF,:)),90);
+        errori_Ts(cnt) = mean(mean(abs((OrSlice-TsConsSlice)./OrSlice))); %#ok<*AGROW>
+    end
+    bestTS = find(errori_Ts==min(errori_Ts));
+    worstTS = find(errori_Ts==max(errori_Ts));
+    if flag_TS==1
+        count_error_distance=1;
+        for i_plot_TS=1:length(queryPointY)
+            
+            count_error_distance=count_error_distance+1;
+            figure('Name',['Timeseries_ORVsTurbSIM_Shear' index_shear '_TI' index_TI '_POINT [' num2str(queryPointY(i_plot_TS)) ',' num2str(queryPointZ(i_plot_TS)) ']'],'visible','on'),
+            plot(OrWF.windfield.grid.t,(OrWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS))),...
+                TsWF.windfield.grid.t,(TsWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS))),'Linewidth',1.3)
+            legend('Original','TurbSim'),xlabel('Time [s]','Fontsize',23),ylabel('Velocity [m/s]','Fontsize',23),title(['Point ['  num2str(queryPointY(i_plot_TS)) ',' num2str(queryPointZ(i_plot_TS)) ']. TimeStep ' TSnam2 's - TI' index_TI ' - Shear' index_shear ' - Vmean' MeanVstr ' - ' Pattern(1:2) 'Pattern'],'Fontsize',15);
+            length_OrWF_TS=find(OrWF.windfield.grid.t==TsWF.windfield.grid.nt);
+%             res_factor_TS=(length_OrWF_TS/TsWF.windfield.grid.nt);
+%             
+%             Resampled_TsWF(i_plot_TS,:)=interpft(TsWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS)),TsWF.windfield.grid.nt*res_factor_TS); %#ok<*AGROW>
+%             Error_TS_turbsim(i_plot_TS,:)   = 100*(abs((OrWF.windfield.u(queryPointY(i_plot_TS),1:length(Resampled_TsWF),queryPointZ(i_plot_TS))-Resampled_TsWF(i_plot_TS,:))./(OrWF.windfield.u(queryPointY(i_plot_TS),1:length(Resampled_TsWF),queryPointZ(i_plot_TS)))));
+%             MeanError_Turbsim(i_plot_TS)   = mean((Error_TS_turbsim(i_plot_TS,:)));
+%             Distance_Vector1=[Distance_Vector(1,:);Distance_Vector(count_error_distance,:)];
+%             d(i_plot_TS) = pdist(Distance_Vector1,'euclidean');
+        end
+%         fitTS=fit(d',MeanError_Turbsim','poly2');
+%         figure('Name', 'Error_distance')
+%         plotTS=plot(fitTS,d,MeanError_Turbsim,'*b');
+%         title('Error[%] TurbSim Time Series Vs Distance','Fontsize',20), xlabel('Distance [m]','Fontsize',24),ylabel('Error [%]','Fontsize',22);
+        
+%         
+%         set(plotTS,'color','b');
+%         legend('Data from TurbSim', 'fitted curve TurbSim')
+    end
+    
+   
+    if flag_plot_contours==1
+        QuerySlice_OrWF_TS = find(abs(OrWF.windfield.grid.t-vec_rep(bestTS))<.001);
+        QuerySlice_TsWF    = find(abs(TsWF.windfield.grid.t-vec_rep(bestTS))<.001); 
+        OrSlice_TS_best    = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF_TS,:)),90);
+        TsConsSlice_best   = imrotate(squeeze(TsWF.windfield.u(:,QuerySlice_TsWF,:)),90);
+
+% specific time step slice
+%          slicess=50;
+%         QuerySlice_OrWF_TS = find(abs(OrWF.windfield.grid.t-vec_rep(slicess))<.001);
+%         QuerySlice_TsWF    = find(abs(TsWF.windfield.grid.t-vec_rep(slicess))<.001);
+%         OrSlice_TS_best         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF_TS,:)),90);
+%         TsConsSlice_best        = imrotate(squeeze(TsWF.windfield.u(:,QuerySlice_TsWF,:)),90);
+        
+        %%%%%  This is made because the negative values       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%         for inTSi=1:size(OrSlice_TS_best,1)
+%             for inTSj=1:size(OrSlice_TS_best,2)
+                ErrorMatrixTS_best=abs(OrSlice_TS_best-TsConsSlice_best);
+%             end
+%         end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+        gridY=TsWF.windfield.grid.y;
+        gridZ=TsWF.windfield.grid.z;
+
+        % TurbSim best
+        figure('Name','Original_TS_BEST','visible','on'), contour(gridY,gridZ,flip(OrSlice_TS_best),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['Original Contour Best. TS t= ' num2str(TsWF.windfield.grid.t(QuerySlice_TsWF)) ' [s] - TI' index_TI ' - Shear' index_shear ' - V_m' MeanVstr ' - ' Pattern(1:2) 'Pattern' ' Units:[m/s]'],'Fontsize',11),grid on
+        set(gca,'BoxStyle','full','CLim',[6.5 18],'Layer','top');
+        colorbar('peer',gca);
+        figure('Name','TurbSim_BEST','visible','on'), contour(gridY,gridZ,flip(TsConsSlice_best),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['TurbSim Contour Best. t= ' num2str(TsWF.windfield.grid.t(QuerySlice_TsWF)) ' [s] - TI' index_TI ' - Shear' index_shear ' - V_m' MeanVstr ' - ' Pattern(1:2) 'Pattern' ' Units: [m/s]'],'Fontsize',11),grid on
+        set(gca,'BoxStyle','full','CLim',[6.5 18],'Layer','top');
+        colorbar('peer',gca);
+        figure('Name','Error_TurbSim_BEST','visible','on'), contour(gridY,gridZ,100*abs(flip((ErrorMatrixTS_best)./OrSlice_TS_best)),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['TurbSim Contour Error Best. t= ' num2str(TsWF.windfield.grid.t(QuerySlice_TsWF)) ' [s] - TI' index_TI ' - Shear' index_shear ' - V_m' MeanVstr ' - ' Pattern(1:2) 'Pattern'],'Fontsize',11),grid on
+        colorbar('peer',gca);
+        
+        QuerySlice_OrWF_worst_TS = find(abs(OrWF.windfield.grid.t-vec_rep(worstTS))<.001);
+        QuerySlice_TsWF_worst = find(abs(TsWF.windfield.grid.t-vec_rep(worstTS))<.001);
+        
+        OrSlice_TS_worst         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF_worst_TS,:)),-90);
+        
+        TsConsSlice_worst     = imrotate(squeeze(TsWF.windfield.u(:,QuerySlice_TsWF_worst,:)),90);
+        
+        ErrorMatrixTS_worst=abs(OrSlice_TS_worst-TsConsSlice_worst);
+        % Turbsim worst
+        figure('Name','Original_TurbSim_WORST','visible','on'), contour(gridY,gridZ,(OrSlice_TS_worst),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['Original Contour Worst Ts. t= ' num2str(TsWF.windfield.grid.t(QuerySlice_TsWF_worst)) ' [s] - TI' index_TI ' - Shear' index_shear ' - Vmean' MeanVstr ' - ' Pattern(1:2) 'Pattern' ' Units:[m/s]'],'Fontsize',11),grid on
+        set(gca,'BoxStyle','full','CLim',[6.5 18],'Layer','top');
+        colorbar('peer',gca);
+        figure('Name','TurbSim_WORST','visible','on'), contour(gridY,gridZ,flip(TsConsSlice_worst),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['Turbsim Contour Worst. t= ' num2str(TsWF.windfield.grid.t(QuerySlice_TsWF_worst)) ' [s] - TI' index_TI ' - Shear' index_shear ' - Vmean' MeanVstr ' - ' Pattern(1:2) 'Pattern' ' Units:[m/s]'],'Fontsize',11),grid on
+        set(gca,'BoxStyle','full','CLim',[6.5 18],'Layer','top');
+        colorbar('peer',gca);
+        figure('Name','Error_TurbSim_WORST','visible','on'), contour(gridY,gridZ,100*abs(flip((ErrorMatrixTS_worst)./OrSlice_TS_worst)),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['TurbSim Contour Error Worst. t= ' num2str(TsWF.windfield.grid.t(QuerySlice_TsWF_worst)) ' [s] - TI' index_TI ' - Shear' index_shear ' - Vmean' MeanVstr ' - ' Pattern(1:2) 'Pattern'],'Fontsize',11),grid on
+        colorbar('peer',gca);
+      
+        %     figure('Name','Error','visible','on'),plot(0:timestep_pat:Analysistime,errori_Ts.*100,0:timestep_pat:Analysistime,errori_Py.*100),grid on,legend({'TS' 'PY'}),title('Error [%]'),xlabel('Time [s]'),ylabel('%')
+        %     figure('Name','Error','visible','on'),plot(1:timestep_pat:Analysistime,errori_Ts.*100),grid on,legend({'TS' 'PY'}),title('Error [%]'),xlabel('Time [s]'),ylabel('%')
+        
+    end
+      toterrorTs=mean(errori_Ts)*100;
+end
+if flag_read_PyConTurb==1
+    cnt=0;
+    vec_rep =0:timestep_pat:(Analysistime-1); % Check this (-1)
+    
+    %Ancient: Turb_class=none
+%     PyWF=load(['C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\Constrained_PyConTurb_Test\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_' Pattern '_PyConTurb']);
+    PyWF=load(['C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\ancient\Constrained_PyConTurb_TestA\DTU10MW_Shear_' index_shear '_SD1_' MeanVstr '_TI' index_TI '_PyConTurb']);
+    for itime =vec_rep
+        queryTime=itime;
+        cnt =cnt+1;
+        % OrWF=load(['..\OriginalWindFields\V08_41_WF\Shear_' Shear '_SD1\DTU10MW_Shear_' Shear '_SD1_08_TI' TI]);
+        % PyWF=load(['..\ConstrainedWindfields\PyConTurb\Pattern_5P_Squared\TimeStp_pat' TimeStep '\DTU10MW_Shear_' Shear '_SD1_08_TI' TI '_PyConTurb_ConstrainedWF\DTU10MW_Shear_' Shear '_SD1_08_TI' TI '_PyConTurb']);
+        % TsWF=load(['..\ConstrainedWindfields\TurbSim\Pattern_5P_Squared\TimeStp_pat' TimeStep '\DTU10MW_Shear_' Shear '_SD1_08_TI' TI '_TurbSim_ConstrainedWF\DTU10MW_Shear_' Shear '_SD1_08_TI' TI '_TurbSim_ConstrainedWF']);
+        % figure,plot(OrWF.windfield.grid.t,squeeze(OrWF.windfield.u(queryPoint(1),:,queryPoint(2))),...
+        % PyWF.windfield.grid.t,squeeze(PyWF.windfield.u(queryPoint(1),:,queryPoint(2))),...
+        % TsWF.windfield.grid.t,squeeze(TsWF.windfield.u(queryPoint(1),:,queryPoint(2)))),legend('Original','Pyconturb','TurbSim'),title(['Point ['  num2str(queryPoint(1)) ',' num2str(queryPoint(2)) ']. TimeStep ' TimeStep 's'])
+        
+        QuerySlice_OrWF = find(abs(OrWF.windfield.grid.t-queryTime)<.001);
+        QuerySlice_PyWF = find(abs(PyWF.windfield.grid.t-queryTime)<.001);
+        OrSlice         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF,:)),90);
+        PyConsSlice     = (squeeze(PyWF.windfield.u(:,QuerySlice_PyWF,:))); %#ok<*FNDSB>
+        
+        % title(['Point [' num2str(queryPoint(1)) ',' num2str(queryPoint(2)) '] - TimeStep = 1.5s']),xlabel('time [s]','Fontsize',20),ylabel('wind velocity [m/s]','Fontsize',20)
+        % figure, contour(OrSlice,'Fill','on'),title('Original Contour')
+        % figure, contour(PyConsSlice,'Fill','on'),title('PyConTurb Contour')
+        % figure, contour(TsConsSlice,'Fill','on'),title('Turbsim Contour')
+        errori_Py(cnt) = mean(mean(abs((OrSlice-PyConsSlice)./OrSlice)))
+        
+    end
+    bestPy = find(errori_Py==min(errori_Py));
+    worstPy = find(errori_Py==max(errori_Py));
+    if flag_TS==1
+        count_error_distance=1;
+        for i_plot_TS=1:length(queryPointY)
+            
+            count_error_distance=count_error_distance+1;
+            
+            figure('Name',['Timeseries_ORVsPyConTurb_Shear' index_shear '_TI' index_TI '_POINT [' num2str(queryPointY(i_plot_TS)) ',' num2str(queryPointZ(i_plot_TS)) ']'],'visible','on'),
+            plot(OrWF.windfield.grid.t,squeeze(OrWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS))),...
+                PyWF.windfield.grid.t,squeeze(PyWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS))),'Linewidth',1.3),
+            legend('Original','PyConTurb'),xlabel('Time [s]','Fontsize',23),ylabel('Velocity [m/s]','Fontsize',23),title(['Point ['  num2str(queryPointY(i_plot_TS)) ',' num2str(queryPointZ(i_plot_TS)) ']. TimeStep ' TSnam2 's - TI' index_TI ' - Shear' index_shear ' - Vmean' MeanVstr ' - ' Pattern(1:2) 'Pattern'],'Fontsize',15);            
+            
+%             res_factor_PY=(OrWF.windfield.grid.nt/PyWF.windfield.grid.nt);
+%             Resampled_PyWF(i_plot_TS,:)=interpft(PyWF.windfield.u(queryPointY(i_plot_TS),:,queryPointZ(i_plot_TS)),PyWF.windfield.grid.nt*res_factor_PY);
+%             Error_TS_pyconturb(i_plot_TS,:) = 100*(abs((OrWF.windfield.u(queryPointY(i_plot_TS),1:length(Resampled_PyWF),queryPointZ(i_plot_TS))-Resampled_PyWF(i_plot_TS,:))./(OrWF.windfield.u(queryPointY(i_plot_TS),1:length(Resampled_PyWF),queryPointZ(i_plot_TS)))));
+%             MeanError_Pyconturb(i_plot_TS) = mean((Error_TS_pyconturb(i_plot_TS,:)));
+%             Distance_Vector1=[Distance_Vector(1,:);Distance_Vector(count_error_distance,:)];
+%             d(i_plot_TS) = pdist(Distance_Vector1,'euclidean');
+        end
+%         fitPY = fit(d',MeanError_Pyconturb','poly2');
+%         figure('Name', 'Error_distance')
+%         plotPY=plot(fitPY,d,MeanError_Pyconturb,'*r');
+%         title('Error[%] PyConTurb Time Series Vs Distance','Fontsize',20), xlabel('Distance [m]','Fontsize',24),ylabel('Error [%]','Fontsize',22);
+%         
+%         set(plotPY,'color','r');
+%         
+%         legend('Data from PyConTurb' ,'fitted curve PyConTurb')
+    end
+    
+    
+    if flag_plot_contours==1
+        QuerySlice_OrWF_PY = find(abs(OrWF.windfield.grid.t-vec_rep(bestPy))<.001);
+        QuerySlice_PyWF = find(PyWF.windfield.grid.t==vec_rep(bestPy));
+        
+        OrSlice_PY         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF_PY,:)),-90);
+        PyConsSlice     = (squeeze(PyWF.windfield.u(:,QuerySlice_PyWF,:)));
+        %%%%%  This is made because the negative values       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        for inPYi=1:size(OrSlice,1)
+            for inPYj=1:size(OrSlice,2)
+                ErrorMatrixPY(inPYi,inPYj)=dist(OrSlice(inPYi,inPYj),PyConsSlice(inPYi,inPYj));
+            end
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        gridY=PyWF.windfield.grid.y;
+        gridZ=PyWF.windfield.grid.z;
+        % PyCOnTurb best
+        figure('Name','Original_PY_BEST','visible','on'), contour(gridY,gridZ,(OrSlice_PY),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['Original Contour Best Py. t= ' num2str(PyWF.windfield.grid.t(QuerySlice_PyWF)) ' [s] - TI' index_TI ' - Shear' index_shear ' - V_m' MeanVstr ' - ' Pattern(1:2) 'Pattern ' 'Units:[m/s]'],'Fontsize',11),grid on
+        set(gca,'BoxStyle','full','CLim',[6.5 18],'Layer','top');
+        colorbar('peer',gca);
+        figure('Name','PyConTurb_BEST','visible','on'), contour(gridY,gridZ,(flip((PyConsSlice))),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['PyConTurb Contour Best. t= ' num2str(PyWF.windfield.grid.t(QuerySlice_PyWF)) ' [s] - TI' index_TI ' - Shear' index_shear ' - V_m' MeanVstr ' - ' Pattern(1:2) 'Pattern' ' Units:[m/s]'],'Fontsize',11),grid on
+        set(gca,'BoxStyle','full','CLim',[6.5 18],'Layer','top');
+        colorbar('peer',gca);
+        figure('Name','Error_PyConturb_BEST','visible','on'), contour(gridY,gridZ,100*abs(flip(ErrorMatrixPY)./OrSlice),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['PyConTurb Contour Error Best. t= ' num2str(PyWF.windfield.grid.t(QuerySlice_PyWF)) ' [s] - TI' index_TI ' - Shear' index_shear ' - V_m' MeanVstr ' - ' Pattern(1:2) 'Pattern'],'Fontsize',11),grid on
+        colorbar('peer',gca);
+        QuerySlice_OrWF_worst_PY = find(abs(OrWF.windfield.grid.t-vec_rep(worstPy))<.001);
+        QuerySlice_PyWF_worst = find(PyWF.windfield.grid.t==vec_rep(worstPy));
+        
+        OrSlice_PY         = imrotate(squeeze(OrWF.windfield.u(:,QuerySlice_OrWF_worst_PY,:)),-90);
+        
+        PyConsSlice     = (squeeze(PyWF.windfield.u(:,QuerySlice_PyWF_worst,:)));
+        
+        
+        % PyConTurb worst
+        figure('Name','Original_PyConTurb_WORST','visible','on'), contour(gridY,gridZ,(OrSlice_PY),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['Original Contour Worst Py. t= ' num2str(PyWF.windfield.grid.t(QuerySlice_PyWF_worst)) ' [s] - TI' index_TI ' - Shear' index_shear ' - Vmean' MeanVstr ' - ' Pattern(1:2) 'Pattern' '  Units:[m/s]'],'Fontsize',11),grid on
+        set(gca,'BoxStyle','full','CLim',[6.5 18],'Layer','top');
+        colorbar('peer',gca);
+        figure('Name','PyConTurb_WORST','visible','on'), contour(gridY,gridZ,flip(PyConsSlice),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['PyConTurb Contour Worst. t= ' num2str(PyWF.windfield.grid.t(QuerySlice_PyWF_worst)) ' [s] - TI' index_TI ' - Shear' index_shear ' - Vmean' MeanVstr ' - ' Pattern(1:2) 'Pattern' '  Units:[m/s]'],'Fontsize',11),grid on
+        set(gca,'BoxStyle','full','CLim',[6.5 18],'Layer','top');
+        colorbar('peer',gca);
+        figure('Name','Error_PyConTurb_WORST','visible','on'), contour(gridY,gridZ,100*abs(flip((ErrorMatrixPY)./OrSlice)),'Fill','on'),xlabel('width [m]','Fontsize',23),ylabel('height [m]','Fontsize',23),title(['PyConTurb Contour Error Worst. t= ' num2str(PyWF.windfield.grid.t(QuerySlice_PyWF_worst)) ' [s] - TI' index_TI ' - Shear' index_shear ' - Vmean' MeanVstr ' - ' Pattern(1:2) 'Pattern' ],'Fontsize',11),grid on
+        colorbar('peer',gca);
+        
+        
+        
+        toterrorPy=mean(errori_Py)*100;
+        
+        %     figure('Name','Error','visible','on'),plot(0:timestep_pat:Analysistime,errori_Ts.*100,0:timestep_pat:Analysistime,errori_Py.*100),grid on,legend({'TS' 'PY'}),title('Error [%]'),xlabel('Time [s]'),ylabel('%')
+        %     figure('Name','Error','visible','on'),plot(1:timestep_pat:Analysistime,errori_Ts.*100),grid on,legend({'TS' 'PY'}),title('Error [%]'),xlabel('Time [s]'),ylabel('%')
+        
+    end
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Save text with errors and figures
+if ~exist (FolderName,'dir')
+    mkdir(FolderName);
+end
+addpath(genpath(FolderName));
+if flag_plot_contours==1 && flag_save_errors==1
+    
+    myfilepath = [FolderName '_Errors.txt'];
+    
+    if flag_read_TurbSim==1
+        fid = fopen(myfilepath, 'wt');
+        fprintf(fid, [' Total Error TurbSim = ',num2str(toterrorTs)]);  % if var1 is double
+        fclose(fid);
+    elseif flag_read_PyConTurb==1
+        fid = fopen(myfilepath, 'wt');
+        fprintf(fid, ['Total Error PyConTurb = ', num2str(toterrorPy)]);  % if var1 is double
+        
+    end
+end
+% Save figures
+if flag_savecontours==1
+    FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+    for iFig = 1:length(FigList)
+        FigHandle = FigList(iFig);
+        FigName = get(FigHandle,'Name');
+        savefig(FigHandle, fullfile(FolderName, [FigName '.fig']));
+        saveas(FigHandle, fullfile(FolderName, [FigName '.png']));
+    end
+    
+    close all
+end
+end
+##### SOURCE END #####
+--></body></html>

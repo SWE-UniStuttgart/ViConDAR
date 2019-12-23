@@ -1,0 +1,701 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Wrapper</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-09"><meta name="DC.source" content="Wrapper.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Header</a></li><li><a href="#2">Input variables:</a></li><li><a href="#3">Obtain the lidar output form virtual lidar</a></li><li><a href="#4">Obtain the inputs for constraining WF with turbsim</a></li><li><a href="#5">Obtain the inputs for constraining WF with pyconturb</a></li><li><a href="#6">Obtain constrained windfield with Turbsim</a></li><li><a href="#7">Obtain constrained windfield with Pyconturb running from matlab</a></li><li><a href="#8">Obtain constrained windfield with Pyconturb running with python</a></li><li><a href="#9">Calculate statistics from full wind fields</a></li><li><a href="#10">Plotting Lidar measurements vs original windfield</a></li><li><a href="#11">Plotting time series from windfield (e.g. constrained vs original)</a></li><li><a href="#12">Plotting contours from windfield slices  (e.g. constrained vs original)</a></li><li><a href="#13">Check what this is doing!!!!</a></li></ul></div><h2>Header<a name="1"></a></h2><p>WRAPPER script for ViConDAR Processing and Postprocessing data from Lidar Simulator, comparison and constrainins Windfields</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput">clc;
+close <span class="string">all</span>;
+clear <span class="string">all</span>; <span class="comment">%#ok&lt;*CLALL&gt;</span>
+tmp = matlab.desktop.editor.getActive;
+cd(fileparts(tmp.Filename));
+addpath (genpath(<span class="string">'..\Functions'</span>))
+addpath (genpath(<span class="string">'..\Main'</span>))
+addpath (genpath(<span class="string">'..\HelpfulStandAlone'</span>))
+</pre><h2>Input variables:<a name="2"></a></h2><pre class="codeinput">input = InputParameters();     <span class="comment">% Call all the inputs</span>
+
+<span class="comment">% Adding directories if do not exist (here because input. should exist):</span>
+<span class="keyword">for</span> indDirec=1:length(input.AddUser_dir)
+    FolderName=input.AddUser_dir{indDirec};
+    <span class="keyword">if</span> ~exist(FolderName, <span class="string">'dir'</span>)
+        mkdir(FolderName);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+perm_cell = getNamesFromInputs(input);
+</pre><h2>Obtain the lidar output form virtual lidar<a name="3"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_getLidarOutput==1
+    <span class="comment">%Loop over requested wind fields</span>
+    <span class="keyword">for</span> iProcess = 1:length(perm_cell.OutNames)
+        <span class="comment">% passs information on get lidar output</span>
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        curFileInfo.values = perm_cell.values{iProcess}  ;
+        curFileInfo.variables = perm_cell.variables  ;
+
+        <span class="comment">% find the corresponding original WF</span>
+        <span class="keyword">for</span> iName= 1:length(perm_cell.namesOWF)
+            Indexi = strfind (perm_cell.OutNames{iProcess},perm_cell.namesOWF{iName});
+            <span class="keyword">if</span> Indexi == 1
+                indexvec(iName) = 1;
+            <span class="keyword">else</span>
+                indexvec(iName) = 0;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        curFileInfo.originalWF = perm_cell.namesOWF (indexvec(indexvec==1))  ;
+        Output=getLidarOutput(input,curFileInfo);
+        disp([curFileInfo.name <span class="string">' has been processed ('</span> datestr(datetime) <span class="string">'):'</span> ])
+    <span class="keyword">end</span>
+    disp(<span class="string">'Creating virtual lidar output finished successfully'</span>)
+<span class="keyword">end</span>
+</pre><h2>Obtain the inputs for constraining WF with turbsim<a name="4"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_getTurbsimInput==1
+    <span class="keyword">for</span> iProcess = 1:length(perm_cell.OutNames)
+        <span class="comment">% passs information to turbsim input</span>
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        curFileInfo.values = perm_cell.values{iProcess}  ;
+        curFileInfo.variables = perm_cell.variables  ;
+        <span class="keyword">try</span>
+            load([input.LidarOutput_dir curFileInfo.name]); <span class="comment">% Output file is loaded here!</span>
+        <span class="keyword">catch</span> e
+            fprintf(1,<span class="string">'The identifier was:\n%s'</span>,e.identifier);
+            fprintf(1,<span class="string">'There was an error! The message was:\n%s'</span>,e.message);
+            error ([<span class="string">'Error loading lidar measurements for creating Turbsim inputfile '</span> curFileInfo.name <span class="string">'. Check if the lidar measurement exists and is in the correct folder.'</span>])
+        <span class="keyword">end</span>
+        [VFinal,t_lidar,Y1,Z1] = Create_Turbsim_Vinput(Output,input,curFileInfo);
+        [~,RefNode]=min(abs(Z1-input.Zh)+abs(Y1));
+        writeTurbSimTimeSeriesInput([input.TurbSimInput_dir curFileInfo.name <span class="string">'.TimeSer'</span>], curFileInfo.name, VFinal, t_lidar', Y1,Z1,input.nComp,RefNode); <span class="comment">% Write time series for TurbSim</span>
+        CreateInpTurbsim([input.TurbSimInput_dir curFileInfo.name <span class="string">'_ConTurbSim.inp'</span>],[curFileInfo.name <span class="string">'.TimeSer'</span>],t_lidar,input,Output)
+        disp([curFileInfo.name <span class="string">' input for turbsim done.'</span> ])
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Obtain the inputs for constraining WF with pyconturb<a name="5"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_getPyconturbInput==1
+    <span class="keyword">for</span> iProcess = 1:length(perm_cell.OutNames)
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        curFileInfo.values = perm_cell.values{iProcess}  ;
+        curFileInfo.variables = perm_cell.variables  ;
+        <span class="keyword">try</span>
+            load([input.LidarOutput_dir curFileInfo.name]); <span class="comment">% Output file is loaded here!</span>
+        <span class="keyword">catch</span> e
+            fprintf(1,<span class="string">'The identifier was:\n%s'</span>,e.identifier);
+            fprintf(1,<span class="string">'There was an error! The message was:\n%s'</span>,e.message);
+            error ([<span class="string">'Error loading lidar measurements for creating Pyconturb input file '</span> curFileInfo.name <span class="string">'. Check if the lidar measurement exists and is in the correct folder.'</span>])
+        <span class="keyword">end</span>
+        Create_Pyconturb_input(Output,input,curFileInfo.name)
+        disp([curFileInfo.name <span class="string">'Input for PyConTurb done'</span>])
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">% calculate automatically resample factor:Wr</span>
+<span class="comment">%         format long</span>
+<span class="comment">%         Vector_resampling_factor=2:1:8;% Vector of possible resampling factor values</span>
+<span class="comment">%         original_TimeStep=.125;% time step of the original windfield</span>
+<span class="comment">%         for prueb_fact_ind=1:length(Vector_resampling_factor);</span>
+<span class="comment">%             number_fact(prueb_fact_ind)=timestep_pat/Vector_resampling_factor(prueb_fact_ind); %#ok&lt;*SAGROW&gt;</span>
+<span class="comment">%             number_fact(prueb_fact_ind)=round(number_fact(prueb_fact_ind),3);</span>
+<span class="comment">%             if number_fact(prueb_fact_ind)&lt;original_TimeStep</span>
+<span class="comment">%                 break  %%% Esta parte hay que mejorarla.  No usar break!1</span>
+<span class="comment">%             else</span>
+<span class="comment">%                 busquIndex=TOTAL_TIME_SERIE_DURATION/ number_fact(prueb_fact_ind);</span>
+<span class="comment">%                 mod(busquIndex,1);</span>
+<span class="comment">%                 if mod(busquIndex,1)==0</span>
+<span class="comment">%                     RF(prueb_fact_ind)=Vector_resampling_factor(prueb_fact_ind);</span>
+<span class="comment">%                 else</span>
+<span class="comment">%                     RF(prueb_fact_ind)=0;</span>
+<span class="comment">%                 end</span>
+<span class="comment">%                 resampling_factor=max(RF);</span>
+<span class="comment">%                 index_resamplingFactor=find(Vector_resampling_factor==resampling_factor);</span>
+<span class="comment">%                 value_newSteptime=number_fact(index_resamplingFactor);</span>
+<span class="comment">%             end</span>
+<span class="comment">%         end</span>
+<span class="comment">%         format short</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+</pre><h2>Obtain constrained windfield with Turbsim<a name="6"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_obtain_Con_Turbsim ==1
+    <span class="keyword">for</span> iProcess = 1:length(perm_cell.OutNames)  <span class="comment">% try parfoe here for saving</span>
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        curFileInfo.values = perm_cell.values{iProcess}  ;
+        curFileInfo.variables = perm_cell.variables  ;
+        filenamTurbSimConInp =  [curFileInfo.name];
+        RunTurbSimCon_WF(input,filenamTurbSimConInp)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Obtain constrained windfield with Pyconturb running from matlab<a name="7"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_obtain_Con_Pyconturb_Matlab ==1
+    <span class="keyword">for</span> iProcess = 1:length(perm_cell.OutNames)
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        RunPyconturb_Con_WF(input,curFileInfo.name)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Obtain constrained windfield with Pyconturb running with python<a name="8"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_obtain_Con_Pyconturb_python ==1
+    <span class="keyword">for</span> iProcess = 1:length(perm_cell.OutNames)
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        <span class="comment">%create names for wrapper</span>
+        Pythonwrapperin{iProcess,1}=[input.PyconturbInput_dir <span class="string">'con_tc_'</span> curFileInfo.name <span class="string">'.csv,'</span> input.PyconturbInput_dir <span class="string">'GridY_'</span> curFileInfo.name <span class="string">'.csv,'</span> input.PyconturbInput_dir <span class="string">'GridZ_'</span> curFileInfo.name <span class="string">'.csv,'</span> input.PyconturbInput_dir <span class="string">'Variables_'</span> curFileInfo.name <span class="string">'.csv,'</span> input.PyconturbOut_dir curFileInfo.name <span class="string">'ConPyconturb.csv'</span>]; <span class="comment">%#ok&lt;*SAGROW&gt;</span>
+    <span class="keyword">end</span>
+    <span class="comment">% write a .csv file with all the inputs for the python wrapper</span>
+    filePh = fopen([input.PyconturbInput_dir <span class="string">'PythonWrapperInput.csv'</span>],<span class="string">'w'</span>);
+    <span class="keyword">for</span> iNamCsv =1:length(Pythonwrapperin)+1
+        <span class="keyword">if</span>   iNamCsv ==1
+            fprintf(filePh,<span class="string">'%s\n'</span>,<span class="string">'contc,gridy,gridz,variables,savename'</span>);
+        <span class="keyword">else</span>
+            fprintf(filePh,<span class="string">'%s\n'</span>,Pythonwrapperin{iNamCsv-1,1});
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    fclose(filePh);
+    <span class="keyword">if</span> input.flag_obtain_Con_Pyconturb_ConverToMat == 1
+        <span class="keyword">for</span> iProcess = 1:length(perm_cell.OutNames)
+            curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+            Pyconturb_CSV2MAT(input,curFileInfo.name)
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Calculate statistics from full wind fields<a name="9"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_calculate_fullWF_statisitcs == 1
+
+
+
+<span class="keyword">end</span>
+</pre><h2>Plotting Lidar measurements vs original windfield<a name="10"></a></h2><p>the requested cases will be plott</p><pre class="codeinput"><span class="keyword">if</span> input.flag_plot_lidar == 1
+    plot_Lidar_measurements(input,perm_cell)
+    disp(<span class="string">'Plotting lidar measurements and statistics done'</span>)
+<span class="keyword">end</span>
+</pre><h2>Plotting time series from windfield (e.g. constrained vs original)<a name="11"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_plot_WF_timeseries  == 1
+    plot_fullWF_timeseries(input,perm_cell)
+    disp(<span class="string">'Plotting requested full wind field timeseries done'</span>)
+<span class="keyword">end</span>
+</pre><h2>Plotting contours from windfield slices  (e.g. constrained vs original)<a name="12"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.plot_fullWF_Slices  == 1
+    plot_fullWF_Slices(input,perm_cell)
+    disp(<span class="string">'Plotting requested full wind field slices done'</span>)
+<span class="keyword">end</span>
+</pre><h2>Check what this is doing!!!!<a name="13"></a></h2><pre class="codeinput"><span class="keyword">if</span> 2==1
+    <span class="keyword">for</span> indexTimeStep=1:length(timestep_pat_vec)
+        timestep_pat1=timestep_pat_vec(indexTimeStep);
+        TSnam=num2str(timestep_pat1);
+        <span class="keyword">if</span> length(TSnam)~=1
+            TSnam2=strrep(TSnam,<span class="string">'.'</span>,<span class="string">'_'</span>); <span class="comment">% change '.' by '_' otherwise we have erroneous outputs</span>
+        <span class="keyword">else</span>
+            TSnam2=TSnam;
+        <span class="keyword">end</span>
+
+        <span class="keyword">for</span> index_shear1=1:length(ShearValues);<span class="comment">%6% here parfor</span>
+
+            index_shear=ShearValues(index_shear1);
+            <span class="keyword">for</span> indexSeed= 1;<span class="comment">%:Nseeds</span>
+                <span class="keyword">for</span> ind_TI2=1:length(TIValues)
+
+                    index_TI=TIValues(ind_TI2);
+
+                    <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%  For the horizontal shear test %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+                    <span class="comment">%</span>
+                    <span class="comment">%</span>
+                    <span class="comment">%             windfieldfile=strcat('testWindfield_HorzVariation');</span>
+                    <span class="comment">%             windfieldfile2run=['DTU10MW_HorShearLR_25_SD1_08__5P_Squared_result_PatTStp1_Constrained_WF'];</span>
+                    <span class="comment">%</span>
+                    <span class="comment">%</span>
+                    <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+                    <span class="keyword">if</span> input.flag_obtain_Constrained_WF==1
+                        <span class="comment">%read the windfields</span>
+                        <span class="comment">%                         windfieldfile=strcat('DTU10MW_Shear_', index_shear{1}, '_SD', num2str(indexSeed), '_' ,MeanVstr, '_TI', index_TI{1},'_',Pattern);</span>
+                        <span class="comment">%                         windfieldfile2run=['DTU10MW_Shear_' index_shear{1} '_SD1_' MeanVstr '_TI' index_TI{1} '_' Pattern '_result_PatTStp' TSnam2 '_Constrained_WF'];</span>
+                        <span class="comment">%                         save_Py_WF_directory = ['..\ConstrainedWindfields\PyConTurb\Pattern_' Pattern '\TimeStp_pat' TSnam2 '\' windfieldfile '_PyConTurb_ConstrainedWF\']; % directpor&lt;</span>
+                        <span class="comment">%                         wnd_WF_directory = strcat('..\Output\Output_TurbSim\V',MeanVstr,'\',Pattern,'_41_Pattern_WF\TimeStep',TSnam2,'\'); %Directoy where .wnd is</span>
+                        <span class="comment">%                         save_TurbSim_WF_directory = ['..\ConstrainedWindfields\TurbSim\Pattern_',Pattern,'\TimeStp_pat',TSnam2,'\' windfieldfile '_TurbSim_ConstrainedWF\']; % directpor&lt; Directory to save constrained windfield</span>
+                        <span class="comment">%</span>
+
+
+
+                        <span class="comment">%Test constrained and non constrained windfields</span>
+
+                        windfieldfile              = [NAME <span class="string">'_'</span> Pattern <span class="string">'_result_PatTStp'</span>  TSnam2];
+                        windfieldfile2run          = [NAME <span class="string">'_'</span> Pattern <span class="string">'_result_PatTStp'</span>  TSnam2 <span class="string">'_Constrained_WF'</span>]; <span class="comment">% Input file name for turbsim for constrain</span>
+                        save_Py_WF_directory       = <span class="string">'C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\Constrained_PyConTurb_Test\'</span>; <span class="comment">% directpor&lt;</span>
+                        wnd_WF_directory           = <span class="string">'X:\Documents\FranciscoCosta\NewGitHub\LidarSimulator\TestingCode\Constrained\TurbSim\'</span>; <span class="comment">%Directoy where .wnd is</span>
+                        save_TurbSim_WF_directory  = <span class="string">'X:\Documents\FranciscoCosta\NewGitHub\LidarSimulator\TestingCode\Constrained\TurbSim\'</span>; <span class="comment">% directpor&lt; Directory to save constrained windfield</span>
+
+                        <span class="comment">% Run obtain constrained Windfields:</span>
+                        Obtain_Const_WF(windfieldfile2run,TSnam2,Pattern,MeanVstr,input.flag_runTurbSim,input.flag_ConstrainwithPyConTurb,input.flag_ConstrainwithTurbSim,windfieldfile,save_Py_WF_directory,wnd_WF_directory,save_TurbSim_WF_directory)
+                    <span class="keyword">end</span>
+                    <span class="keyword">if</span> input.flag_testing==1
+                        queryPointY1=21;
+                        queryPointZ1=21;
+                        queryPointY=[21 21 21 21 21]; <span class="comment">%[Ypos] in the grid. Not in meters. For calculation of error with distance.</span>
+                        queryPointZ=[5 11 21 31 35 ];
+                        count_dist=1;
+                        DistanceVector= [queryPointY1,queryPointZ1];
+                        <span class="keyword">for</span> in_dist=1:length(queryPointY)
+                            count_dist=count_dist+1;
+
+                            DistanceVector(count_dist,:)=[queryPointY(in_dist), queryPointZ(in_dist)];
+
+                        <span class="keyword">end</span>
+                        <span class="comment">%OrWF=load(['..\OriginalWindFields\V' MeanVstr '_41_WF\Shear_' index_shear{1} '_SD1\DTU10MW_Shear_' index_shear{1} '_SD1_' MeanVstr '_TI' index_TI{1}]); % Original windfield to compare with</span>
+                        <span class="comment">%FolderName = ['..\ConstrainedWindfields\Contours_ORvsCONS_WF\TotalError_TI' index_TI{1} '_Shear' index_shear{1} '\']; %Folder to save plots of constrained/non constrained WF</span>
+                        <span class="comment">% TEST</span>
+                        OrWF       = load([<span class="string">'C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\OriginalWF\Shear'</span> index_shear{1} <span class="string">'\DTU10MW_Shear_'</span> index_shear{1} <span class="string">'_SD1_'</span> MeanVstr <span class="string">'_TI'</span> index_TI{1}]); <span class="comment">% Original windfield to compare with</span>
+                        FolderName = [<span class="string">'C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\Contours\Shear'</span> index_shear{1} <span class="string">'\Contours_ORvsCONS_W_TI'</span> index_TI{1} <span class="string">'_Shear'</span> index_shear{1} <span class="string">'_'</span> Pattern]; <span class="comment">%Folder to save contours of constrained/non constrained WF</span>
+                        Testing_ConstVSOrig_SeparatedCases(DistanceVector,MeanVstr,Pattern,index_shear{1},index_TI{1},timestep_pat1,TSnam2,queryPointY,queryPointZ,Analysistime,OrWF,FolderName,input.flag_savecontours,input.flag_save_errors,input.flag_TS,input.flag_plot_contours,input.flag_read_TurbSim,input.flag_read_PyConTurb)
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% % Run Constrained_LidarSimulator to get statistics of constrained wind fields.</span>
+<span class="keyword">if</span> 2==1
+    TSnam=num2str(timestep_pat);
+    <span class="keyword">if</span> length(TSnam)~=1
+        TSnam2=strrep(TSnam,<span class="string">'.'</span>,<span class="string">'_'</span>); <span class="comment">% change '.' by '_' otherwise we have erroneous outputs</span>
+    <span class="keyword">else</span>
+        TSnam2=TSnam;
+    <span class="keyword">end</span>
+    <span class="keyword">for</span> index_shear={<span class="string">'05'</span> }<span class="comment">%'05' '10' '15' '20' '25'}</span>
+        <span class="keyword">for</span> indexSeed= 1;<span class="comment">%:Nseeds</span>
+            <span class="keyword">for</span> ind_TI=1:length(TIValues)
+
+                index_TI=TIValues(ind_TI);<span class="comment">%{ '10' '15' '20' '25' '30'}</span>
+                tic
+                windfieldfile            = strcat(<span class="string">'DTU10MW_Shear_'</span>,index_shear{1},<span class="string">'_SD'</span>, num2str(indexSeed),<span class="string">'_'</span>,MeanVstr,<span class="string">'_TI'</span>,index_TI{1},<span class="string">'_'</span>,Pattern,<span class="string">'_result_PatTStp'</span>,TSnam2,<span class="string">'_Constrained_WF'</span>);
+                load_WF_directory        = strcat(<span class="string">'..\Output\Output_TurbSim\V'</span>,MeanVstr,<span class="string">'\'</span>,Pattern,<span class="string">'_41_Pattern_WF\TimeStep'</span>,TSnam2,<span class="string">'\'</span>); <span class="comment">%Directoy where .wnd is</span>
+
+                Name_ORWF=strcat(<span class="string">'DTU10MW_Shear_'</span>, index_shear{1}, <span class="string">'_SD'</span>, num2str(indexSeed), <span class="string">'_'</span> ,MeanVstr, <span class="string">'_TI'</span>, index_TI{1});
+                OriginalWFDirectory=strcat(<span class="string">'..\OriginalWindFields\V'</span>, MeanVstr, <span class="string">'_41_WF\Shear_'</span>,index_shear{1},<span class="string">'_SD'</span>,num2str(indexSeed),<span class="string">'\'</span> );
+                OriginalWF=load(strcat(OriginalWFDirectory, Name_ORWF));
+
+                <span class="keyword">if</span> strcmp(Method2Constrain,<span class="string">'TurbSim'</span>)
+                    save_WF_Turbsim_directory = [<span class="string">'..\Constrained_Data\'</span> Method2Constrain <span class="string">'\Pattern_'</span>,Pattern,<span class="string">'\TimeStp_pat'</span>,TSnam2,<span class="string">'\'</span>]; <span class="comment">% directpor&lt;</span>
+                    <span class="keyword">if</span> ~exist((save_WF_Turbsim_directory), <span class="string">'dir'</span>)
+                        mkdir(save_WF_Turbsim_directory);
+                    <span class="keyword">end</span>
+                    addpath (genpath(save_WF_Turbsim_directory));
+                <span class="keyword">elseif</span> strcmp(Method2Constrain,<span class="string">'PyConTurb'</span>)
+                    save_WF_PyConTurb_directory = [<span class="string">'..\Constrained_Data\'</span> Method2Constrain <span class="string">'\Pattern_'</span>,Pattern,<span class="string">'\TimeStp_pat'</span>,TSnam2,<span class="string">'\'</span>];
+                    <span class="keyword">if</span> ~exist((save_WF_PyConTurb_directory), <span class="string">'dir'</span>)
+                        mkdir(save_WF_PyConTurb_directory);
+                    <span class="keyword">end</span>
+                    addpath (genpath(save_WF_PyConTurb_directory));
+                <span class="keyword">elseif</span> strcmp(Method2Constrain,<span class="string">'Both'</span>)
+                    save_WF_Turbsim_directory = [<span class="string">'..\Constrained_Data\TurbSim\Pattern_'</span>,Pattern,<span class="string">'\TimeStp_pat'</span>,TSnam2,<span class="string">'\'</span>];
+                    save_WF_PyConTurb_directory = [<span class="string">'..\Constrained_Data\PyConTurb\Pattern_'</span>,Pattern,<span class="string">'\TimeStp_pat'</span>,TSnam2,<span class="string">'\'</span>];
+                    <span class="keyword">if</span> ~exist((save_WF_PyConTurb_directory), <span class="string">'dir'</span>)
+                        mkdir(save_WF_PyConTurb_directory);
+                    <span class="keyword">end</span>
+                    <span class="keyword">if</span> ~exist((save_WF_Turbsim_directory), <span class="string">'dir'</span>)
+                        mkdir(save_WF_Turbsim_directory);
+                    <span class="keyword">end</span>
+                    addpath (genpath(save_WF_Turbsim_directory));
+                    addpath (genpath(save_WF_PyConTurb_directory));
+                <span class="keyword">end</span>
+
+
+
+                <span class="comment">%Run Post_processing to obtain statistics from constrained</span>
+                <span class="comment">%wind fields.</span>
+                run <span class="string">Constrained_LidarSimulator</span>
+                disp([windfieldfile <span class="string">' is done.'</span> ])
+                clearvars <span class="string">-except</span> <span class="string">input_directory</span> <span class="string">i</span> <span class="string">index</span> <span class="string">index_shear</span> <span class="string">indexSeed</span> <span class="string">fullslicesTime</span> <span class="string">MeanVstr</span> <span class="string">Pattern</span> <span class="string">Method2Constrain</span> <span class="string">TSnam2</span> <span class="string">timestep_pat</span>
+                toc
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    Full_Constrained_Time=fullslicesTime;
+
+    save(<span class="string">'..\Constrained_Data\Constrained_Time'</span>,<span class="string">'Full_Constrained_Time'</span>);
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Header
+%
+% WRAPPER script for ViConDAR
+% Processing and Postprocessing data from Lidar Simulator, comparison and
+% constrainins Windfields
+%
+% V.Pettas/F.Costa
+% University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
+
+clc;
+close all;
+clear all; %#ok<*CLALL>
+tmp = matlab.desktop.editor.getActive;
+cd(fileparts(tmp.Filename));
+addpath (genpath('..\Functions'))
+addpath (genpath('..\Main'))
+addpath (genpath('..\HelpfulStandAlone'))
+
+%% Input variables:
+input = InputParameters();     % Call all the inputs
+
+% Adding directories if do not exist (here because input. should exist):
+for indDirec=1:length(input.AddUser_dir)
+    FolderName=input.AddUser_dir{indDirec};
+    if ~exist(FolderName, 'dir')
+        mkdir(FolderName);
+    end
+end
+
+perm_cell = getNamesFromInputs(input);
+
+%% Obtain the lidar output form virtual lidar
+if input.flag_getLidarOutput==1
+    %Loop over requested wind fields
+    for iProcess = 1:length(perm_cell.OutNames)
+        % passs information on get lidar output
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        curFileInfo.values = perm_cell.values{iProcess}  ;
+        curFileInfo.variables = perm_cell.variables  ;
+        
+        % find the corresponding original WF
+        for iName= 1:length(perm_cell.namesOWF)
+            Indexi = strfind (perm_cell.OutNames{iProcess},perm_cell.namesOWF{iName});
+            if Indexi == 1
+                indexvec(iName) = 1;
+            else
+                indexvec(iName) = 0;
+            end
+        end
+        curFileInfo.originalWF = perm_cell.namesOWF (indexvec(indexvec==1))  ;
+        Output=getLidarOutput(input,curFileInfo);
+        disp([curFileInfo.name ' has been processed (' datestr(datetime) '):' ])
+    end
+    disp('Creating virtual lidar output finished successfully')
+end
+
+%% Obtain the inputs for constraining WF with turbsim
+
+if input.flag_getTurbsimInput==1
+    for iProcess = 1:length(perm_cell.OutNames)
+        % passs information to turbsim input
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        curFileInfo.values = perm_cell.values{iProcess}  ;
+        curFileInfo.variables = perm_cell.variables  ;
+        try
+            load([input.LidarOutput_dir curFileInfo.name]); % Output file is loaded here!
+        catch e
+            fprintf(1,'The identifier was:\n%s',e.identifier);
+            fprintf(1,'There was an error! The message was:\n%s',e.message);
+            error (['Error loading lidar measurements for creating Turbsim inputfile ' curFileInfo.name '. Check if the lidar measurement exists and is in the correct folder.'])
+        end
+        [VFinal,t_lidar,Y1,Z1] = Create_Turbsim_Vinput(Output,input,curFileInfo);
+        [~,RefNode]=min(abs(Z1-input.Zh)+abs(Y1));
+        writeTurbSimTimeSeriesInput([input.TurbSimInput_dir curFileInfo.name '.TimeSer'], curFileInfo.name, VFinal, t_lidar', Y1,Z1,input.nComp,RefNode); % Write time series for TurbSim
+        CreateInpTurbsim([input.TurbSimInput_dir curFileInfo.name '_ConTurbSim.inp'],[curFileInfo.name '.TimeSer'],t_lidar,input,Output)
+        disp([curFileInfo.name ' input for turbsim done.' ])
+    end
+end
+
+%% Obtain the inputs for constraining WF with pyconturb
+
+if input.flag_getPyconturbInput==1
+    for iProcess = 1:length(perm_cell.OutNames)
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        curFileInfo.values = perm_cell.values{iProcess}  ;
+        curFileInfo.variables = perm_cell.variables  ;
+        try
+            load([input.LidarOutput_dir curFileInfo.name]); % Output file is loaded here!
+        catch e
+            fprintf(1,'The identifier was:\n%s',e.identifier);
+            fprintf(1,'There was an error! The message was:\n%s',e.message);
+            error (['Error loading lidar measurements for creating Pyconturb input file ' curFileInfo.name '. Check if the lidar measurement exists and is in the correct folder.'])
+        end
+        Create_Pyconturb_input(Output,input,curFileInfo.name)
+        disp([curFileInfo.name 'Input for PyConTurb done'])
+    end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% calculate automatically resample factor:Wr
+%         format long
+%         Vector_resampling_factor=2:1:8;% Vector of possible resampling factor values
+%         original_TimeStep=.125;% time step of the original windfield
+%         for prueb_fact_ind=1:length(Vector_resampling_factor);
+%             number_fact(prueb_fact_ind)=timestep_pat/Vector_resampling_factor(prueb_fact_ind); %#ok<*SAGROW>
+%             number_fact(prueb_fact_ind)=round(number_fact(prueb_fact_ind),3);
+%             if number_fact(prueb_fact_ind)<original_TimeStep
+%                 break  %%% Esta parte hay que mejorarla.  No usar break!1
+%             else
+%                 busquIndex=TOTAL_TIME_SERIE_DURATION/ number_fact(prueb_fact_ind);
+%                 mod(busquIndex,1);
+%                 if mod(busquIndex,1)==0
+%                     RF(prueb_fact_ind)=Vector_resampling_factor(prueb_fact_ind);
+%                 else
+%                     RF(prueb_fact_ind)=0;
+%                 end
+%                 resampling_factor=max(RF);
+%                 index_resamplingFactor=find(Vector_resampling_factor==resampling_factor);
+%                 value_newSteptime=number_fact(index_resamplingFactor);
+%             end
+%         end
+%         format short
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Obtain constrained windfield with Turbsim
+
+if input.flag_obtain_Con_Turbsim ==1
+    for iProcess = 1:length(perm_cell.OutNames)  % try parfoe here for saving
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        curFileInfo.values = perm_cell.values{iProcess}  ;
+        curFileInfo.variables = perm_cell.variables  ;
+        filenamTurbSimConInp =  [curFileInfo.name];
+        RunTurbSimCon_WF(input,filenamTurbSimConInp)
+    end
+end
+
+%% Obtain constrained windfield with Pyconturb running from matlab
+if input.flag_obtain_Con_Pyconturb_Matlab ==1
+    for iProcess = 1:length(perm_cell.OutNames)
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        RunPyconturb_Con_WF(input,curFileInfo.name)
+    end
+end
+
+%% Obtain constrained windfield with Pyconturb running with python
+if input.flag_obtain_Con_Pyconturb_python ==1
+    for iProcess = 1:length(perm_cell.OutNames)
+        curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+        %create names for wrapper
+        Pythonwrapperin{iProcess,1}=[input.PyconturbInput_dir 'con_tc_' curFileInfo.name '.csv,' input.PyconturbInput_dir 'GridY_' curFileInfo.name '.csv,' input.PyconturbInput_dir 'GridZ_' curFileInfo.name '.csv,' input.PyconturbInput_dir 'Variables_' curFileInfo.name '.csv,' input.PyconturbOut_dir curFileInfo.name 'ConPyconturb.csv']; %#ok<*SAGROW>
+    end
+    % write a .csv file with all the inputs for the python wrapper
+    filePh = fopen([input.PyconturbInput_dir 'PythonWrapperInput.csv'],'w');
+    for iNamCsv =1:length(Pythonwrapperin)+1
+        if   iNamCsv ==1
+            fprintf(filePh,'%s\n','contc,gridy,gridz,variables,savename');
+        else
+            fprintf(filePh,'%s\n',Pythonwrapperin{iNamCsv-1,1});
+        end
+    end
+    fclose(filePh);
+    if input.flag_obtain_Con_Pyconturb_ConverToMat == 1
+        for iProcess = 1:length(perm_cell.OutNames)
+            curFileInfo.name = perm_cell.OutNames{iProcess}  ;
+            Pyconturb_CSV2MAT(input,curFileInfo.name)
+        end
+    end
+end
+
+%% Calculate statistics from full wind fields
+if input.flag_calculate_fullWF_statisitcs == 1
+    
+    
+    
+end
+
+%% Plotting Lidar measurements vs original windfield
+% the requested cases will be plott
+if input.flag_plot_lidar == 1
+    plot_Lidar_measurements(input,perm_cell)
+    disp('Plotting lidar measurements and statistics done')
+end
+
+%% Plotting time series from windfield (e.g. constrained vs original)
+if input.flag_plot_WF_timeseries  == 1
+    plot_fullWF_timeseries(input,perm_cell)
+    disp('Plotting requested full wind field timeseries done')
+end
+
+%% Plotting contours from windfield slices  (e.g. constrained vs original)
+if input.plot_fullWF_Slices  == 1
+    plot_fullWF_Slices(input,perm_cell)
+    disp('Plotting requested full wind field slices done')
+end
+
+%% Check what this is doing!!!!
+
+if 2==1
+    for indexTimeStep=1:length(timestep_pat_vec)
+        timestep_pat1=timestep_pat_vec(indexTimeStep);
+        TSnam=num2str(timestep_pat1);
+        if length(TSnam)~=1
+            TSnam2=strrep(TSnam,'.','_'); % change '.' by '_' otherwise we have erroneous outputs
+        else
+            TSnam2=TSnam;
+        end
+        
+        for index_shear1=1:length(ShearValues);%6% here parfor
+            
+            index_shear=ShearValues(index_shear1);
+            for indexSeed= 1;%:Nseeds
+                for ind_TI2=1:length(TIValues)
+                    
+                    index_TI=TIValues(ind_TI2);
+                    
+                    %%%%%%%%%%%%%%%%%%%%%%%%%  For the horizontal shear test %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                    %
+                    %
+                    %             windfieldfile=strcat('testWindfield_HorzVariation');
+                    %             windfieldfile2run=['DTU10MW_HorShearLR_25_SD1_08__5P_Squared_result_PatTStp1_Constrained_WF'];
+                    %
+                    %
+                    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                    
+                    if input.flag_obtain_Constrained_WF==1
+                        %read the windfields
+                        %                         windfieldfile=strcat('DTU10MW_Shear_', index_shear{1}, '_SD', num2str(indexSeed), '_' ,MeanVstr, '_TI', index_TI{1},'_',Pattern);
+                        %                         windfieldfile2run=['DTU10MW_Shear_' index_shear{1} '_SD1_' MeanVstr '_TI' index_TI{1} '_' Pattern '_result_PatTStp' TSnam2 '_Constrained_WF'];
+                        %                         save_Py_WF_directory = ['..\ConstrainedWindfields\PyConTurb\Pattern_' Pattern '\TimeStp_pat' TSnam2 '\' windfieldfile '_PyConTurb_ConstrainedWF\']; % directpor<
+                        %                         wnd_WF_directory = strcat('..\Output\Output_TurbSim\V',MeanVstr,'\',Pattern,'_41_Pattern_WF\TimeStep',TSnam2,'\'); %Directoy where .wnd is
+                        %                         save_TurbSim_WF_directory = ['..\ConstrainedWindfields\TurbSim\Pattern_',Pattern,'\TimeStp_pat',TSnam2,'\' windfieldfile '_TurbSim_ConstrainedWF\']; % directpor< Directory to save constrained windfield
+                        %
+                        
+                        
+                        
+                        %Test constrained and non constrained windfields
+                        
+                        windfieldfile              = [NAME '_' Pattern '_result_PatTStp'  TSnam2];
+                        windfieldfile2run          = [NAME '_' Pattern '_result_PatTStp'  TSnam2 '_Constrained_WF']; % Input file name for turbsim for constrain
+                        save_Py_WF_directory       = 'C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\Constrained_PyConTurb_Test\'; % directpor<
+                        wnd_WF_directory           = 'X:\Documents\FranciscoCosta\NewGitHub\LidarSimulator\TestingCode\Constrained\TurbSim\'; %Directoy where .wnd is
+                        save_TurbSim_WF_directory  = 'X:\Documents\FranciscoCosta\NewGitHub\LidarSimulator\TestingCode\Constrained\TurbSim\'; % directpor< Directory to save constrained windfield
+                        
+                        % Run obtain constrained Windfields:
+                        Obtain_Const_WF(windfieldfile2run,TSnam2,Pattern,MeanVstr,input.flag_runTurbSim,input.flag_ConstrainwithPyConTurb,input.flag_ConstrainwithTurbSim,windfieldfile,save_Py_WF_directory,wnd_WF_directory,save_TurbSim_WF_directory)
+                    end
+                    if input.flag_testing==1
+                        queryPointY1=21;
+                        queryPointZ1=21;
+                        queryPointY=[21 21 21 21 21]; %[Ypos] in the grid. Not in meters. For calculation of error with distance.
+                        queryPointZ=[5 11 21 31 35 ];
+                        count_dist=1;
+                        DistanceVector= [queryPointY1,queryPointZ1];
+                        for in_dist=1:length(queryPointY)
+                            count_dist=count_dist+1;
+                            
+                            DistanceVector(count_dist,:)=[queryPointY(in_dist), queryPointZ(in_dist)];
+                            
+                        end
+                        %OrWF=load(['..\OriginalWindFields\V' MeanVstr '_41_WF\Shear_' index_shear{1} '_SD1\DTU10MW_Shear_' index_shear{1} '_SD1_' MeanVstr '_TI' index_TI{1}]); % Original windfield to compare with
+                        %FolderName = ['..\ConstrainedWindfields\Contours_ORvsCONS_WF\TotalError_TI' index_TI{1} '_Shear' index_shear{1} '\']; %Folder to save plots of constrained/non constrained WF
+                        % TEST
+                        OrWF       = load(['C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\OriginalWF\Shear' index_shear{1} '\DTU10MW_Shear_' index_shear{1} '_SD1_' MeanVstr '_TI' index_TI{1}]); % Original windfield to compare with
+                        FolderName = ['C:\Users\fcosta\Desktop\Test_TurbSimCoherenceModel\Contours\Shear' index_shear{1} '\Contours_ORvsCONS_W_TI' index_TI{1} '_Shear' index_shear{1} '_' Pattern]; %Folder to save contours of constrained/non constrained WF
+                        Testing_ConstVSOrig_SeparatedCases(DistanceVector,MeanVstr,Pattern,index_shear{1},index_TI{1},timestep_pat1,TSnam2,queryPointY,queryPointZ,Analysistime,OrWF,FolderName,input.flag_savecontours,input.flag_save_errors,input.flag_TS,input.flag_plot_contours,input.flag_read_TurbSim,input.flag_read_PyConTurb)
+                    end
+                end
+            end
+        end
+    end
+end
+
+% % Run Constrained_LidarSimulator to get statistics of constrained wind fields.
+if 2==1
+    TSnam=num2str(timestep_pat);
+    if length(TSnam)~=1
+        TSnam2=strrep(TSnam,'.','_'); % change '.' by '_' otherwise we have erroneous outputs
+    else
+        TSnam2=TSnam;
+    end
+    for index_shear={'05' }%'05' '10' '15' '20' '25'}
+        for indexSeed= 1;%:Nseeds
+            for ind_TI=1:length(TIValues)
+                
+                index_TI=TIValues(ind_TI);%{ '10' '15' '20' '25' '30'}
+                tic
+                windfieldfile            = strcat('DTU10MW_Shear_',index_shear{1},'_SD', num2str(indexSeed),'_',MeanVstr,'_TI',index_TI{1},'_',Pattern,'_result_PatTStp',TSnam2,'_Constrained_WF');
+                load_WF_directory        = strcat('..\Output\Output_TurbSim\V',MeanVstr,'\',Pattern,'_41_Pattern_WF\TimeStep',TSnam2,'\'); %Directoy where .wnd is
+                
+                Name_ORWF=strcat('DTU10MW_Shear_', index_shear{1}, '_SD', num2str(indexSeed), '_' ,MeanVstr, '_TI', index_TI{1});
+                OriginalWFDirectory=strcat('..\OriginalWindFields\V', MeanVstr, '_41_WF\Shear_',index_shear{1},'_SD',num2str(indexSeed),'\' );
+                OriginalWF=load(strcat(OriginalWFDirectory, Name_ORWF));
+                
+                if strcmp(Method2Constrain,'TurbSim')
+                    save_WF_Turbsim_directory = ['..\Constrained_Data\' Method2Constrain '\Pattern_',Pattern,'\TimeStp_pat',TSnam2,'\']; % directpor<
+                    if ~exist((save_WF_Turbsim_directory), 'dir')
+                        mkdir(save_WF_Turbsim_directory);
+                    end
+                    addpath (genpath(save_WF_Turbsim_directory));
+                elseif strcmp(Method2Constrain,'PyConTurb')
+                    save_WF_PyConTurb_directory = ['..\Constrained_Data\' Method2Constrain '\Pattern_',Pattern,'\TimeStp_pat',TSnam2,'\'];
+                    if ~exist((save_WF_PyConTurb_directory), 'dir')
+                        mkdir(save_WF_PyConTurb_directory);
+                    end
+                    addpath (genpath(save_WF_PyConTurb_directory));
+                elseif strcmp(Method2Constrain,'Both')
+                    save_WF_Turbsim_directory = ['..\Constrained_Data\TurbSim\Pattern_',Pattern,'\TimeStp_pat',TSnam2,'\'];
+                    save_WF_PyConTurb_directory = ['..\Constrained_Data\PyConTurb\Pattern_',Pattern,'\TimeStp_pat',TSnam2,'\'];
+                    if ~exist((save_WF_PyConTurb_directory), 'dir')
+                        mkdir(save_WF_PyConTurb_directory);
+                    end
+                    if ~exist((save_WF_Turbsim_directory), 'dir')
+                        mkdir(save_WF_Turbsim_directory);
+                    end
+                    addpath (genpath(save_WF_Turbsim_directory));
+                    addpath (genpath(save_WF_PyConTurb_directory));
+                end
+                
+                
+                
+                %Run Post_processing to obtain statistics from constrained
+                %wind fields.
+                run Constrained_LidarSimulator
+                disp([windfieldfile ' is done.' ])
+                clearvars -except input_directory i index index_shear indexSeed fullslicesTime MeanVstr Pattern Method2Constrain TSnam2 timestep_pat
+                toc
+            end
+        end
+    end
+    Full_Constrained_Time=fullslicesTime;
+    
+    save('..\Constrained_Data\Constrained_Time','Full_Constrained_Time');
+end
+
+##### SOURCE END #####
+--></body></html>

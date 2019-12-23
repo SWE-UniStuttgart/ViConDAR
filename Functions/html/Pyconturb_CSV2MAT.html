@@ -1,0 +1,217 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="Pyconturb_CSV2MAT.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Header</h1><p>Loading a .csv file from PyConTurb  and writting a .mat windfield. structure file.</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> Pyconturb_CSV2MAT(input,filename)
+
+VariablesFile=[input.PyconturbInput_dir <span class="string">'Variables_'</span> filename <span class="string">'.csv'</span>];
+PyconturbFile=csvread([input.PyconturbOut_dir filename <span class="string">'_ConPyconturb.csv'</span>],1);
+
+WF_VariablesTab=readtable(VariablesFile);
+WF_Variables=table2cell(WF_VariablesTab);
+gridz=csvread([input.PyconturbInput_dir <span class="string">'GridZ_'</span> filename <span class="string">'.csv'</span>],1);
+gridy=csvread([input.PyconturbInput_dir <span class="string">'GridY_'</span> filename <span class="string">'.csv'</span>],1);
+
+<span class="comment">% Parameters from PyConTurb file:</span>
+ny=length(gridy);
+nz=length(gridz);
+dz=abs(gridz(1,2))-abs(gridz(1,1));
+dy=abs(abs(gridy(1,1))-abs(gridy(1,2)));
+dt=(PyconturbFile(2,1)-PyconturbFile(1,1));
+URef=WF_Variables{3};
+Zh=WF_Variables{5};
+gridz=(gridz)-Zh;
+nt=length(PyconturbFile(:,1));
+componentUinp=PyconturbFile(:,2:3:end);
+componentVinp=PyconturbFile(:,3:3:end);
+componentWinp=PyconturbFile(:,4:3:end);
+timecomponent=PyconturbFile(:,1);
+
+<span class="comment">% sort matrix:</span>
+count1=1;
+<span class="keyword">for</span> timecount=1:length(timecomponent)
+    <span class="keyword">for</span> col1=1:ny
+        ComponentU{timecount}(1:ny,col1)=(componentUinp(timecount,count1:count1+(ny-1))); <span class="comment">%#ok&lt;*AGROW&gt;</span>
+        ComponentV{timecount}(1:ny,col1)=(componentVinp(timecount,count1:count1+(ny-1)));
+        ComponentW{timecount}(1:ny,col1)=(componentWinp(timecount,count1:count1+(ny-1)));
+
+        count1=count1+ny;
+    <span class="keyword">end</span>
+    ComponU(:,timecount,:)=(ComponentU{timecount})';
+    ComponV(:,timecount,:)=(ComponentV{timecount})';
+    ComponW(:,timecount,:)=(ComponentW{timecount})';
+
+    count1=1;
+<span class="keyword">end</span>
+
+
+<span class="comment">% Grid Structure:</span>
+windfield.grid.nt=nt;
+windfield.grid.ny=ny;
+windfield.grid.nz=nz;
+windfield.grid.dt=dt;
+windfield.grid.dy=dy;
+windfield.grid.dz=dz;
+windfield.grid.t=timecomponent;
+windfield.grid.z=gridz;
+windfield.grid.y=gridy;
+windfield.grid.Y=repmat(gridy,length(gridy),1);
+windfield.grid.Z=repmat(gridz',1,length(gridz));
+
+<span class="comment">% Windfield Structure</span>
+windfield.ny=ny;
+windfield.nz=nz;
+windfield.dt=dt;
+windfield.u=ComponU;
+windfield.v=ComponV;
+windfield.w=ComponW;
+windfield.URef=URef;
+windfield.T_offset  = windfield.grid.dy*(windfield.grid.ny-1)/windfield.URef/2+windfield.grid.dt; <span class="comment">%GridWidth/URef/2 % +dt(DS)</span>
+parsave(<span class="string">'-v7.3'</span>,[input.PyconturbOut_dir filename <span class="string">'_ConPyconturb.mat'</span>],windfield)
+disp ([<span class="string">'File '</span> filename <span class="string">'_ConPyconturb.csv succesfully converted to windfield format .mat'</span>])
+<span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Header
+%
+% Loading a .csv file from PyConTurb  and writting a .mat windfield.
+% structure file.
+%
+% V.Pettas/F.Costa 
+% University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
+
+
+function Pyconturb_CSV2MAT(input,filename)
+
+VariablesFile=[input.PyconturbInput_dir 'Variables_' filename '.csv'];
+PyconturbFile=csvread([input.PyconturbOut_dir filename '_ConPyconturb.csv'],1); 
+
+WF_VariablesTab=readtable(VariablesFile);
+WF_Variables=table2cell(WF_VariablesTab);
+gridz=csvread([input.PyconturbInput_dir 'GridZ_' filename '.csv'],1);
+gridy=csvread([input.PyconturbInput_dir 'GridY_' filename '.csv'],1);
+
+% Parameters from PyConTurb file:
+ny=length(gridy);
+nz=length(gridz);
+dz=abs(gridz(1,2))-abs(gridz(1,1));
+dy=abs(abs(gridy(1,1))-abs(gridy(1,2)));
+dt=(PyconturbFile(2,1)-PyconturbFile(1,1));
+URef=WF_Variables{3};
+Zh=WF_Variables{5};
+gridz=(gridz)-Zh;
+nt=length(PyconturbFile(:,1));
+componentUinp=PyconturbFile(:,2:3:end);
+componentVinp=PyconturbFile(:,3:3:end);
+componentWinp=PyconturbFile(:,4:3:end);
+timecomponent=PyconturbFile(:,1);
+
+% sort matrix:
+count1=1;
+for timecount=1:length(timecomponent)
+    for col1=1:ny
+        ComponentU{timecount}(1:ny,col1)=(componentUinp(timecount,count1:count1+(ny-1))); %#ok<*AGROW>
+        ComponentV{timecount}(1:ny,col1)=(componentVinp(timecount,count1:count1+(ny-1)));
+        ComponentW{timecount}(1:ny,col1)=(componentWinp(timecount,count1:count1+(ny-1)));
+       
+        count1=count1+ny;
+    end
+    ComponU(:,timecount,:)=(ComponentU{timecount})';
+    ComponV(:,timecount,:)=(ComponentV{timecount})';
+    ComponW(:,timecount,:)=(ComponentW{timecount})';
+   
+    count1=1;
+end
+
+
+% Grid Structure:
+windfield.grid.nt=nt;
+windfield.grid.ny=ny;
+windfield.grid.nz=nz;
+windfield.grid.dt=dt;
+windfield.grid.dy=dy;
+windfield.grid.dz=dz;
+windfield.grid.t=timecomponent;
+windfield.grid.z=gridz;
+windfield.grid.y=gridy;
+windfield.grid.Y=repmat(gridy,length(gridy),1);
+windfield.grid.Z=repmat(gridz',1,length(gridz));
+
+% Windfield Structure
+windfield.ny=ny;
+windfield.nz=nz;
+windfield.dt=dt;
+windfield.u=ComponU;
+windfield.v=ComponV;
+windfield.w=ComponW;
+windfield.URef=URef;
+windfield.T_offset  = windfield.grid.dy*(windfield.grid.ny-1)/windfield.URef/2+windfield.grid.dt; %GridWidth/URef/2 % +dt(DS)
+parsave('-v7.3',[input.PyconturbOut_dir filename '_ConPyconturb.mat'],windfield)
+disp (['File ' filename '_ConPyconturb.csv succesfully converted to windfield format .mat'])
+end
+##### SOURCE END #####
+--></body></html>

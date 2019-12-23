@@ -1,0 +1,1872 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>LidarSimulatorCOPY</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="LidarSimulatorCOPY.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">HEADER</a></li><li><a href="#2">IO definition</a></li><li><a href="#3">Flags for calculations and plots</a></li><li><a href="#4">Load windfield file</a></li><li><a href="#5">Obtain and create data</a></li><li><a href="#6">Discretization</a></li><li><a href="#7">Rotate wind field for adding yaw and tilt inflow offsets</a></li><li><a href="#8">Extract points with time, spatial discretization and LOS</a></li><li><a href="#9">LOS transformations. From cartesian to ray coordinates and back with the cyclops dilema (or something else.. )</a></li><li><a href="#10">Application of noise to the measured points</a></li><li><a href="#11">Plot time series of measured points</a></li><li><a href="#12">Calculate REWS</a></li><li><a href="#13">Calculate Shear power law exponent from measurements and full windfield</a></li><li><a href="#14">Statistics</a></li><li><a href="#15">plot the slice only requested by the user</a></li><li><a href="#16">Resample Data (check the missmatch in time at the end of the series...!!)</a></li><li><a href="#17">Save in TurbSim timeseries input format:</a></li><li><a href="#18">Save in pyconturb format (Check how i remove nans for turbsim!!! maybe we should do it earlier in the code: Done!!)</a></li><li><a href="#19">Execute python: Does not work... cannot import PyCOnTurb packages</a></li><li><a href="#20">Create and save .mat output and figures</a></li></ul></div><h2>HEADER<a name="1"></a></h2><pre class="codeinput"><span class="comment">% Francisco Costa &amp;&amp; Vasilis Pettas</span>
+<span class="comment">% &copy; SWE</span>
+<span class="comment">%obtain Windfield data</span>
+<span class="comment">%Inputs</span>
+<span class="comment">%Outputs</span>
+<span class="comment">%Dependencies</span>
+
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+<span class="comment">% TODOs:</span>
+<span class="comment">% LOS transformations also on the averaged points</span>
+<span class="comment">% Definition of outputs and format URGENT!!!!</span>
+<span class="comment">% Add the possiblility to rotate the field for yawed and inclined inflow</span>
+<span class="comment">% Separate plotting from the main code</span>
+<span class="comment">% Break the code in modular functions</span>
+<span class="comment">% Separate inputs in an input definition file and make the main code a function</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+<span class="comment">%--------------------------------------------------------------------------%</span>
+</pre><h2>IO definition<a name="2"></a></h2><p>Turbine parameters</p><pre class="codeinput">rotor_radius = input.rotor_radius; <span class="comment">% Radio of the Rotor [m]</span>
+Zh           = input.Zh;           <span class="comment">% HubHeight [m]</span>
+Pos_LiDAR    = input.Pos_LiDAR;    <span class="comment">% LiDAR position offsetfrom hub center(meters)==&gt; [Y,Z] WE NEED TO FIX THE APPLICATION OF OFFSET IN LOS ONLY!!!!</span>
+<span class="comment">% Lidar parameters</span>
+ref_plane_dist = input.ref_plane_dist;   <span class="comment">% Reference Plane for LOS (distance[m])</span>
+distance_av_space = input.distance_av_space; <span class="comment">% [m] values to use for imitating range gate averaging in the calcualtion of wind speeds from pulses meters ahead and afer the point</span>
+points_av_slice   = input.points_av_slice; <span class="comment">%how many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!</span>
+
+<span class="comment">%Processing REWS:</span>
+dist_REWS_nd = input.dist_REWS_nd; <span class="comment">% Non dimentional span position for rotor effective wind speed calculation [define from 0 to 1 inclusive]</span>
+Wi           = input.Wi;  <span class="comment">%Weight to be applied for rotor effective wind speed calculation</span>
+<span class="comment">%Resampling lidar measurements, currently in Frequency domain</span>
+resampling_factor = input.resampling_factor; <span class="comment">% Amount of desired resampling for outputs in Turbsim and PyConTurb used with input.flag_resampling</span>
+<span class="comment">% Wind velocity vector components to be used</span>
+nComp             = input.nComp;        <span class="comment">%1:u, 2:v+u 3:u+v+w % Number of components to process (U,V,W):</span>
+<span class="comment">% Interpolation for time and space</span>
+type_interpolation     = input.type_interpolation; <span class="comment">% (interp1) interpolation between slices [Time] line460 (check other options of interpm)</span>
+type_interpolation_2   = input.type_interpolation_2; <span class="comment">% (interp2)  interpolation in grid points for values on the pattern points[Space]</span>
+<span class="comment">%Noise magnitude to imitate uncertainty and noise in real measurements (in dB)</span>
+noise_U  = input.noise_U; <span class="comment">% magnitude of noise to be applied in U time series (see help of awgn function)</span>
+noise_V  = input.noise_V; <span class="comment">% magnitude of noise to be applied in V time series (see help of awgn function)</span>
+noise_W  = input.noise_W; <span class="comment">% magnitude of noise to be applied in W time series (see help of awgn function)</span>
+
+<span class="comment">%Secondary options REMOVE!!</span>
+extract_distance_slice = 100; <span class="comment">%[m] Distance you want to extract a slice (only ploting) The distance must exist!!!! Probably remove!!!!!</span>
+<span class="keyword">if</span> input.flag_unconstrain==1
+    <span class="comment">% TurbsimParameters:</span>
+    RandSeed=round(rand(1)*80682);
+    UsableTime=<span class="string">'"ALL"'</span>;
+    IECstandard=<span class="string">'"1-ED3"'</span>;
+    SCMod1=<span class="string">'"GENERAL"'</span>;
+    RefHt=Zh;
+    WindProfileType=<span class="string">'"PL"'</span>; <span class="comment">% "LOG", "PL" and, if we have more than one measuring point must use "TS"</span>
+
+    <span class="comment">%P yConturb parameters</span>
+    turb_class = <span class="string">'B'</span>;
+    coh_model  = <span class="string">'iec'</span>; <span class="comment">% coh_model (str, optional) &#8211; Spatial coherence model specifier. Default is IEC 61400-1.</span>
+    wsp_func   = <span class="string">'power_profile'</span>;<span class="comment">% wsp_func (function, optional): constant_profile or power_profile</span>
+    sig_func   = <span class="string">'iec_sig'</span>; <span class="comment">%sig_func (function, optional):</span>
+    spec_func  = <span class="string">'kaimal_spectrum'</span>;<span class="comment">%spec_func (function, optional). 'kaimal_spectrum',:</span>
+    seed       = uint32(rand(1)*80682); <span class="comment">%seed (int, optional): Optional random seed for turbulence generation. Use the same seed and settings to regenerate the same turbulence box.</span>
+    nf_chunk     = 500000; <span class="comment">%mem_gb (float, optional) &#8211; Size of memory to use when doing the calculations. Increase this number to have faster turbulence generation, but if the number becomes too large the generation will fail.</span>
+
+    interp_data = <span class="string">'Take_list'</span>; <span class="comment">% Could be 'all','none' or 'Take_list'. If 'Takes_list' then takes into account what we introduce in wsp_func, sig_func and spec_func.</span>
+    <span class="comment">%**kwargs &#8211; Optional keyword arguments to be fed into the spectral/turbulence/profile/etc. models</span>
+<span class="keyword">end</span>
+</pre><h2>Flags for calculations and plots<a name="3"></a></h2><pre class="codeinput">input.flag_VW_0                 = 1; <span class="comment">%REMOVE% Consider v and w components of the wind field =0 for TurbSim;</span>
+input.flag_interp_lidar_meas    = 0; <span class="comment">%REMOVE% interpolate between measured lidar values</span>
+input.flag_spacenIterp          = 0; <span class="comment">%REMOVE interpolate in space inside each slice for points that don't lie on the grid.Don't use in order it to speed up calculations (!!!!here there is an error in ointerpolation function. If interpolate VFinalTotal_Time is not calculated!!!!!1)</span>
+input.flag_check_for_nans       = 0; <span class="comment">%REMOVE% check if there are any nans in your windfield and change them</span>
+
+input.flag_plot_CS_LOS_trans    = 0; <span class="comment">%REMOVE or plotting? % Plot the coordinate system transofrmation    ===&gt;  0=NO, 1=YES</span>
+input.flag_Plot_LOS_beams       = 0; <span class="comment">%REMOVE or plotting? % Plot beams of LOS                    ===&gt;  0=NO, 1=YES</span>
+input.flag_figure_RealSyn       = 0 ;<span class="comment">%REMOVE or plotting? % Plot Time Series                     ===&gt;  0=NO, 1=YES</span>
+input.flag_plot_int_points      = 0; <span class="comment">%REMOVE or plotting? % Plot interpolated points             ===&gt;  0=NO, 1=YES</span>
+input.flag_plot_REWS            = 0; <span class="comment">%REMOVE or plotting? % Plot REWS                            ===&gt;  0=NO, 1=YES</span>
+input.flag_plot_statistics      = 0; <span class="comment">%REMOVE or plotting?% Plot  statistics        ===&gt;  0=NO, 1=YES</span>
+input.flag_plot_shear           = 0; <span class="comment">%REMOVE or plotting?%Plot time series of calculated shear</span>
+input.flag_plot_pattern         = 0; <span class="comment">%REMOVE or plotting?% Plot Slice with pattern              ===&gt;  0=NO, 1=YES</span>
+</pre><h2>Load windfield file<a name="4"></a></h2><pre class="codeinput">filename=strcat(input_directory,windfieldfile);
+load (filename);
+</pre><h2>Obtain and create data<a name="5"></a></h2><pre class="codeinput"><span class="comment">%extract components from the windfield variable</span>
+
+compU               =  windfield.u;
+compV               =  windfield.v;
+compW               =  windfield.w;
+dt                  =  windfield.dt; <span class="comment">%time step</span>
+gridtime            =  windfield.grid.nt;
+gridny              =  windfield.grid.ny;
+gridnz              =  windfield.grid.nz;
+spatialstep_dy      =  windfield.grid.dy;
+spatialstep_dz      =  windfield.grid.dz;
+gridz               =  -windfield.grid.z;
+gridy               =  windfield.grid.y;
+Uref                =  windfield.URef; <span class="comment">% Mean velocity of the windfied (m/s)</span>
+dz                  =  windfield.grid.dz;
+dy                  =  windfield.grid.dy;
+distanceSlices      =  Uref*dt; <span class="comment">% Distance step  between consecutive slices(m)</span>
+
+<span class="comment">% Manipulation of data before calculations:</span>
+<span class="keyword">for</span> i=1:gridtime
+    SqueezeCompU{i}=squeeze(compU(:,i,:));
+    FlippedCompU{i}=flipud(SqueezeCompU{i}');
+<span class="keyword">end</span>
+<span class="keyword">for</span> i=1:gridtime
+    compU(:,i,:)=FlippedCompU{i} ;
+<span class="keyword">end</span>
+[Uy,Ux,Uz]          =  size(compU);<span class="comment">% Named components matrix</span>
+</pre><h2>Discretization<a name="6"></a></h2><pre class="codeinput">fullTime            =  (dt*gridtime)-dt; <span class="comment">%total time duration of the windfield</span>
+fullslicesTime      =  0:dt:fullTime;
+slicesDistance      =  fullslicesTime*Uref; <span class="comment">% vector with distance between slices(m)</span>
+<span class="comment">%Calculate the slice of each pattern point</span>
+icunt1 = 0;
+<span class="keyword">for</span> ipoint = 1:length(Y) <span class="comment">% different time and slices for each point!!</span>
+
+    slicesN     = floor((1+(icunt1*timeStep_Measurements)/dt):(Ux*(timestep_pat_vec/fullTime)):gridtime); <span class="comment">% Slices for each pattern point [index]. We use floor to avoid taking a slice that does not exist. Use high resolution WF!!!!</span>
+    slicesTimeN = icunt1*timeStep_Measurements:timestep_pat_vec:fullTime;<span class="comment">% Slices for each pattern point [s].</span>
+    <span class="keyword">if</span> length(slicesN)&lt;length(floor((1+1:(Ux*(timestep_pat_vec/fullTime)):gridtime)))
+        slicesN(end+1:length(floor((1+1:(Ux*(timestep_pat_vec/fullTime)):gridtime))))=nan ;
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> length(slicesTimeN)&lt;length(0:timestep_pat_vec:fullTime)
+        slicesTimeN(end+1:length(0:timestep_pat_vec:fullTime))=nan ;
+    <span class="keyword">end</span>
+
+    <span class="comment">%%%%%%%%%%%%%%%%%%%%This loop does exactly the same thing with the previous 4 lines check why it works%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+    <span class="keyword">if</span> ipoint &gt;1 &amp;&amp; length(slicesN)&lt;length(slices(ipoint-1,:))
+        vectornans1=nan*abs(length(slicesN)-length(slices(ipoint-1,:)));
+        slicesN=[ slicesN vectornans1]; <span class="comment">%#ok&lt;*AGROW&gt;</span>
+        slices(ipoint,:)     =  slicesN; <span class="comment">%requested slices for scanning</span>
+    <span class="keyword">else</span>
+        slices(ipoint,:)     =  slicesN; <span class="comment">%requested slices for scanning</span>
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> ipoint &gt;1 &amp;&amp; length(slicesTimeN)&lt;length(slices(ipoint-1,:))
+        vectornans2=nan*abs(length(slicesN)-length(slices(ipoint-1,:)));
+        slicesTimeN=[ slicesN vectornans2];
+        slicesTime(ipoint,:) =  slicesTimeN; <span class="comment">% time of slices</span>
+    <span class="keyword">else</span>
+        slicesTime(ipoint,:) =  slicesTimeN; <span class="comment">% time of slices</span>
+    <span class="keyword">end</span>
+    <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+    slices(ipoint,:)     =  slicesN; <span class="comment">%requested slices for scanning</span>
+    slicesTime(ipoint,:) =  slicesTimeN; <span class="comment">% time of slices</span>
+    icunt1 = icunt1 +1;
+    clear <span class="string">slicesN</span> <span class="string">slicesTimeN</span>
+<span class="keyword">end</span>
+
+distance_av_slice = distance_av_space/(distanceSlices); <span class="comment">%transforming the distance in space to slices count</span>
+</pre><h2>Rotate wind field for adding yaw and tilt inflow offsets<a name="7"></a></h2><pre class="codeinput"><span class="keyword">if</span> 2==1 <span class="comment">% dummy place holder</span>
+<span class="keyword">end</span>
+</pre><h2>Extract points with time, spatial discretization and LOS<a name="8"></a></h2><pre class="codeinput"><span class="keyword">for</span> num_tr=1:length (Y)
+    trajectory(:,num_tr) = [Y(num_tr);Z(num_tr)]; <span class="comment">%#ok&lt;*SAGROW&gt;  first line is y direction second is z. Origin is (Pos_LiDAR(1),Pos_LiDAR(2))==0</span>
+    trajectory_forAng(:,num_tr) = [Y(num_tr)+Pos_LiDAR(1);Z(num_tr)+Pos_LiDAR(2)]; <span class="comment">%#ok&lt;*SAGROW&gt;  Offset is included here to calculate the changed LOS. first line is y direction second is z. Origin is (Pos_LiDAR(1),Pos_LiDAR(2))==0</span>
+<span class="keyword">end</span>
+
+<span class="comment">% loop over trajectory to find LOS angles (constant for all repeated measurement points)</span>
+<span class="keyword">if</span> input.flag_apply_LOS == 1
+    <span class="keyword">for</span> i_ang=1:size(trajectory_forAng,2)
+        angley(i_ang) = atand(trajectory_forAng(1,i_ang)/ref_plane_dist) ;
+        anglez(i_ang) = atand(trajectory_forAng(2,i_ang)/ref_plane_dist) ;
+    <span class="keyword">end</span>
+<span class="keyword">else</span>
+    <span class="keyword">for</span> i_ang=1:size(trajectory_forAng,2)
+        angley(i_ang) = 0;
+        anglez(i_ang) = 0 ;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">%get the transformation matrices for each pattern point. look at https://en.wikipedia.org/wiki/Rotation_matrix</span>
+<span class="keyword">for</span> iTra= 1:length(Y)
+    In_2_LOS_matrix{iTra} = [cosd(anglez(iTra))*cosd(angley(iTra))   -cosd(anglez(iTra))*sind(angley(iTra))   sind(anglez(iTra));
+        sind(angley(iTra))                    cosd(angley(iTra))                      0  ;
+        sind(angley(iTra))* cosd(anglez(iTra))  -sind(anglez(iTra))*sind(angley(iTra))   cosd(anglez(iTra)) ];
+    <span class="comment">%     In_2_LOS_matrix{iTra} = [cosd(anglez(iTra))*cosd(angley(iTra))   -sind(anglez(iTra))   cosd(anglez(iTra))*sind(angley(iTra));</span>
+    <span class="comment">%         sind(anglez(iTra))*cosd(angley(iTra))    cosd(anglez(iTra))   sind(anglez(iTra))*sind(angley(iTra)) ;</span>
+    <span class="comment">%         -sind(angley(iTra))                     0                     cosd(angley(iTra))];</span>
+    LOS_2_In_matrix{iTra} =  In_2_LOS_matrix{iTra}^-1; <span class="comment">% Invers transformation: LOS_CS to Inertial_CS</span>
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> distance_av_slice~=0
+    SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
+    focus_distances = SliceVecInt+ref_plane_dist;
+<span class="keyword">else</span>
+    focus_distances = ref_plane_dist;  <span class="comment">% no slices to be averaged, single point measurement</span>
+<span class="keyword">end</span>
+
+<span class="comment">%loop over planes to get points</span>
+<span class="keyword">for</span> i=1:length (focus_distances)
+    iplane= focus_distances(i); <span class="comment">% requested planes are all the planes along the distance (slicesDistance)</span>
+    <span class="keyword">for</span> ii=1:size(trajectory,2)
+        <span class="keyword">if</span> input.flag_apply_LOS ==1
+            plane_traj{i}(1,ii) = iplane*tand(angley(ii));
+            plane_traj{i}(2,ii) = iplane*tand(anglez(ii));
+        <span class="keyword">else</span>   <span class="comment">%dont move the trajectory projection if you dont have LOS</span>
+            plane_traj{i}(1,ii) = Y(ii);
+            plane_traj{i}(2,ii) = Z(ii); <span class="comment">% this variable saves Y aand z points according to the plane</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
+
+<span class="comment">%Check for the case when we request only 1 slice to be averaged</span>
+<span class="keyword">if</span> [isempty(LOS_points.slicesAv) || any(isnan(LOS_points.slicesAv))]  &amp;&amp; distance_av_slice==0
+    LOS_points.slicesAv = 0;
+<span class="keyword">end</span>
+
+<span class="keyword">for</span> num_tr3=1:length (Y)
+    LOS_points.slices(num_tr3,:)= slices(num_tr3,:);
+    LOS_points.slicesTime(num_tr3,:)= slicesTime(num_tr3,:);
+    <span class="keyword">for</span> ii=1:length(plane_traj)
+        LOS_points.Coor{num_tr3}(:,ii)= plane_traj{1,ii}(:,num_tr3); <span class="comment">%this variable saves coordinates according to trajectory points</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% extract the measured slices as well as the full time series. Here is also</span>
+<span class="comment">% the averaging (or any other mnanipulation) for the multiple slices. NO LOS here</span>
+<span class="comment">% Here is calculated the mean velocity of all the points in the pattern every time LiDAR completes one</span>
+<span class="comment">% pattern (frequency of the pattern) taking into account timstep_meas.</span>
+<span class="comment">% HERE ADD A AN OUTPUT WITH THE FIXED SLICESTIME SO THAT THEY  MATCH IN TIME!!!</span>
+
+[VFinalTotal_U,VFinalTotal_Time_U,~,~,slicesTime] = interpolationFun(slicesTime,compU,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2,flag_spacenIterp,timestep_pat_vec);
+[VFinalTotal_V,VFinalTotal_Time_V,~,~,~] = interpolationFun(slicesTime,compV,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2,flag_spacenIterp,timestep_pat_vec);
+[VFinalTotal_W,VFinalTotal_Time_W,~,~,~] = interpolationFun(slicesTime,compW,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2,flag_spacenIterp,timestep_pat_vec);
+<span class="comment">% Remove Nans (repeating values from the row above):</span>
+
+<span class="keyword">for</span> ind_nan=1:length(Y)  <span class="comment">% REMOVE THIS PART? WHAT does it do? We should hanlde nans in InterpolationFun</span>
+    <span class="comment">% Find Nans in component U</span>
+    [Row_NAN_VFT_U,Col_NAN_VFT_U]=find(isnan(VFinalTotal_U{ind_nan}));
+    [Row_NAN_VFT_Time_U,Col_NAN_VFT_Time_U]=find(isnan(VFinalTotal_Time_U{ind_nan}));
+    NpointsNanU     = length(Col_NAN_VFT_U);
+    NpointsNanTimeU = length(Col_NAN_VFT_Time_U);
+    <span class="comment">% Replace with value previous value</span>
+    VFinalTotal_U{ind_nan}(Row_NAN_VFT_U,Col_NAN_VFT_U) =   VFinalTotal_U{ind_nan}(Row_NAN_VFT_U,Col_NAN_VFT_U-1);
+    VFinalTotal_Time_U{ind_nan}(Row_NAN_VFT_Time_U,Col_NAN_VFT_Time_U) =   VFinalTotal_Time_U{ind_nan}(Row_NAN_VFT_Time_U,Col_NAN_VFT_Time_U-1);
+
+    <span class="comment">% Find Nans in component _V</span>
+    [Row_NAN_VFT_V,Col_NAN_VFT_V]=find(isnan(VFinalTotal_V{ind_nan}));
+    [Row_NAN_VFT_Time_V,Col_NAN_VFT_Time_V]=find(isnan(VFinalTotal_Time_V{ind_nan}));
+    NpointsNanV     = length(Col_NAN_VFT_V);
+    NpointsNanTimeV = length(Col_NAN_VFT_Time_V);
+    <span class="comment">% Replace with value previous value</span>
+    VFinalTotal_V{ind_nan}(Row_NAN_VFT_V,Col_NAN_VFT_V) =   VFinalTotal_V{ind_nan}(Row_NAN_VFT_V,Col_NAN_VFT_V-1);
+    VFinalTotal_Time_V{ind_nan}(Row_NAN_VFT_Time_V,Col_NAN_VFT_Time_V) =   VFinalTotal_Time_V{ind_nan}(Row_NAN_VFT_Time_V,Col_NAN_VFT_Time_V-1);
+
+    <span class="comment">% Find Nans in component W</span>
+    [Row_NAN_VFT_W,Col_NAN_VFT_W]=find(isnan(VFinalTotal_W{ind_nan}));
+    [Row_NAN_VFT_Time_W,Col_NAN_VFT_Time_W]=find(isnan(VFinalTotal_Time_W{ind_nan}));
+    NpointsNanW    = length(Col_NAN_VFT_W);
+    NpointsNanTimeW = length(Col_NAN_VFT_Time_W);
+    <span class="comment">% Replace with value previous value</span>
+    VFinalTotal_W{ind_nan}(Row_NAN_VFT_W,Col_NAN_VFT_W) =   VFinalTotal_W{ind_nan}(Row_NAN_VFT_W,Col_NAN_VFT_W-1);
+    VFinalTotal_Time_W{ind_nan}(Row_NAN_VFT_Time_W,Col_NAN_VFT_Time_W) =   VFinalTotal_Time_W{ind_nan}(Row_NAN_VFT_Time_W,Col_NAN_VFT_Time_W-1);
+<span class="keyword">end</span>
+
+NumberRows2delete=max([NpointsNanU,NpointsNanTimeU,NpointsNanV,NpointsNanTimeV,NpointsNanW,NpointsNanTimeW]); <span class="comment">% used only in turbsim output part!</span>
+</pre><h2>LOS transformations. From cartesian to ray coordinates and back with the cyclops dilema (or something else.. )<a name="9"></a></h2><pre class="codeinput"><span class="keyword">for</span> ind_LOS=1:length(Y)
+    <span class="keyword">for</span> ind_slice=1:length(VFinalTotal_Time_U{ind_LOS})
+        <span class="comment">%multiplyng all the slice with the transformation matrix</span>
+        VFinalTotal_Time_LOS_vec =  In_2_LOS_matrix{ind_LOS} * <span class="keyword">...</span>
+            [VFinalTotal_Time_U{ind_LOS}(ind_slice);VFinalTotal_Time_V{ind_LOS}(ind_slice);VFinalTotal_Time_W{ind_LOS}(ind_slice)];
+        <span class="comment">%      Get the measured wind speeds in LOS coordinates</span>
+        VFinalTotal_Time_LOS_U{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec(1);
+        VFinalTotal_Time_LOS_V{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec(2);
+        VFinalTotal_Time_LOS_W{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec(3);
+
+        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  WIND FIELD RECONSTRUCTION</span>
+        <span class="comment">% assuming w and v equal to 0 in order to reconstruct. Other methods could be used HERE like assuming a correlation between u and v</span>
+        VFinalTotal_Time_reconstr_vec = [ LOS_2_In_matrix{ind_LOS}(1,:); [0 0 0]; [0 0 0]] *<span class="keyword">...</span>
+            [VFinalTotal_Time_LOS_vec(1);VFinalTotal_Time_LOS_vec(2) ;VFinalTotal_Time_LOS_vec(3) ] ;
+
+        VFinalTotal_Time_U{ind_LOS}(ind_slice) = VFinalTotal_Time_reconstr_vec(1);
+        VFinalTotal_Time_V{ind_LOS}(ind_slice) = VFinalTotal_Time_reconstr_vec(2);
+        VFinalTotal_Time_W{ind_LOS}(ind_slice) = VFinalTotal_Time_reconstr_vec(3);
+        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% Plot angles of LOS: Does not work CHECK IT</span>
+<span class="keyword">if</span> input.flag_Plot_LOS_beams==1
+    <span class="comment">%     figure</span>
+    <span class="comment">%     plot(trajectory(1,:),trajectory(2,:),'X','Linewidth',2),grid on</span>
+    <span class="comment">%     title (['Trajectory as requested on reference plane at ' num2str(ref_plane_dist) '[m]'])</span>
+    ofsetvec = LOS_points.slicesAv;
+    <span class="keyword">if</span> isempty(ofsetvec)
+        ofsetvec =0;
+    <span class="keyword">end</span>
+
+
+    figure
+    <span class="keyword">for</span> ind_traj=1:length(Y)
+        plane_extract_slicePlot=(find(min(abs(slices(ind_traj,:)*distanceSlices-ref_plane_dist))==abs(slices(ind_traj,:)*distanceSlices-ref_plane_dist)));
+        <span class="keyword">for</span> i=1:length(plane_traj)
+            plot3((ofsetvec(i)+slices(ind_traj,plane_extract_slicePlot))*distanceSlices,<span class="keyword">...</span>
+                ones(1,length(slices(ind_traj,plane_extract_slicePlot)))*plane_traj{1,i}(1,ind_traj),<span class="keyword">...</span>
+                ones(1,length(slices(ind_traj,plane_extract_slicePlot)))*plane_traj{1,i}(2,ind_traj),<span class="string">'X'</span>,<span class="string">'Linewidth'</span>,2);
+            hold <span class="string">on</span>
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+    <span class="comment">%     end</span>
+    plot3(0,0,0,<span class="string">'MarkerFaceColor'</span>,[0 0 1],<span class="string">'MarkerEdgeColor'</span>,[0 0 1],<span class="keyword">...</span>
+        <span class="string">'Marker'</span>,<span class="string">'o'</span>,<span class="string">'LineStyle'</span>,<span class="string">'none'</span>),xlabel(<span class="string">'Time [s]'</span>),ylabel(<span class="string">'Y [m]'</span>),zlabel(<span class="string">'Z [m]'</span>),title(<span class="string">'LOS beams trajectory'</span>);
+    hold <span class="string">off</span>
+    grid <span class="string">on</span>
+    set(gca,<span class="string">'YGrid'</span>,<span class="string">'on'</span>, <span class="string">'FontSize'</span>, 14,<span class="string">'YMinorGrid'</span>,<span class="string">'on'</span>,<span class="string">'XMinorGrid'</span>,<span class="string">'on'</span>,<span class="string">'ZMinorGrid'</span>,<span class="string">'on'</span>)
+<span class="keyword">end</span>
+
+<span class="comment">% Plot part</span>
+<span class="keyword">if</span> input.flag_plot_CS_LOS_trans==1
+    <span class="comment">%     figure,</span>
+    <span class="comment">%     quiver3(0,0,0,25,0,0,'r','Linewidth',2) %eje x</span>
+    <span class="comment">%     hold on,</span>
+    <span class="comment">%     quiver3(0,0,0,0,25,0,'g','Linewidth',2)%eje y</span>
+    <span class="comment">%</span>
+    <span class="comment">%     quiver3(0,0,0,0,0,25,'b','Linewidth',2)%eje z</span>
+    <span class="comment">%</span>
+    <span class="comment">%     quiver3(0,0,0,ref_plane_dist,LOS_points.Coor{1}(1,2),LOS_points.Coor{1}(2,2),'c','Linewidth',2.5)%eje z</span>
+    <span class="comment">%     quiver3(0,0,0,25.* LOS_2_In_matrix{1}(1,1),25.* LOS_2_In_matrix{1}(2,1),25.* LOS_2_In_matrix{1}(3,1),'r-.','Linewidth',1.5) %eje x</span>
+    <span class="comment">%     quiver3(0,0,0,25.*rotated_ejeY{ind_LOS}(1,1),25.*rotated_ejeY{ind_LOS}(2,1),25.*rotated_ejeY{ind_LOS}(3,1),'g-.','Linewidth',1.5) %eje y</span>
+    <span class="comment">%     quiver3(0,0,0,25.*rotated_ejeZ{ind_LOS}(1,1),25.*rotated_ejeZ{ind_LOS}(2,1),25.*rotated_ejeZ{ind_LOS}(3,1),'b-.','Linewidth',1.5) %eje z</span>
+    <span class="comment">%     quiver3(0,0,0,VFinalTotal_U{ind_LOS}(:,4),VFinalTotal_V{ind_LOS}(:,4),VFinalTotal_W{ind_LOS}(:,4),'k-','Linewidth',2)</span>
+    <span class="comment">%     xlabel('X'),ylabel('Y'),zlabel('Z'),legend('CS_X','CS_Y','CS_Z','Beam direction', 'Rotated CS','Velocity Vector'), title('Rotation of the Coordenate System')</span>
+    <span class="comment">%</span>
+    <span class="comment">%     figure, plot(fullslicesTime(1:length(VFinalTotal_U{1})),VFinalTotal_U{1},'b','Linewidth',2)</span>
+    <span class="comment">%     hold on ,plot(fullslicesTime(1:length(VFinalTotal_U{1})),VFinalTotal_U_LOS_Sch{1}(1,:),'r-'), title(['Comparation LOS - NO LOS - ','Point = [',num2str(Y(1)),',',num2str(Z(1)),'] ',' Distance = ',num2str(ref_plane_dist),' m']),legend ('NO LOS','LOS')</span>
+    <span class="comment">%     xlabel('Time (s)'),ylabel('Velocity (m/s)'),grid on,hold off</span>
+    <span class="comment">%     LOSNONLOS=[VFinalTotal_U{1};VFinalTotal_U_LOS_Sch{1}(1,:)];</span>
+    <span class="comment">%     LOSDifference=std(std(LOSNONLOS));</span>
+    <span class="comment">%     %     for ind_slice=1:gridti</span>
+<span class="keyword">end</span>
+<span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+</pre><h2>Application of noise to the measured points<a name="10"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_apply_noise==1
+    <span class="keyword">for</span> ind_noise=1:length(Y)
+        VFinalTotal_Time_U{ind_noise} = awgn(VFinalTotal_Time_U{ind_noise},noise_U);
+        VFinalTotal_Time_V{ind_noise} = awgn(VFinalTotal_Time_V{ind_noise},noise_V);
+        VFinalTotal_Time_W{ind_noise} = awgn(VFinalTotal_Time_W{ind_noise},noise_W);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Plot time series of measured points<a name="11"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_figure_RealSyn==1
+    WindFieldName=strrep(windfieldfile,<span class="string">'_'</span>,<span class="string">'-'</span>);
+    <span class="keyword">for</span> i2=1:length(Y) <span class="comment">% for number of points</span>
+
+        figure(<span class="string">'Name'</span>,[<span class="string">'ComponentU_Point'</span> num2str(i2)]),hold <span class="string">on</span>,
+        plot(fullslicesTime,VFinalTotal_U{i2},<span class="string">'k-'</span>),   <span class="comment">% grafica de campo real</span>
+        plot(slicesTime(i2,:),VFinalTotal_Time_U{i2},<span class="string">'ob'</span>,<span class="string">'Linewidth'</span>,0.9)
+        <span class="keyword">if</span> input.flag_plot_int_points==1
+            plot(fullslicesTime,Interpolated_Vfinal_U{i2},<span class="string">'r-'</span>,<span class="string">'Linewidth'</span>,1.5 )  <span class="comment">% plot of interpolated points</span>
+        <span class="keyword">end</span>
+        xlabel(<span class="string">'Time (s)'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'Velocity (m/s)'</span>,<span class="string">'Fontsize'</span>,23),
+        <span class="keyword">if</span> input.flag_plot_int_points==1
+            legend(<span class="string">'Interpolated Data'</span>,<span class="string">'Real Data'</span>,<span class="string">'Interpolation points'</span>,<span class="string">'Fontsize'</span>,15), grid <span class="string">on</span>
+        <span class="keyword">else</span>
+            legend(<span class="string">'Real Data'</span>,<span class="string">'Interpolation points'</span>,<span class="string">'Fontsize'</span>,15)
+        <span class="keyword">end</span>
+        grid <span class="string">on</span>
+        set(gcf,<span class="string">'color'</span>,<span class="string">'w'</span>)
+
+        title([WindFieldName(1:end-4),<span class="string">' - Component U - '</span>, type_interpolation,<span class="string">' interpolation'</span>,<span class="string">' - point (m) = [ '</span>,num2str(Y(i2)),<span class="string">', '</span>,num2str(Z(i2)),<span class="string">' ] '</span>,<span class="string">'-  interpolation time (s) = '</span>,num2str(timeStep_Measurements)],<span class="string">'Fontsize'</span>,12),
+    <span class="keyword">end</span>
+    hold <span class="string">off</span>
+
+    <span class="comment">%   Plot together u and v</span>
+    <span class="keyword">if</span> nComp==2 || nComp==3
+        <span class="keyword">for</span> i2=1:length(Y) <span class="comment">% for number of points</span>
+
+            figure(<span class="string">'Name'</span>,[<span class="string">'ComponentV_Point'</span> num2str(i2)]),hold <span class="string">on</span>,
+            plot(fullslicesTime,VFinalTotal_V{i2},<span class="string">'k-'</span>),   <span class="comment">% grafica de campo real</span>
+            plot(slicesTime(i2,:),VFinalTotal_Time_V{i2},<span class="string">'ob'</span>,<span class="string">'Linewidth'</span>,0.9)
+            <span class="keyword">if</span> input.flag_plot_int_points==1
+                plot(fullslicesTime,Interpolated_Vfinal_V{i2},<span class="string">'r-'</span>,<span class="string">'Linewidth'</span>,1.5 )  <span class="comment">% plot of interpolated points</span>
+            <span class="keyword">end</span>
+            xlabel(<span class="string">'Time (s)'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'Velocity (m/s)'</span>,<span class="string">'Fontsize'</span>,23),
+            <span class="keyword">if</span> input.flag_plot_int_points==1
+                legend(<span class="string">'Interpolated Data'</span>,<span class="string">'Real Data'</span>,<span class="string">'Interpolation points'</span>), grid <span class="string">on</span>
+            <span class="keyword">else</span>
+                legend(<span class="string">'Real Data'</span>,<span class="string">'Interpolation points'</span>)
+
+            <span class="keyword">end</span>
+            set(gcf,<span class="string">'color'</span>,<span class="string">'w'</span>)
+
+            title([WindFieldName(1:end-4),<span class="string">' - Component V - '</span>,type_interpolation,<span class="string">' interpolation'</span>,<span class="string">' - point (m) = [ '</span>,num2str(Y(i2)),<span class="string">', '</span>,num2str(Z(i2)),<span class="string">' ] '</span>,<span class="string">'-  interpolation time (s) = '</span>,num2str(timeStep_Measurements)],<span class="string">'Fontsize'</span>,12),
+        <span class="keyword">end</span>
+        hold <span class="string">off</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">%   Plot together u v and w</span>
+    <span class="keyword">if</span> nComp==3
+        <span class="keyword">for</span> i2=1:length(Y)
+            figure(<span class="string">'Name'</span>,[<span class="string">'ComponentW_Point'</span> num2str(i2)]),hold <span class="string">on</span>,
+            plot(fullslicesTime,VFinalTotal_W{i2},<span class="string">'k-'</span>),   <span class="comment">% grafica de campo real</span>
+            plot(slicesTime(i2,:),VFinalTotal_Time_W{i2},<span class="string">'ob'</span>,<span class="string">'Linewidth'</span>,0.9)
+            <span class="keyword">if</span> input.flag_plot_int_points==1
+                plot(fullslicesTime,Interpolated_Vfinal_W{i2},<span class="string">'r-'</span>,<span class="string">'Linewidth'</span>,1.5 )  <span class="comment">% plot of interpolated points</span>
+            <span class="keyword">end</span>
+            xlabel(<span class="string">'Time (s)'</span>,<span class="string">'Fontsize'</span>,23),ylabel(<span class="string">'Velocity (m/s)'</span>,<span class="string">'Fontsize'</span>,23),
+            <span class="keyword">if</span> input.flag_plot_int_points==1
+                legend(<span class="string">'Interpolated Data'</span>,<span class="string">'Real Data'</span>,<span class="string">'Interpolation points'</span>), grid <span class="string">on</span>
+            <span class="keyword">else</span>
+                legend(<span class="string">'Real Data'</span>,<span class="string">'Interpolation points'</span>)
+
+            <span class="keyword">end</span>
+            grid <span class="string">on</span>
+            set(gcf,<span class="string">'color'</span>,<span class="string">'w'</span>)
+
+            title([WindFieldName(1:end-4),<span class="string">' - Component W - '</span>,type_interpolation,<span class="string">' interpolation'</span>,<span class="string">' - point (m) = [ '</span>,num2str(Y(i2)),<span class="string">', '</span>,num2str(Z(i2)),<span class="string">' ] '</span>,<span class="string">'-  interpolation time (s) = '</span>,num2str(timeStep_Measurements)],<span class="string">'Fontsize'</span>,12),
+            hold <span class="string">off</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Calculate REWS<a name="12"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_calculate_REWS==1
+
+    <span class="comment">% distances of all points in the turbsim grid from center assuming hub center =0</span>
+    <span class="keyword">for</span> I=1:gridny
+        <span class="keyword">for</span> II=1:gridnz
+            Distances_of_Points_In_Plane(I,II)=sqrt((gridy(I)).^2+(gridz(II)).^2); <span class="comment">%Matrix of distances from center of rotor to each point in the grid</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% distances of all points of the lidar pattern from center assuming hub center =0</span>
+    <span class="keyword">for</span> ind_length=1:length(Y)
+        Distances_LiDAR_Points(ind_length)=sqrt(Y(ind_length).^2+(Z(ind_length)).^2); <span class="comment">%Matrix of distances from center of rotor to each point in the grid</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">if</span> input.flag_apply_weightREWS==1
+        dist_REWS = rotor_radius*[dist_REWS_nd 2]; <span class="comment">%convert ND spanwise to meters and treat the point outside with 0 weight</span>
+        Wi        = [Wi 0];
+        <span class="comment">% calculate weigths for all the turbsim  grid points</span>
+        <span class="keyword">for</span> I=1:gridny
+            <span class="keyword">for</span> II=1:gridnz
+                Weights_of_Points_In_Plane(I,II)=interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(I,II)); <span class="comment">%Matrix of weights for all grid points</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        weigthTot_grid    = sum(sum(Weights_of_Points_In_Plane)); <span class="comment">%sum of weights needed for weighted average</span>
+
+        <span class="comment">% calculate weigths for all lidar pattern points</span>
+        <span class="keyword">for</span> ind_length=1:length(Y)
+            Weights_of_Lidar_In_Plane(ind_length)=interp1(dist_REWS,Wi,Distances_LiDAR_Points(ind_length));<span class="comment">%Matrix of weights for all lidar pattern points</span>
+        <span class="keyword">end</span>
+        weigthTot_lidar    = sum(sum(Weights_of_Lidar_In_Plane)); <span class="comment">%sum of weights needed for weighted average</span>
+    <span class="keyword">end</span>
+
+    <span class="comment">% For FullWindField data: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+    <span class="comment">%Transform Slices</span>
+    rad_values=Distances_of_Points_In_Plane&lt;=rotor_radius;       <span class="comment">%keep only points inside the rotor</span>
+    <span class="keyword">for</span> ind_slicesDistance =1:length (slicesDistance) <span class="comment">% loop over all the slices</span>
+        <span class="comment">% Take complete slice from turbsim:</span>
+        ExSlice_U = squeeze(compU(:,ind_slicesDistance,:)); <span class="comment">% Values of the selected slice CompU</span>
+        ExSlice_U = ExSlice_U.*rad_values; <span class="comment">%remove points out of rotor</span>
+        <span class="keyword">if</span> input.flag_apply_weightREWS==1
+            ExSlice_U = ExSlice_U.*Weights_of_Points_In_Plane;         <span class="comment">%multiply with weights</span>
+            noZeroSlice = nonzeros(ExSlice_U);
+            REWS.fullWF.TS(ind_slicesDistance) = sum(sum(ExSlice_U))/weigthTot_grid;
+        <span class="keyword">else</span>
+            noZeroSlice = nonzeros(ExSlice_U);
+            REWS.fullWF.TS(ind_slicesDistance) = mean(noZeroSlice,<span class="string">'omitnan'</span>);
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+    REWS.fullWF.mean = mean(REWS.fullWF.TS,<span class="string">'omitnan'</span>);
+    <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+    <span class="comment">% For the pattern of LiDAR points %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+    rad_valuesLiDAR=Distances_LiDAR_Points&lt;=rotor_radius;       <span class="comment">%logical index of pattern points inside the rotor</span>
+
+    <span class="keyword">for</span> ind_LiDAR_REWS=1:size(slicesTime,2) <span class="comment">% here there is something to fix:  pointsToAverage sometimes (when TstepPattern=time step of the Original WF) gives errors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+        <span class="keyword">for</span> ind_point_LiDAR_REWS=1:length(Y)
+            pointsToAverage(:,ind_point_LiDAR_REWS) = VFinalTotal_Time_U{ind_point_LiDAR_REWS}(1,ind_LiDAR_REWS); <span class="comment">% we take points of each Time series in the correspondent slice and mean it.</span>
+        <span class="keyword">end</span>
+        pointsToAverage = rad_valuesLiDAR.*pointsToAverage; <span class="comment">% remove points out of the rotor</span>
+        <span class="keyword">if</span> input.flag_apply_weightREWS==1
+            pointsToAverage = Weights_of_Lidar_In_Plane.*pointsToAverage;
+            REWS.lidar.TS(ind_LiDAR_REWS) = sum(pointsToAverage)/weigthTot_lidar;
+        <span class="keyword">else</span>
+            REWS.lidar.TS(ind_LiDAR_REWS) = mean(pointsToAverage,<span class="string">'omitnan'</span>); <span class="comment">% removing points that are outside the rotor area</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    REWS.lidar.mean = mean(REWS.lidar.TS,<span class="string">'omitnan'</span>);
+    <span class="keyword">if</span> timeStep_Measurements ~=0
+        REWS.lidar.TSTime=timestep_pat_vec/2:timestep_pat_vec:fullTime; <span class="comment">% We suppose that measurements are in the center of the pattern. If do not create the same number of points in time we add the points(*)</span>
+        <span class="keyword">if</span> length(REWS.lidar.TSTime)&lt;length(slicesTime)
+            No_difference_points=length(slicesTime)-length(REWS.lidar.TSTime);
+            <span class="keyword">for</span> idifpoint=1:No_difference_points
+                REWS.lidar.TSTime = [REWS.lidar.TSTime REWS.lidar.TSTime(end)+ timestep_pat_vec]; <span class="comment">% (*)</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">else</span>   <span class="comment">% when we have all beams synchronized we dont need to average time</span>
+        REWS.lidar.TSTime = slicesTime(1,:);
+    <span class="keyword">end</span>
+
+    <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+    <span class="keyword">if</span> input.flag_plot_REWS==1
+        figure(<span class="string">'NAME'</span>, <span class="string">'REWS'</span>)
+        plot(fullslicesTime,REWS.fullWF.TS,REWS.lidar.TSTime,REWS.lidar.TS,<span class="string">'Linewidth'</span>,2)
+        grid <span class="string">on</span>
+        set(gcf,<span class="string">'color'</span>,<span class="string">'w'</span>)
+
+        xlabel(<span class="string">'Time [s]'</span>)
+        <span class="keyword">if</span> input.flag_apply_weightREWS==1
+            ylabel (<span class="string">'Weighted Rotor Effective wind speed [m/s]'</span>)
+        <span class="keyword">else</span>
+            ylabel (<span class="string">'Rotor Effective wind speed [m/s]'</span>)
+        <span class="keyword">end</span>
+        legend({<span class="string">'Turbsim'</span> <span class="string">'Lidar'</span>})
+        annotation(<span class="string">'textbox'</span>, [0.36 0.15 0.266 0.0973], <span class="string">'String'</span>, [<span class="string">'Mean value Turbsim='</span> num2str(REWS.fullWF.mean,<span class="string">'%01.03f'</span>)<span class="keyword">...</span>
+            char(10) <span class="string">'Mean value Lidar='</span> num2str(REWS.lidar.mean,<span class="string">'%01.03f'</span>)], <span class="string">'FontSize'</span>,12,<span class="string">'FitBoxToText'</span>,<span class="string">'on'</span>,<span class="string">'LineStyle'</span>,<span class="string">'none'</span> )
+        set(gca,<span class="string">'FontSize'</span>,14)
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre><h2>Calculate Shear power law exponent from measurements and full windfield<a name="13"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_power_law==1   <span class="comment">%maybe add an option to calculate shear on every nth slice of the ful field to reduce time</span>
+
+    zero_valueY=find(gridy==0);
+    zero_valueZ=find(gridz==0);
+    z_vec_Shear = (gridz)+Zh;             <span class="comment">%create vector of heights</span>
+    Vhub_shear = compU(zero_valueZ,:,zero_valueY); <span class="comment">%Velocity u at the hub height</span>
+
+    <span class="comment">% calculate power law for full turbsim data:</span>
+    <span class="keyword">for</span> ind_sliceLaW = 1:gridtime  <span class="comment">%for slices</span>
+        V_slice = squeeze(compU(:,ind_sliceLaW,:)); <span class="comment">% velocity of point in slices</span>
+        v_hor = mean (V_slice,2);     <span class="comment">% take the average of all points in each horizontal line</span>
+
+        <span class="comment">% find least square fit for the average vertical line</span>
+        fcn = @(alphaPL) sum((Vhub_shear(ind_sliceLaW)*(z_vec_Shear/Zh).^(alphaPL) - v_hor').^2); <span class="comment">% least square defintion f</span>
+        [s,~,~] = fminsearch(fcn, 0.14);        <span class="comment">% Minimise Least-Squares error</span>
+        ShearPL.fullWF.TS(ind_sliceLaW) = s; <span class="comment">%#ok&lt;*SAGROW&gt;</span>
+    <span class="keyword">end</span>
+    ShearPL.fullWF.Mean=mean(ShearPL.fullWF.TS); <span class="comment">% total shear of the wind field</span>
+
+
+    <span class="comment">% Calculate power law exponent from LiDAR measurements.</span>
+
+    <span class="comment">% We suppose that each pattern can be projected to one plane in order to calculate shear. This % plane is the middle of the scan pattern in time</span>
+    Match_index = FindSameValuesAndAverageV(Z);   <span class="comment">% Calculate index of repeated heights in order to calculate mean of each height for calculating EXPONENT LAW</span>
+    <span class="comment">%     Z_lid_point = ceil(length(LOS_points.slicesAv)/2); %find the middle distance of the multiple ranges  where we project all the velocities</span>
+    [~,Z_sorted_ind] = sort(Z);
+    Match_index_mat  = cell2mat(Match_index);
+    Match_index2 = Match_index;
+    <span class="keyword">for</span> indSlice=1:size(VFinalTotal_Time_U{1},2)
+        <span class="keyword">for</span> ind_LOS=1:length(Z)
+            iV_vec_lidar(ind_LOS) =  VFinalTotal_Time_U{ind_LOS}(indSlice);
+        <span class="keyword">end</span>
+
+        <span class="comment">% create vector of heights and speeds sorted by speeds from lowerto higher</span>
+        <span class="comment">%THIS PART IS SPAGHETTI CODE WE HAVE TO RECONSIDER FOR A BETTER SOLUTION!!</span>
+        <span class="keyword">for</span> iZ = 1:length(Z)
+            iZint = Z_sorted_ind(iZ);                      <span class="comment">% take the index of the original height vector corresponding to the order of sorted heights</span>
+            <span class="keyword">if</span> any(Match_index_mat==iZint)                 <span class="comment">%check if the height is included in the matching indices</span>
+                <span class="keyword">for</span> ind_LAW_NO_LOS=1:length(Match_index)   <span class="comment">%loop ove all matching groups of heights</span>
+                    iMatchIndex = Match_index2{ind_LAW_NO_LOS};
+                    <span class="keyword">if</span> any(iMatchIndex==iZint) <span class="comment">% check if my value is in this group og matching values</span>
+                        <span class="keyword">for</span> ind_LAW_NONLOS2 = 1:length(iMatchIndex) <span class="comment">%loop over the matching elements</span>
+                            <span class="keyword">if</span> ind_LAW_NONLOS2==1 <span class="comment">% if it the first of the matching gorup assign the mean value and the gheight in the second sorted index</span>
+                                Z1_sh(iZ) = Z(iZint);
+                                V1_sh(iZ) = mean(iV_vec_lidar(iMatchIndex),<span class="string">'omitnan'</span>);
+                            <span class="keyword">else</span>
+                                Match_index2{ind_LAW_NO_LOS} (ind_LAW_NONLOS2)=nan; <span class="comment">%if it not the first just clear the value to avoid repeateing it next</span>
+                            <span class="keyword">end</span>
+                        <span class="keyword">end</span>
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                <span class="keyword">if</span> length(Z1_sh)&lt;iZ
+                    Z1_sh(iZ) = nan; <span class="comment">%if it passed all htes tests and it is nothere assign nan to keep length</span>
+                    V1_sh(iZ)    = nan;
+                <span class="keyword">end</span>
+
+            <span class="keyword">else</span> <span class="comment">% if it is not in the matching groups assign to a new variable the values height and velocity according to the sorted values</span>
+                Z1_sh(iZ)= Z(iZint);
+                V1_sh(iZ) = iV_vec_lidar (iZint);
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+        Vshear_final = V1_sh(~isnan(V1_sh));
+        Zshear_final = Zh + Z1_sh(~isnan(Z1_sh));
+        <span class="comment">%         Zshear_final = flip(Zshear_final);</span>
+        clear <span class="string">V1_sh</span> <span class="string">Z1_sh</span>
+
+        <span class="comment">%Calculate the approximate Vhub (or take it from turbsim...)</span>
+        <span class="comment">% % find least square fit for the average vertical line</span>
+        <span class="keyword">if</span> length(Vshear_final) == length(Zshear_final)
+            fcn     = @(alphaPL2) sum(( Vhub_shear(indSlice).*(Zshear_final/Zh).^(alphaPL2) - Vshear_final).^2); <span class="comment">% least square defintion f</span>
+            [s,~,~] = fminsearch(fcn, 0.14);        <span class="comment">% Minimise Least-Squares error</span>
+            ShearPL.lidar.TS(:,indSlice) = s;       <span class="comment">%#ok&lt;*SAGROW&gt;</span>
+        <span class="keyword">else</span>
+            ShearPL.lidar.TS(:,indSlice) = nan;     <span class="comment">%#ok&lt;*SAGROW&gt; % in case there arre many nans there is not enough data for a height so discard measurement</span>
+        <span class="keyword">end</span>
+        Match_index2 = Match_index;
+    <span class="keyword">end</span>
+    ShearPL.lidar.Mean = mean(ShearPL.lidar.TS,<span class="string">'omitnan'</span>); <span class="comment">% total shear of the wind field</span>
+    <span class="keyword">if</span> timeStep_Measurements ~=0
+        ShearPL.lidar.TSTime = (timestep_pat_vec/2:timestep_pat_vec:fullTime); <span class="comment">% We supose that measurements are in the center of the pattern. If do not create the same number of points in time we add the points(*)</span>
+        <span class="keyword">if</span> length(ShearPL.lidar.TSTime)&lt;length(slicesTime)
+            No_difference_points = length(slicesTime)-length(ShearPL.lidar.TSTime);
+            <span class="keyword">for</span> idifpoint = 1:No_difference_points
+                ShearPL.lidar.TSTime = [ShearPL.lidar.TSTime ShearPL.lidar.TSTime(end)+ timestep_pat_vec]; <span class="comment">% (*)</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">else</span>   <span class="comment">% when we have all beams synchronized we dont need to average time</span>
+        ShearPL.lidar.TSTime = slicesTime(1,:);
+    <span class="keyword">end</span>
+
+    <span class="comment">%plot time series comparison</span>
+    <span class="keyword">if</span> input.flag_plot_shear == 1
+        figure(<span class="string">'NAME'</span>,<span class="string">'Shear'</span>)
+        plot(fullslicesTime,ShearPL.fullWF.TS,ShearPL.lidar.TSTime,ShearPL.lidar.TS,<span class="string">'Linewidth'</span>,2)
+        grid <span class="string">on</span>
+        xlabel(<span class="string">'Time [s]'</span>)
+        ylabel (<span class="string">'Shear exponent Alpha [-]'</span>)
+        legend({<span class="string">'Turbsim'</span> <span class="string">'Lidar'</span>})
+        annotation(<span class="string">'textbox'</span>, [0.36 0.15 0.266 0.0973], <span class="string">'String'</span>, [<span class="string">'Mean value Turbsim='</span> num2str(ShearPL.fullWF.Mean,<span class="string">'%01.03f'</span>)<span class="keyword">...</span>
+            char(10) <span class="string">'Mean value Lidar='</span> num2str(ShearPL.lidar.Mean,<span class="string">'%01.03f'</span>)], <span class="string">'FontSize'</span>,12,<span class="string">'FitBoxToText'</span>,<span class="string">'on'</span>,<span class="string">'LineStyle'</span>,<span class="string">'none'</span> )
+        set(gca,<span class="string">'FontSize'</span>,14)
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Statistics<a name="14"></a></h2><p>obtain differences between real and interpolated WindField, mean, % of differences, STDV of the current Time series and STDV of the error...</p><pre class="codeinput">    [statisticsOut.U]<span class="keyword">...</span>
+        = statisticsFun(Y,VFinalTotal_U,VFinalTotal_Time_U,slices,slicesTime);
+
+
+    [statisticsOut.V]<span class="keyword">...</span>
+        = statisticsFun(Y,VFinalTotal_V,VFinalTotal_Time_V,slices,slicesTime);
+
+    [statisticsOut.W]<span class="keyword">...</span>
+        = statisticsFun(Y,VFinalTotal_W,VFinalTotal_Time_W,slices,slicesTime);
+
+<span class="keyword">if</span> input.flag_plot_statistics==1
+    <span class="keyword">for</span> ind_plot_stat=1:length(Y)
+        figure(<span class="string">'Name'</span>,[<span class="string">'Statistics Point '</span> num2str(ind_plot_stat)]), plot (statisticsOut.U.error.error_time{ind_plot_stat},statisticsOut.U.error.Abs_Error{ind_plot_stat},<span class="string">'Linewidth'</span>,2)
+        grid <span class="string">on</span>
+        xlabel(<span class="string">'Time [s]'</span>)
+        ylabel (<span class="string">'Absolut Error [m/s]'</span>)
+        legend({<span class="string">'Absolut error'</span>})
+        annotation(<span class="string">'textbox'</span>, [0.16 0.35 0.266 0.4973], <span class="string">'String'</span>, [<span class="string">'RMS='</span> num2str(statisticsOut.U.lidar.RMSE(ind_plot_stat),<span class="string">'%01.03f'</span>)<span class="keyword">...</span>
+            char(10) <span class="string">'Mean Absolute error='</span> num2str(statisticsOut.U.error.Mean_Abs_Error(ind_plot_stat),<span class="string">'%01.03f'</span>)<span class="keyword">...</span>
+            char(10) <span class="string">'Max of the Error='</span> num2str(max(statisticsOut.U.error.Abs_Error{ind_plot_stat}),<span class="string">'%01.03f'</span>)<span class="keyword">...</span>
+            char(10) <span class="string">'STDV='</span> num2str(statisticsOut.U.error.STDV_Error(ind_plot_stat),<span class="string">'%01.03f'</span>)<span class="keyword">...</span>
+            char(10) <span class="string">'Variance='</span> num2str(statisticsOut.U.error.Variance_Error(ind_plot_stat),<span class="string">'%01.03f'</span>)], <span class="string">'FontSize'</span>,12,<span class="string">'FitBoxToText'</span>,<span class="string">'on'</span>,<span class="string">'LineStyle'</span>,<span class="string">'none'</span> )
+        set(gca,<span class="string">'FontSize'</span>,14)
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>plot the slice only requested by the user<a name="15"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_plot_pattern==1
+    plane_extract_slice=min(find(min(abs(slicesDistance-extract_distance_slice))==abs(slicesDistance-extract_distance_slice)));
+    <span class="keyword">if</span> ~isempty(plane_extract_slice)
+        plot_slices(1,Y,gridy,gridz,squeeze(compU(:,plane_extract_slice,:)),LOS_points,extract_distance_slice,input.flag_apply_weightREWS);
+        <span class="keyword">if</span> nComp==3 || nComp==2
+            plot_slices(2,Y,gridy,gridz,squeeze(compV(:,plane_extract_slice,:)),LOS_points,extract_distance_slice,input.flag_apply_weightREWS);
+        <span class="keyword">end</span>
+
+        <span class="keyword">if</span> nComp==3
+            plot_slices(3,Y,gridy,gridz,squeeze(compW(:,plane_extract_slice,:)),LOS_points,extract_distance_slice,input.flag_apply_weightREWS);
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><h2>Resample Data (check the missmatch in time at the end of the series...!!)<a name="16"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_resampling==1
+    slicesTime2               = slicesTime;
+    clear <span class="string">slicesTime</span>
+    <span class="keyword">for</span> iPat= 1:length(Y)
+        <span class="comment">%CompU</span>
+        VFinalTotal_Time_U{iPat} = interpft(VFinalTotal_Time_U{iPat},length(VFinalTotal_Time_U{iPat})*resampling_factor);
+        VFinalTotal_Time_U{iPat} = VFinalTotal_Time_U{iPat}(1:end-resampling_factor+1);
+        <span class="comment">%CompV</span>
+        VFinalTotal_Time_V{iPat} = interpft(VFinalTotal_Time_V{iPat},length(VFinalTotal_Time_V{iPat})*resampling_factor);
+        VFinalTotal_Time_V{iPat} = VFinalTotal_Time_V{iPat}(1:end-resampling_factor+1);
+        <span class="comment">%CompW</span>
+        VFinalTotal_Time_W{iPat} = interpft(VFinalTotal_Time_W{iPat},length(VFinalTotal_Time_W{iPat})*resampling_factor);
+        VFinalTotal_Time_W{iPat} = VFinalTotal_Time_W{iPat}(1:end-resampling_factor+1);
+
+        slicesTime(iPat,:)       = 0:(slicesTime2(iPat,2)-slicesTime2(iPat,1))/resampling_factor:slicesTime2(iPat,end);
+        <span class="comment">%         slicesTime_resamp(iPat,:)       = 0:(slicesTime(iPat,2)-slicesTime(iPat,1))/resampling_factor:slicesTime(iPat,end)+(resampling_factor-1)*(slicesTime(iPat,2)-slicesTime(iPat,1))/resampling_factor;</span>
+    <span class="keyword">end</span>
+    <span class="comment">% Matching the time vector with TurbSim time series:</span>
+    slicesTime    = slicesTime(:,1:length(VFinalTotal_Time_U{1}));
+    timestep_pat_vec  = timestep_pat_vec/resampling_factor;
+    <span class="comment">%     Analysistime  = TOTAL_TIME_SERIE_DURATION;</span>
+<span class="keyword">else</span>
+    [~,colNaNslicesTime]=find(isnan(slicesTime));
+    ncolsdelete=unique(colNaNslicesTime);
+    slicesTime=slicesTime(:,1:(end-length(ncolsdelete)));
+    <span class="comment">%     Analysistime   = TOTAL_TIME_SERIE_DURATION; %max(slicesTime(1,end));%slicesTime(1,end)+timestep_pat_vec;</span>
+<span class="keyword">end</span>
+</pre><h2>Save in TurbSim timeseries input format:<a name="17"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_save_turbsim_input==1
+    <span class="comment">%First sort with heigths</span>
+    [Z1,SortedIndex] = sort(Z);
+    Y1 = Y(SortedIndex);
+    <span class="comment">%     count_sort=0;</span>
+    <span class="keyword">for</span> ind_sort=1:length(Y1)
+                VFinalTotal_CompU{ind_sort}=VFinalTotal_Time_U{SortedIndex(ind_sort)};
+<span class="comment">%         VFinalTotal_U_test{ind_sort}=VFinalTotal_Time_U{SortedIndex(ind_sort)};</span>
+    <span class="keyword">end</span>
+
+    t      = slicesTime(1,:)';  <span class="comment">% what time to put here when they are not synchronized???? ASSUMPTION: project all data in a slice!!!!!!</span>
+    <span class="comment">%     t      = fullslicesTime(1,1:8:end)';  % what time to put here when they are not synchronized???? ASSUMPTION: project all data in a slice!!!!!!</span>
+
+    y      = Y1;
+    z      = Z1+Zh;
+
+    <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%  Only want 1 component  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+
+    <span class="keyword">if</span> input.flag_VW_0 ==1 <span class="comment">%this is because want to remove 2nd and 3rd components for turbsim since  we consider them 0.</span>
+        VFinal = [];
+        <span class="keyword">for</span> iTurb=1:length(Y)
+                        VFinal(:,iTurb)=(VFinalTotal_CompU{iTurb}');
+<span class="comment">%             VFinal(:,iTurb)=(VFinalTotal_U_test{iTurb}');</span>
+        <span class="keyword">end</span>
+        nComp_TurbSim=1;
+        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+    <span class="keyword">else</span>
+        <span class="comment">% Take the Time Series depending on the components requested</span>
+        <span class="keyword">switch</span> nComp
+            <span class="keyword">case</span> 1
+                VFinal = [];
+                <span class="keyword">for</span> iTurb=1:length(Y)
+                    VFinal(:,iTurb)=(VFinalTotal_CompU{iTurb}');
+                <span class="keyword">end</span>
+                nComp_TurbSim=nComp;
+            <span class="keyword">case</span> 2
+                <span class="keyword">for</span> iTurb=1:length(Y)
+                    VFinal2{iTurb}=horzcat(VFinalTotal_CompU{iTurb}',(VFinalTotal_CompV{iTurb}.*0)');
+                <span class="keyword">end</span>
+                VFinal = [];
+                <span class="keyword">for</span> iTurb2=1:length(Y)
+                    VFinal=[VFinal,(VFinal2{iTurb2})]; <span class="comment">%#ok&lt;AGROW&gt;</span>
+                <span class="keyword">end</span>
+                nComp_TurbSim=nComp;
+            <span class="keyword">case</span> 3
+                <span class="keyword">for</span> iTurb=1:length(Y)
+                    VFinal3{iTurb}=horzcat(VFinalTotal_CompU{iTurb}',(VFinalTotal_CompV{iTurb}.*0)',(VFinalTotal_CompW{iTurb}*0)');
+                <span class="keyword">end</span>
+                VFinal = [];
+                <span class="keyword">for</span> iTurb2=1:length(Y)
+                    VFinal=[VFinal,(VFinal3{iTurb2})]; <span class="comment">%#ok&lt;AGROW&gt;</span>
+                <span class="keyword">end</span>
+                nComp_TurbSim=nComp;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+
+    <span class="comment">%     check for Nans and remove them if turbsim cannot handle them</span>
+    <span class="keyword">for</span> iRowTS = 1:size(VFinal,1)
+        <span class="keyword">if</span> any(isnan(VFinal(iRowTS,:)))
+            CntNan(iRowTS)=0;
+        <span class="keyword">else</span>
+            CntNan(iRowTS)=1;
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+
+    VFinal =(VFinal(find(CntNan==1),:));  <span class="comment">%#ok&lt;FNDSB&gt;</span>
+
+    <span class="comment">%Cut the last "NumberRows2delete" rows because if there is any nan, we repeat the last row of values</span>
+    VFinal = VFinal (1:end-NumberRows2delete,:);
+
+
+    <span class="keyword">if</span> ~exist(SaveDirectory_TurbSim, <span class="string">'dir'</span>)
+        mkdir(SaveDirectory_TurbSim);
+    <span class="keyword">end</span>
+    addpath (genpath(SaveDirectory_TurbSim));
+
+    input_file = strcat(SaveDirectory_TurbSim,OutSaveName,<span class="string">'_PatTStep'</span>,TSnam2,<span class="string">'.TimeSer'</span>);  <span class="comment">%defines filename of user timeser file</span>
+
+    <span class="comment">%     data_file = strcat(windfieldfile,'_DATAFILE_',num2str(nComp),'Components');    % string, which defines data origin file if needed</span>
+    <span class="comment">% string, which defines data origin file if needed</span>
+
+    [rowRefNode,colRefnode]=min(abs(abs(z)-Zh)+abs(Y1));
+    RefNode = colRefnode;    <span class="comment">% Reference Node of measurements from the points. we find the closest one to zero and assign it</span>
+    RefPtID = length(Y);
+    <span class="comment">% Call function for generating turbsim timeusr inputs</span>
+    <span class="comment">% cut the time series to matcvh with the original:</span>
+    <span class="comment">%Here have to add the lines of code that finds the time in which all</span>
+    <span class="comment">%time series coincide: (script PruebaTotalTimeSeries in the desktop)</span>
+
+    <span class="comment">%     time_row=find(t==Analysistime);</span>
+    [Analysistime,time_row]=max(slicesTime(1,:)); <span class="comment">%When time_pat=to the time step of the original WF gives problems.</span>
+    <span class="comment">%     Analysistime=298; % I added this to match the time series vector. Have to figure out how to do it automatically. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
+    writeTurbSimTimeSeriesInput(input_file, windfieldfile, VFinal(1:time_row,:), t(1:time_row,:), y, z, RefNode,nComp_TurbSim); <span class="comment">% Write time series for TurbSim</span>
+    disp(strcat(<span class="string">'Time series of the wind field  '</span>, windfieldfile(1:end-4),<span class="string">' for TurbSim is done'</span>))
+    <span class="comment">%Take the constraining timeseries, pass it to Turbsim and create the</span>
+    <span class="comment">%template for turbsim</span>
+    GridHt=gridnz*dz-dz;
+    GridWt=gridny*dy-dz;
+
+    <span class="comment">% writing .inp file for turbsim</span>
+    processingTurbsim(TSnam2,SaveDirectory_TurbSim,OutSaveName,RandSeed,gridnz,gridny,timestep_pat_vec,Analysistime,UsableTime,Zh,GridHt,GridWt,IECstandard,statisticsOut.U.lidar.TI_mean,RefHt,statisticsOut.U.lidar.Mean_TS_LiDAR,ShearPL.lidar.Mean,WindProfileType,SCMod1)
+    <span class="comment">%     destination=strcat('..\Output\Output_TurbSim\V',MeanVstr,'\',Pattern,'_41_Pattern_WF\TimeStep',TSnam2) ;</span>
+    <span class="comment">%     origen='..\Output\Output_TurbSim\TurbSim_Win32.exe';</span>
+    <span class="comment">%     if ~exist([destination '\TurbSim_Win32.exe'])</span>
+    <span class="comment">%         copyfile ( origen,  destination);</span>
+    <span class="comment">%     end</span>
+    disp([windfieldfile(1:end-4) <span class="string">' template of the time series is done.'</span> ])
+<span class="keyword">end</span>
+</pre><h2>Save in pyconturb format (Check how i remove nans for turbsim!!! maybe we should do it earlier in the code: Done!!)<a name="18"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_save_pyconturb_input==1
+    LiDAR_ShearPL=ShearPL.lidar.Mean;
+
+    CSV_Out2PyConTurb(SaveDirectory_PyCOnTurb,TSnam2,OutSaveName,NumberRows2delete,VFinalTotal_Time_U,VFinalTotal_Time_V,VFinalTotal_Time_W,gridy,gridz,Y,Z,Zh,slicesTime,nComp,statisticsOut.U.lidar.Mean_TS_LiDAR,coh_model,wsp_func,sig_func,spec_func,seed,nf_chunk,interp_data,LiDAR_ShearPL,turb_class)
+    disp([OutSaveName <span class="string">' data for PyConTurb is saved.'</span>])
+<span class="keyword">end</span>
+</pre><h2>Execute python: Does not work... cannot import PyCOnTurb packages<a name="19"></a></h2><p>pyversion C:\Python27\Scripts\spyder.exe % Initializates Spyder</p><pre class="codeinput"><span class="comment">% run Spyder code</span>
+<span class="keyword">if</span> input.flag_runPyConTurb==1
+    systemCommand = <span class="string">'..\Functions\Read_CSV_Run_PycConTurb.py '</span>;
+    <span class="comment">% system ('python X:\Documents\FranciscoCosta\GIT_HUB\LidarSimulator\LidarSimulator\Functions\Read_CSV_Run_PycConTurb.py');</span>
+    <span class="comment">% addpath('X:\Documents\FranciscoCosta\GIT_HUB\LidarSimulator\LidarSimulator\pyconturb');</span>
+    <span class="comment">% import py.pyconturb_wind_profiles.*</span>
+    system(systemCommand)
+
+<span class="keyword">end</span>
+</pre><h2>Create and save .mat output and figures<a name="20"></a></h2><pre class="codeinput"><span class="keyword">if</span> input.flag_getLidarOutput==1
+    save_data=[savedirectory windfieldfile];
+    savedirectory=strcat(<span class="string">'..\Save4Comparison\V'</span>,MeanVstr,<span class="string">'_WF2\'</span>,Pattern,<span class="string">'\TStp_'</span>,nam2,<span class="string">'\'</span>,NameWF,<span class="string">'\'</span>);
+    <span class="keyword">if</span> ~exist(savedirectory, <span class="string">'dir'</span>)
+        mkdir(savedirectory);
+    <span class="keyword">end</span>
+    savefigures=[savedirectory <span class="string">'\Figures\'</span>];
+    <span class="keyword">if</span> ~exist(savefigures, <span class="string">'dir'</span>)
+        mkdir(savefigures);
+    <span class="keyword">end</span>
+    addpath (genpath(savefigures));
+
+    addpath (genpath(savedirectory));
+<span class="keyword">elseif</span> input.flag_unconstrain==1
+    save_data=[savedirectory <span class="string">'_TimeStp_pat'</span> TSnam2 <span class="string">'\'</span> OutSaveName <span class="string">'_PatTStp'</span> TSnam2]; <span class="comment">% where do you want to save Output.mat file</span>
+    savefigures=strcat(savedirectory,<span class="string">'_TimeStp_pat'</span>,TSnam2,<span class="string">'\Figures'</span>);
+    <span class="keyword">if</span> ~exist(savefigures, <span class="string">'dir'</span>)
+        mkdir(savefigures);
+    <span class="keyword">end</span>
+    addpath (genpath(savefigures));
+
+    <span class="keyword">if</span> ~exist(strcat(savedirectory,<span class="string">'_TimeStp_pat'</span>,TSnam2), <span class="string">'dir'</span>)
+        mkdir(strcat(savedirectory,<span class="string">'_TimeStp_pat'</span>,TSnam2));
+    <span class="keyword">end</span>
+    addpath (genpath(savedirectory));
+<span class="keyword">end</span>
+Output.REWS   = REWS;
+Output.Shear  = ShearPL;
+
+<span class="keyword">if</span> input.flag_apply_noise==1
+    Output.Parameter.Noise  = [noise_U ;noise_V; noise_W];
+<span class="keyword">else</span>
+    Output.Parameter.Noise  = [ ]    ;
+<span class="keyword">end</span>
+
+Output.statistics       = statisticsOut;
+Output.TS.fullWF.time   = fullslicesTime;
+Output.Pattern.Coord    = [Y;Z];
+Output.Pattern.refplane = ref_plane_dist; <span class="comment">%like focus distance</span>
+Output.Pattern.timestep_pat_vec  = timestep_pat_vec; <span class="comment">%like focus distance</span>
+Output.Pattern.timeStep_Measurements = timeStep_Measurements; <span class="comment">%like focus distance</span>
+Output.Pattern.distance_av_slice  = distance_av_slice; <span class="comment">%like focus distance</span>
+Output.Pattern.points_av_slice    = points_av_slice;
+Output.Pattern.timestep_pat_vec   = timestep_pat_vec;
+Output.Parameter.rotor_radius = rotor_radius; <span class="comment">% Radio of the Rotor [m]</span>
+Output.Parameter.Zh   = Zh;
+<span class="keyword">for</span> iPat= 1:length(Y)
+    Output.TS.fullWF.Uval{iPat} = VFinalTotal_U{iPat};
+    Output.TS.fullWF.Vval{iPat} = VFinalTotal_U{iPat};
+    Output.TS.fullWF.Wval{iPat} = VFinalTotal_U{iPat};
+    Output.TS.lidar.Uval{iPat}  = VFinalTotal_Time_U{iPat};
+    Output.TS.lidar.Vval{iPat}  = VFinalTotal_Time_V{iPat};
+    Output.TS.lidar.Wval{iPat}  = VFinalTotal_Time_W{iPat};
+    Output.TS.lidar.time{iPat}  = slicesTime(iPat,:);
+    Output.TS.lidar.Uval_LOS{iPat} = VFinalTotal_Time_LOS_U{iPat};
+<span class="keyword">end</span>
+save(save_data,<span class="string">'Output'</span>)
+
+
+<span class="comment">% FolderName = savefigures;</span>
+<span class="comment">% %     FigList = findobj(allchild(0), 'flat', 'Type', 'figure');</span>
+<span class="comment">% %     for iFig = 1:length(FigList)</span>
+<span class="comment">% %         FigHandle = FigList(iFig);</span>
+<span class="comment">% %         FigName   = get(FigHandle, 'Name');</span>
+<span class="comment">% %         savefig(FigHandle, fullfile(savefigures, [num2str(FigName) '.fig']));</span>
+<span class="comment">% %         saveas(FigHandle, fullfile(savefigures, [num2str(FigName) '.png']))</span>
+<span class="comment">% %     end</span>
+<span class="comment">% close all</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% HEADER
+
+% Francisco Costa && Vasilis Pettas
+% © SWE
+%obtain Windfield data
+%Inputs
+%Outputs
+%Dependencies
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TODOs:
+% LOS transformations also on the averaged points
+% Definition of outputs and format URGENT!!!!
+% Add the possiblility to rotate the field for yawed and inclined inflow
+% Separate plotting from the main code
+% Break the code in modular functions
+% Separate inputs in an input definition file and make the main code a function
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH%
+
+%% IO definition
+% Turbine parameters
+rotor_radius = input.rotor_radius; % Radio of the Rotor [m]
+Zh           = input.Zh;           % HubHeight [m]
+Pos_LiDAR    = input.Pos_LiDAR;    % LiDAR position offsetfrom hub center(meters)==> [Y,Z] WE NEED TO FIX THE APPLICATION OF OFFSET IN LOS ONLY!!!!
+% Lidar parameters
+ref_plane_dist = input.ref_plane_dist;   % Reference Plane for LOS (distance[m])
+distance_av_space = input.distance_av_space; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds from pulses meters ahead and afer the point
+points_av_slice   = input.points_av_slice; %how many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
+
+%Processing REWS:
+dist_REWS_nd = input.dist_REWS_nd; % Non dimentional span position for rotor effective wind speed calculation [define from 0 to 1 inclusive]
+Wi           = input.Wi;  %Weight to be applied for rotor effective wind speed calculation
+%Resampling lidar measurements, currently in Frequency domain
+resampling_factor = input.resampling_factor; % Amount of desired resampling for outputs in Turbsim and PyConTurb used with input.flag_resampling
+% Wind velocity vector components to be used
+nComp             = input.nComp;        %1:u, 2:v+u 3:u+v+w % Number of components to process (U,V,W):
+% Interpolation for time and space
+type_interpolation     = input.type_interpolation; % (interp1) interpolation between slices [Time] line460 (check other options of interpm)
+type_interpolation_2   = input.type_interpolation_2; % (interp2)  interpolation in grid points for values on the pattern points[Space]
+%Noise magnitude to imitate uncertainty and noise in real measurements (in dB)
+noise_U  = input.noise_U; % magnitude of noise to be applied in U time series (see help of awgn function)
+noise_V  = input.noise_V; % magnitude of noise to be applied in V time series (see help of awgn function)
+noise_W  = input.noise_W; % magnitude of noise to be applied in W time series (see help of awgn function)
+
+%Secondary options REMOVE!!
+extract_distance_slice = 100; %[m] Distance you want to extract a slice (only ploting) The distance must exist!!!! Probably remove!!!!!
+if input.flag_unconstrain==1
+    % TurbsimParameters:
+    RandSeed=round(rand(1)*80682);
+    UsableTime='"ALL"';
+    IECstandard='"1-ED3"';
+    SCMod1='"GENERAL"';
+    RefHt=Zh;
+    WindProfileType='"PL"'; % "LOG", "PL" and, if we have more than one measuring point must use "TS"
+    
+    %P yConturb parameters
+    turb_class = 'B';
+    coh_model  = 'iec'; % coh_model (str, optional) – Spatial coherence model specifier. Default is IEC 61400-1.
+    wsp_func   = 'power_profile';% wsp_func (function, optional): constant_profile or power_profile
+    sig_func   = 'iec_sig'; %sig_func (function, optional):
+    spec_func  = 'kaimal_spectrum';%spec_func (function, optional). 'kaimal_spectrum',:
+    seed       = uint32(rand(1)*80682); %seed (int, optional): Optional random seed for turbulence generation. Use the same seed and settings to regenerate the same turbulence box.
+    nf_chunk     = 500000; %mem_gb (float, optional) – Size of memory to use when doing the calculations. Increase this number to have faster turbulence generation, but if the number becomes too large the generation will fail.
+    
+    interp_data = 'Take_list'; % Could be 'all','none' or 'Take_list'. If 'Takes_list' then takes into account what we introduce in wsp_func, sig_func and spec_func.
+    %**kwargs – Optional keyword arguments to be fed into the spectral/turbulence/profile/etc. models
+end
+
+%% Flags for calculations and plots
+
+input.flag_VW_0                 = 1; %REMOVE% Consider v and w components of the wind field =0 for TurbSim;
+input.flag_interp_lidar_meas    = 0; %REMOVE% interpolate between measured lidar values
+input.flag_spacenIterp          = 0; %REMOVE interpolate in space inside each slice for points that don't lie on the grid.Don't use in order it to speed up calculations (!!!!here there is an error in ointerpolation function. If interpolate VFinalTotal_Time is not calculated!!!!!1)
+input.flag_check_for_nans       = 0; %REMOVE% check if there are any nans in your windfield and change them
+
+input.flag_plot_CS_LOS_trans    = 0; %REMOVE or plotting? % Plot the coordinate system transofrmation    ===>  0=NO, 1=YES
+input.flag_Plot_LOS_beams       = 0; %REMOVE or plotting? % Plot beams of LOS                    ===>  0=NO, 1=YES
+input.flag_figure_RealSyn       = 0 ;%REMOVE or plotting? % Plot Time Series                     ===>  0=NO, 1=YES
+input.flag_plot_int_points      = 0; %REMOVE or plotting? % Plot interpolated points             ===>  0=NO, 1=YES
+input.flag_plot_REWS            = 0; %REMOVE or plotting? % Plot REWS                            ===>  0=NO, 1=YES
+input.flag_plot_statistics      = 0; %REMOVE or plotting?% Plot  statistics        ===>  0=NO, 1=YES
+input.flag_plot_shear           = 0; %REMOVE or plotting?%Plot time series of calculated shear
+input.flag_plot_pattern         = 0; %REMOVE or plotting?% Plot Slice with pattern              ===>  0=NO, 1=YES
+
+%% Load windfield file
+filename=strcat(input_directory,windfieldfile);
+load (filename);
+
+%% Obtain and create data
+%extract components from the windfield variable
+
+compU               =  windfield.u;
+compV               =  windfield.v;
+compW               =  windfield.w;
+dt                  =  windfield.dt; %time step
+gridtime            =  windfield.grid.nt;
+gridny              =  windfield.grid.ny;
+gridnz              =  windfield.grid.nz;
+spatialstep_dy      =  windfield.grid.dy;
+spatialstep_dz      =  windfield.grid.dz;
+gridz               =  -windfield.grid.z;
+gridy               =  windfield.grid.y;
+Uref                =  windfield.URef; % Mean velocity of the windfied (m/s)
+dz                  =  windfield.grid.dz;
+dy                  =  windfield.grid.dy;
+distanceSlices      =  Uref*dt; % Distance step  between consecutive slices(m)
+
+% Manipulation of data before calculations:
+for i=1:gridtime
+    SqueezeCompU{i}=squeeze(compU(:,i,:));
+    FlippedCompU{i}=flipud(SqueezeCompU{i}');
+end
+for i=1:gridtime
+    compU(:,i,:)=FlippedCompU{i} ;
+end
+[Uy,Ux,Uz]          =  size(compU);% Named components matrix
+
+%% Discretization
+
+fullTime            =  (dt*gridtime)-dt; %total time duration of the windfield
+fullslicesTime      =  0:dt:fullTime;
+slicesDistance      =  fullslicesTime*Uref; % vector with distance between slices(m)
+%Calculate the slice of each pattern point
+icunt1 = 0;
+for ipoint = 1:length(Y) % different time and slices for each point!!
+    
+    slicesN     = floor((1+(icunt1*timeStep_Measurements)/dt):(Ux*(timestep_pat_vec/fullTime)):gridtime); % Slices for each pattern point [index]. We use floor to avoid taking a slice that does not exist. Use high resolution WF!!!!
+    slicesTimeN = icunt1*timeStep_Measurements:timestep_pat_vec:fullTime;% Slices for each pattern point [s].
+    if length(slicesN)<length(floor((1+1:(Ux*(timestep_pat_vec/fullTime)):gridtime)))
+        slicesN(end+1:length(floor((1+1:(Ux*(timestep_pat_vec/fullTime)):gridtime))))=nan ;
+    end
+    if length(slicesTimeN)<length(0:timestep_pat_vec:fullTime)
+        slicesTimeN(end+1:length(0:timestep_pat_vec:fullTime))=nan ;
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%This loop does exactly the same thing with the previous 4 lines check why it works%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if ipoint >1 && length(slicesN)<length(slices(ipoint-1,:))
+        vectornans1=nan*abs(length(slicesN)-length(slices(ipoint-1,:)));
+        slicesN=[ slicesN vectornans1]; %#ok<*AGROW>       
+        slices(ipoint,:)     =  slicesN; %requested slices for scanning
+    else
+        slices(ipoint,:)     =  slicesN; %requested slices for scanning
+    end
+    if ipoint >1 && length(slicesTimeN)<length(slices(ipoint-1,:))       
+        vectornans2=nan*abs(length(slicesN)-length(slices(ipoint-1,:)));       
+        slicesTimeN=[ slicesN vectornans2];  
+        slicesTime(ipoint,:) =  slicesTimeN; % time of slices
+    else
+        slicesTime(ipoint,:) =  slicesTimeN; % time of slices
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    slices(ipoint,:)     =  slicesN; %requested slices for scanning
+    slicesTime(ipoint,:) =  slicesTimeN; % time of slices
+    icunt1 = icunt1 +1;
+    clear slicesN slicesTimeN
+end
+
+distance_av_slice = distance_av_space/(distanceSlices); %transforming the distance in space to slices count
+
+%% Rotate wind field for adding yaw and tilt inflow offsets
+
+if 2==1 % dummy place holder
+end
+
+%% Extract points with time, spatial discretization and LOS
+
+for num_tr=1:length (Y)
+    trajectory(:,num_tr) = [Y(num_tr);Z(num_tr)]; %#ok<*SAGROW>  first line is y direction second is z. Origin is (Pos_LiDAR(1),Pos_LiDAR(2))==0
+    trajectory_forAng(:,num_tr) = [Y(num_tr)+Pos_LiDAR(1);Z(num_tr)+Pos_LiDAR(2)]; %#ok<*SAGROW>  Offset is included here to calculate the changed LOS. first line is y direction second is z. Origin is (Pos_LiDAR(1),Pos_LiDAR(2))==0
+end
+
+% loop over trajectory to find LOS angles (constant for all repeated measurement points)
+if input.flag_apply_LOS == 1
+    for i_ang=1:size(trajectory_forAng,2)
+        angley(i_ang) = atand(trajectory_forAng(1,i_ang)/ref_plane_dist) ;
+        anglez(i_ang) = atand(trajectory_forAng(2,i_ang)/ref_plane_dist) ;
+    end
+else
+    for i_ang=1:size(trajectory_forAng,2)
+        angley(i_ang) = 0;
+        anglez(i_ang) = 0 ;
+    end
+end
+
+%get the transformation matrices for each pattern point. look at https://en.wikipedia.org/wiki/Rotation_matrix
+for iTra= 1:length(Y)
+    In_2_LOS_matrix{iTra} = [cosd(anglez(iTra))*cosd(angley(iTra))   -cosd(anglez(iTra))*sind(angley(iTra))   sind(anglez(iTra));
+        sind(angley(iTra))                    cosd(angley(iTra))                      0  ;
+        sind(angley(iTra))* cosd(anglez(iTra))  -sind(anglez(iTra))*sind(angley(iTra))   cosd(anglez(iTra)) ];
+    %     In_2_LOS_matrix{iTra} = [cosd(anglez(iTra))*cosd(angley(iTra))   -sind(anglez(iTra))   cosd(anglez(iTra))*sind(angley(iTra));
+    %         sind(anglez(iTra))*cosd(angley(iTra))    cosd(anglez(iTra))   sind(anglez(iTra))*sind(angley(iTra)) ;
+    %         -sind(angley(iTra))                     0                     cosd(angley(iTra))];
+    LOS_2_In_matrix{iTra} =  In_2_LOS_matrix{iTra}^-1; % Invers transformation: LOS_CS to Inertial_CS
+end
+
+if distance_av_slice~=0
+    SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
+    focus_distances = SliceVecInt+ref_plane_dist;
+else
+    focus_distances = ref_plane_dist;  % no slices to be averaged, single point measurement
+end
+
+%loop over planes to get points
+for i=1:length (focus_distances)
+    iplane= focus_distances(i); % requested planes are all the planes along the distance (slicesDistance)
+    for ii=1:size(trajectory,2)
+        if input.flag_apply_LOS ==1
+            plane_traj{i}(1,ii) = iplane*tand(angley(ii));
+            plane_traj{i}(2,ii) = iplane*tand(anglez(ii));
+        else   %dont move the trajectory projection if you dont have LOS
+            plane_traj{i}(1,ii) = Y(ii);
+            plane_traj{i}(2,ii) = Z(ii); % this variable saves Y aand z points according to the plane
+        end
+    end
+end
+
+LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
+
+%Check for the case when we request only 1 slice to be averaged
+if [isempty(LOS_points.slicesAv) || any(isnan(LOS_points.slicesAv))]  && distance_av_slice==0
+    LOS_points.slicesAv = 0;
+end
+
+for num_tr3=1:length (Y)
+    LOS_points.slices(num_tr3,:)= slices(num_tr3,:);
+    LOS_points.slicesTime(num_tr3,:)= slicesTime(num_tr3,:);
+    for ii=1:length(plane_traj)
+        LOS_points.Coor{num_tr3}(:,ii)= plane_traj{1,ii}(:,num_tr3); %this variable saves coordinates according to trajectory points
+    end
+end
+
+% extract the measured slices as well as the full time series. Here is also
+% the averaging (or any other mnanipulation) for the multiple slices. NO LOS here
+% Here is calculated the mean velocity of all the points in the pattern every time LiDAR completes one
+% pattern (frequency of the pattern) taking into account timstep_meas.
+% HERE ADD A AN OUTPUT WITH THE FIXED SLICESTIME SO THAT THEY  MATCH IN TIME!!!
+
+[VFinalTotal_U,VFinalTotal_Time_U,~,~,slicesTime] = interpolationFun(slicesTime,compU,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2,flag_spacenIterp,timestep_pat_vec);
+[VFinalTotal_V,VFinalTotal_Time_V,~,~,~] = interpolationFun(slicesTime,compV,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2,flag_spacenIterp,timestep_pat_vec);
+[VFinalTotal_W,VFinalTotal_Time_W,~,~,~] = interpolationFun(slicesTime,compW,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2,flag_spacenIterp,timestep_pat_vec);
+% Remove Nans (repeating values from the row above):
+
+for ind_nan=1:length(Y)  % REMOVE THIS PART? WHAT does it do? We should hanlde nans in InterpolationFun
+    % Find Nans in component U
+    [Row_NAN_VFT_U,Col_NAN_VFT_U]=find(isnan(VFinalTotal_U{ind_nan}));
+    [Row_NAN_VFT_Time_U,Col_NAN_VFT_Time_U]=find(isnan(VFinalTotal_Time_U{ind_nan}));
+    NpointsNanU     = length(Col_NAN_VFT_U);
+    NpointsNanTimeU = length(Col_NAN_VFT_Time_U);   
+    % Replace with value previous value
+    VFinalTotal_U{ind_nan}(Row_NAN_VFT_U,Col_NAN_VFT_U) =   VFinalTotal_U{ind_nan}(Row_NAN_VFT_U,Col_NAN_VFT_U-1);
+    VFinalTotal_Time_U{ind_nan}(Row_NAN_VFT_Time_U,Col_NAN_VFT_Time_U) =   VFinalTotal_Time_U{ind_nan}(Row_NAN_VFT_Time_U,Col_NAN_VFT_Time_U-1);
+    
+    % Find Nans in component _V
+    [Row_NAN_VFT_V,Col_NAN_VFT_V]=find(isnan(VFinalTotal_V{ind_nan}));
+    [Row_NAN_VFT_Time_V,Col_NAN_VFT_Time_V]=find(isnan(VFinalTotal_Time_V{ind_nan}));
+    NpointsNanV     = length(Col_NAN_VFT_V);
+    NpointsNanTimeV = length(Col_NAN_VFT_Time_V);
+    % Replace with value previous value
+    VFinalTotal_V{ind_nan}(Row_NAN_VFT_V,Col_NAN_VFT_V) =   VFinalTotal_V{ind_nan}(Row_NAN_VFT_V,Col_NAN_VFT_V-1);
+    VFinalTotal_Time_V{ind_nan}(Row_NAN_VFT_Time_V,Col_NAN_VFT_Time_V) =   VFinalTotal_Time_V{ind_nan}(Row_NAN_VFT_Time_V,Col_NAN_VFT_Time_V-1);
+    
+    % Find Nans in component W
+    [Row_NAN_VFT_W,Col_NAN_VFT_W]=find(isnan(VFinalTotal_W{ind_nan}));
+    [Row_NAN_VFT_Time_W,Col_NAN_VFT_Time_W]=find(isnan(VFinalTotal_Time_W{ind_nan}));
+    NpointsNanW    = length(Col_NAN_VFT_W);
+    NpointsNanTimeW = length(Col_NAN_VFT_Time_W);
+    % Replace with value previous value
+    VFinalTotal_W{ind_nan}(Row_NAN_VFT_W,Col_NAN_VFT_W) =   VFinalTotal_W{ind_nan}(Row_NAN_VFT_W,Col_NAN_VFT_W-1);
+    VFinalTotal_Time_W{ind_nan}(Row_NAN_VFT_Time_W,Col_NAN_VFT_Time_W) =   VFinalTotal_Time_W{ind_nan}(Row_NAN_VFT_Time_W,Col_NAN_VFT_Time_W-1);
+end
+
+NumberRows2delete=max([NpointsNanU,NpointsNanTimeU,NpointsNanV,NpointsNanTimeV,NpointsNanW,NpointsNanTimeW]); % used only in turbsim output part!
+
+%% LOS transformations. From cartesian to ray coordinates and back with the cyclops dilema (or something else.. )
+
+for ind_LOS=1:length(Y)
+    for ind_slice=1:length(VFinalTotal_Time_U{ind_LOS})
+        %multiplyng all the slice with the transformation matrix
+        VFinalTotal_Time_LOS_vec =  In_2_LOS_matrix{ind_LOS} * ...
+            [VFinalTotal_Time_U{ind_LOS}(ind_slice);VFinalTotal_Time_V{ind_LOS}(ind_slice);VFinalTotal_Time_W{ind_LOS}(ind_slice)];
+        %      Get the measured wind speeds in LOS coordinates
+        VFinalTotal_Time_LOS_U{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec(1);
+        VFinalTotal_Time_LOS_V{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec(2);
+        VFinalTotal_Time_LOS_W{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec(3);
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  WIND FIELD RECONSTRUCTION
+        % assuming w and v equal to 0 in order to reconstruct. Other methods could be used HERE like assuming a correlation between u and v
+        VFinalTotal_Time_reconstr_vec = [ LOS_2_In_matrix{ind_LOS}(1,:); [0 0 0]; [0 0 0]] *...
+            [VFinalTotal_Time_LOS_vec(1);VFinalTotal_Time_LOS_vec(2) ;VFinalTotal_Time_LOS_vec(3) ] ;
+        
+        VFinalTotal_Time_U{ind_LOS}(ind_slice) = VFinalTotal_Time_reconstr_vec(1);
+        VFinalTotal_Time_V{ind_LOS}(ind_slice) = VFinalTotal_Time_reconstr_vec(2);
+        VFinalTotal_Time_W{ind_LOS}(ind_slice) = VFinalTotal_Time_reconstr_vec(3);
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    end
+end
+
+% Plot angles of LOS: Does not work CHECK IT
+if input.flag_Plot_LOS_beams==1
+    %     figure
+    %     plot(trajectory(1,:),trajectory(2,:),'X','Linewidth',2),grid on
+    %     title (['Trajectory as requested on reference plane at ' num2str(ref_plane_dist) '[m]'])
+    ofsetvec = LOS_points.slicesAv;
+    if isempty(ofsetvec)
+        ofsetvec =0;
+    end
+    
+    
+    figure
+    for ind_traj=1:length(Y)
+        plane_extract_slicePlot=(find(min(abs(slices(ind_traj,:)*distanceSlices-ref_plane_dist))==abs(slices(ind_traj,:)*distanceSlices-ref_plane_dist)));
+        for i=1:length(plane_traj)
+            plot3((ofsetvec(i)+slices(ind_traj,plane_extract_slicePlot))*distanceSlices,...
+                ones(1,length(slices(ind_traj,plane_extract_slicePlot)))*plane_traj{1,i}(1,ind_traj),...
+                ones(1,length(slices(ind_traj,plane_extract_slicePlot)))*plane_traj{1,i}(2,ind_traj),'X','Linewidth',2);
+            hold on
+        end
+        
+    end
+    %     end
+    plot3(0,0,0,'MarkerFaceColor',[0 0 1],'MarkerEdgeColor',[0 0 1],...
+        'Marker','o','LineStyle','none'),xlabel('Time [s]'),ylabel('Y [m]'),zlabel('Z [m]'),title('LOS beams trajectory');
+    hold off
+    grid on
+    set(gca,'YGrid','on', 'FontSize', 14,'YMinorGrid','on','XMinorGrid','on','ZMinorGrid','on')
+end
+
+% Plot part
+if input.flag_plot_CS_LOS_trans==1
+    %     figure,
+    %     quiver3(0,0,0,25,0,0,'r','Linewidth',2) %eje x
+    %     hold on,
+    %     quiver3(0,0,0,0,25,0,'g','Linewidth',2)%eje y
+    %
+    %     quiver3(0,0,0,0,0,25,'b','Linewidth',2)%eje z
+    %
+    %     quiver3(0,0,0,ref_plane_dist,LOS_points.Coor{1}(1,2),LOS_points.Coor{1}(2,2),'c','Linewidth',2.5)%eje z
+    %     quiver3(0,0,0,25.* LOS_2_In_matrix{1}(1,1),25.* LOS_2_In_matrix{1}(2,1),25.* LOS_2_In_matrix{1}(3,1),'r-.','Linewidth',1.5) %eje x
+    %     quiver3(0,0,0,25.*rotated_ejeY{ind_LOS}(1,1),25.*rotated_ejeY{ind_LOS}(2,1),25.*rotated_ejeY{ind_LOS}(3,1),'g-.','Linewidth',1.5) %eje y
+    %     quiver3(0,0,0,25.*rotated_ejeZ{ind_LOS}(1,1),25.*rotated_ejeZ{ind_LOS}(2,1),25.*rotated_ejeZ{ind_LOS}(3,1),'b-.','Linewidth',1.5) %eje z
+    %     quiver3(0,0,0,VFinalTotal_U{ind_LOS}(:,4),VFinalTotal_V{ind_LOS}(:,4),VFinalTotal_W{ind_LOS}(:,4),'k-','Linewidth',2)
+    %     xlabel('X'),ylabel('Y'),zlabel('Z'),legend('CS_X','CS_Y','CS_Z','Beam direction', 'Rotated CS','Velocity Vector'), title('Rotation of the Coordenate System')
+    %
+    %     figure, plot(fullslicesTime(1:length(VFinalTotal_U{1})),VFinalTotal_U{1},'b','Linewidth',2)
+    %     hold on ,plot(fullslicesTime(1:length(VFinalTotal_U{1})),VFinalTotal_U_LOS_Sch{1}(1,:),'r-'), title(['Comparation LOS - NO LOS - ','Point = [',num2str(Y(1)),',',num2str(Z(1)),'] ',' Distance = ',num2str(ref_plane_dist),' m']),legend ('NO LOS','LOS')
+    %     xlabel('Time (s)'),ylabel('Velocity (m/s)'),grid on,hold off
+    %     LOSNONLOS=[VFinalTotal_U{1};VFinalTotal_U_LOS_Sch{1}(1,:)];
+    %     LOSDifference=std(std(LOSNONLOS));
+    %     %     for ind_slice=1:gridti
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Application of noise to the measured points
+if input.flag_apply_noise==1
+    for ind_noise=1:length(Y)
+        VFinalTotal_Time_U{ind_noise} = awgn(VFinalTotal_Time_U{ind_noise},noise_U);
+        VFinalTotal_Time_V{ind_noise} = awgn(VFinalTotal_Time_V{ind_noise},noise_V);
+        VFinalTotal_Time_W{ind_noise} = awgn(VFinalTotal_Time_W{ind_noise},noise_W);
+    end
+end
+
+%% Plot time series of measured points
+if input.flag_figure_RealSyn==1
+    WindFieldName=strrep(windfieldfile,'_','-');
+    for i2=1:length(Y) % for number of points
+        
+        figure('Name',['ComponentU_Point' num2str(i2)]),hold on,
+        plot(fullslicesTime,VFinalTotal_U{i2},'k-'),   % grafica de campo real
+        plot(slicesTime(i2,:),VFinalTotal_Time_U{i2},'ob','Linewidth',0.9)
+        if input.flag_plot_int_points==1
+            plot(fullslicesTime,Interpolated_Vfinal_U{i2},'r-','Linewidth',1.5 )  % plot of interpolated points
+        end
+        xlabel('Time (s)','Fontsize',23),ylabel('Velocity (m/s)','Fontsize',23),
+        if input.flag_plot_int_points==1
+            legend('Interpolated Data','Real Data','Interpolation points','Fontsize',15), grid on
+        else
+            legend('Real Data','Interpolation points','Fontsize',15)
+        end
+        grid on
+        set(gcf,'color','w')
+        
+        title([WindFieldName(1:end-4),' - Component U - ', type_interpolation,' interpolation',' - point (m) = [ ',num2str(Y(i2)),', ',num2str(Z(i2)),' ] ','-  interpolation time (s) = ',num2str(timeStep_Measurements)],'Fontsize',12),
+    end
+    hold off
+    
+    %   Plot together u and v
+    if nComp==2 || nComp==3
+        for i2=1:length(Y) % for number of points
+            
+            figure('Name',['ComponentV_Point' num2str(i2)]),hold on,
+            plot(fullslicesTime,VFinalTotal_V{i2},'k-'),   % grafica de campo real
+            plot(slicesTime(i2,:),VFinalTotal_Time_V{i2},'ob','Linewidth',0.9)
+            if input.flag_plot_int_points==1
+                plot(fullslicesTime,Interpolated_Vfinal_V{i2},'r-','Linewidth',1.5 )  % plot of interpolated points
+            end
+            xlabel('Time (s)','Fontsize',23),ylabel('Velocity (m/s)','Fontsize',23),
+            if input.flag_plot_int_points==1
+                legend('Interpolated Data','Real Data','Interpolation points'), grid on
+            else
+                legend('Real Data','Interpolation points')
+                
+            end
+            set(gcf,'color','w')
+            
+            title([WindFieldName(1:end-4),' - Component V - ',type_interpolation,' interpolation',' - point (m) = [ ',num2str(Y(i2)),', ',num2str(Z(i2)),' ] ','-  interpolation time (s) = ',num2str(timeStep_Measurements)],'Fontsize',12),
+        end
+        hold off
+    end
+    
+    %   Plot together u v and w
+    if nComp==3
+        for i2=1:length(Y)
+            figure('Name',['ComponentW_Point' num2str(i2)]),hold on,
+            plot(fullslicesTime,VFinalTotal_W{i2},'k-'),   % grafica de campo real
+            plot(slicesTime(i2,:),VFinalTotal_Time_W{i2},'ob','Linewidth',0.9)
+            if input.flag_plot_int_points==1
+                plot(fullslicesTime,Interpolated_Vfinal_W{i2},'r-','Linewidth',1.5 )  % plot of interpolated points
+            end
+            xlabel('Time (s)','Fontsize',23),ylabel('Velocity (m/s)','Fontsize',23),
+            if input.flag_plot_int_points==1
+                legend('Interpolated Data','Real Data','Interpolation points'), grid on
+            else
+                legend('Real Data','Interpolation points')
+                
+            end
+            grid on
+            set(gcf,'color','w')
+            
+            title([WindFieldName(1:end-4),' - Component W - ',type_interpolation,' interpolation',' - point (m) = [ ',num2str(Y(i2)),', ',num2str(Z(i2)),' ] ','-  interpolation time (s) = ',num2str(timeStep_Measurements)],'Fontsize',12),
+            hold off
+        end
+    end
+end
+
+%% Calculate REWS
+
+if input.flag_calculate_REWS==1
+    
+    % distances of all points in the turbsim grid from center assuming hub center =0
+    for I=1:gridny
+        for II=1:gridnz
+            Distances_of_Points_In_Plane(I,II)=sqrt((gridy(I)).^2+(gridz(II)).^2); %Matrix of distances from center of rotor to each point in the grid
+        end
+    end
+    
+    % distances of all points of the lidar pattern from center assuming hub center =0
+    for ind_length=1:length(Y)
+        Distances_LiDAR_Points(ind_length)=sqrt(Y(ind_length).^2+(Z(ind_length)).^2); %Matrix of distances from center of rotor to each point in the grid
+    end
+    
+    if input.flag_apply_weightREWS==1        
+        dist_REWS = rotor_radius*[dist_REWS_nd 2]; %convert ND spanwise to meters and treat the point outside with 0 weight
+        Wi        = [Wi 0];
+        % calculate weigths for all the turbsim  grid points
+        for I=1:gridny
+            for II=1:gridnz
+                Weights_of_Points_In_Plane(I,II)=interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(I,II)); %Matrix of weights for all grid points
+            end
+        end
+        weigthTot_grid    = sum(sum(Weights_of_Points_In_Plane)); %sum of weights needed for weighted average
+        
+        % calculate weigths for all lidar pattern points
+        for ind_length=1:length(Y)
+            Weights_of_Lidar_In_Plane(ind_length)=interp1(dist_REWS,Wi,Distances_LiDAR_Points(ind_length));%Matrix of weights for all lidar pattern points
+        end
+        weigthTot_lidar    = sum(sum(Weights_of_Lidar_In_Plane)); %sum of weights needed for weighted average
+    end
+    
+    % For FullWindField data: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    %Transform Slices
+    rad_values=Distances_of_Points_In_Plane<=rotor_radius;       %keep only points inside the rotor
+    for ind_slicesDistance =1:length (slicesDistance) % loop over all the slices
+        % Take complete slice from turbsim:
+        ExSlice_U = squeeze(compU(:,ind_slicesDistance,:)); % Values of the selected slice CompU
+        ExSlice_U = ExSlice_U.*rad_values; %remove points out of rotor
+        if input.flag_apply_weightREWS==1
+            ExSlice_U = ExSlice_U.*Weights_of_Points_In_Plane;         %multiply with weights
+            noZeroSlice = nonzeros(ExSlice_U);
+            REWS.fullWF.TS(ind_slicesDistance) = sum(sum(ExSlice_U))/weigthTot_grid;
+        else           
+            noZeroSlice = nonzeros(ExSlice_U);
+            REWS.fullWF.TS(ind_slicesDistance) = mean(noZeroSlice,'omitnan');
+        end
+        
+    end
+    REWS.fullWF.mean = mean(REWS.fullWF.TS,'omitnan');
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    % For the pattern of LiDAR points %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    rad_valuesLiDAR=Distances_LiDAR_Points<=rotor_radius;       %logical index of pattern points inside the rotor
+    
+    for ind_LiDAR_REWS=1:size(slicesTime,2) % here there is something to fix:  pointsToAverage sometimes (when TstepPattern=time step of the Original WF) gives errors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        for ind_point_LiDAR_REWS=1:length(Y)
+            pointsToAverage(:,ind_point_LiDAR_REWS) = VFinalTotal_Time_U{ind_point_LiDAR_REWS}(1,ind_LiDAR_REWS); % we take points of each Time series in the correspondent slice and mean it.
+        end
+        pointsToAverage = rad_valuesLiDAR.*pointsToAverage; % remove points out of the rotor
+        if input.flag_apply_weightREWS==1
+            pointsToAverage = Weights_of_Lidar_In_Plane.*pointsToAverage;
+            REWS.lidar.TS(ind_LiDAR_REWS) = sum(pointsToAverage)/weigthTot_lidar;
+        else
+            REWS.lidar.TS(ind_LiDAR_REWS) = mean(pointsToAverage,'omitnan'); % removing points that are outside the rotor area
+        end
+    end
+    REWS.lidar.mean = mean(REWS.lidar.TS,'omitnan');
+    if timeStep_Measurements ~=0
+        REWS.lidar.TSTime=timestep_pat_vec/2:timestep_pat_vec:fullTime; % We suppose that measurements are in the center of the pattern. If do not create the same number of points in time we add the points(*)
+        if length(REWS.lidar.TSTime)<length(slicesTime)
+            No_difference_points=length(slicesTime)-length(REWS.lidar.TSTime);
+            for idifpoint=1:No_difference_points
+                REWS.lidar.TSTime = [REWS.lidar.TSTime REWS.lidar.TSTime(end)+ timestep_pat_vec]; % (*)
+            end
+        end
+    else   % when we have all beams synchronized we dont need to average time
+        REWS.lidar.TSTime = slicesTime(1,:);
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    if input.flag_plot_REWS==1
+        figure('NAME', 'REWS')
+        plot(fullslicesTime,REWS.fullWF.TS,REWS.lidar.TSTime,REWS.lidar.TS,'Linewidth',2)
+        grid on
+        set(gcf,'color','w')
+        
+        xlabel('Time [s]')
+        if input.flag_apply_weightREWS==1
+            ylabel ('Weighted Rotor Effective wind speed [m/s]')
+        else
+            ylabel ('Rotor Effective wind speed [m/s]')
+        end
+        legend({'Turbsim' 'Lidar'})
+        annotation('textbox', [0.36 0.15 0.266 0.0973], 'String', ['Mean value Turbsim=' num2str(REWS.fullWF.mean,'%01.03f')...
+            char(10) 'Mean value Lidar=' num2str(REWS.lidar.mean,'%01.03f')], 'FontSize',12,'FitBoxToText','on','LineStyle','none' )
+        set(gca,'FontSize',14)
+    end
+    
+end
+
+%% Calculate Shear power law exponent from measurements and full windfield
+if input.flag_power_law==1   %maybe add an option to calculate shear on every nth slice of the ful field to reduce time
+    
+    zero_valueY=find(gridy==0);
+    zero_valueZ=find(gridz==0);
+    z_vec_Shear = (gridz)+Zh;             %create vector of heights
+    Vhub_shear = compU(zero_valueZ,:,zero_valueY); %Velocity u at the hub height
+    
+    % calculate power law for full turbsim data:
+    for ind_sliceLaW = 1:gridtime  %for slices
+        V_slice = squeeze(compU(:,ind_sliceLaW,:)); % velocity of point in slices
+        v_hor = mean (V_slice,2);     % take the average of all points in each horizontal line
+        
+        % find least square fit for the average vertical line
+        fcn = @(alphaPL) sum((Vhub_shear(ind_sliceLaW)*(z_vec_Shear/Zh).^(alphaPL) - v_hor').^2); % least square defintion f
+        [s,~,~] = fminsearch(fcn, 0.14);        % Minimise Least-Squares error
+        ShearPL.fullWF.TS(ind_sliceLaW) = s; %#ok<*SAGROW>
+    end
+    ShearPL.fullWF.Mean=mean(ShearPL.fullWF.TS); % total shear of the wind field
+    
+    
+    % Calculate power law exponent from LiDAR measurements.
+    
+    % We suppose that each pattern can be projected to one plane in order to calculate shear. This % plane is the middle of the scan pattern in time
+    Match_index = FindSameValuesAndAverageV(Z);   % Calculate index of repeated heights in order to calculate mean of each height for calculating EXPONENT LAW
+    %     Z_lid_point = ceil(length(LOS_points.slicesAv)/2); %find the middle distance of the multiple ranges  where we project all the velocities
+    [~,Z_sorted_ind] = sort(Z);
+    Match_index_mat  = cell2mat(Match_index);
+    Match_index2 = Match_index;
+    for indSlice=1:size(VFinalTotal_Time_U{1},2)
+        for ind_LOS=1:length(Z)
+            iV_vec_lidar(ind_LOS) =  VFinalTotal_Time_U{ind_LOS}(indSlice);
+        end
+        
+        % create vector of heights and speeds sorted by speeds from lowerto higher
+        %THIS PART IS SPAGHETTI CODE WE HAVE TO RECONSIDER FOR A BETTER SOLUTION!!
+        for iZ = 1:length(Z)
+            iZint = Z_sorted_ind(iZ);                      % take the index of the original height vector corresponding to the order of sorted heights
+            if any(Match_index_mat==iZint)                 %check if the height is included in the matching indices
+                for ind_LAW_NO_LOS=1:length(Match_index)   %loop ove all matching groups of heights
+                    iMatchIndex = Match_index2{ind_LAW_NO_LOS};
+                    if any(iMatchIndex==iZint) % check if my value is in this group og matching values
+                        for ind_LAW_NONLOS2 = 1:length(iMatchIndex) %loop over the matching elements
+                            if ind_LAW_NONLOS2==1 % if it the first of the matching gorup assign the mean value and the gheight in the second sorted index
+                                Z1_sh(iZ) = Z(iZint);
+                                V1_sh(iZ) = mean(iV_vec_lidar(iMatchIndex),'omitnan');
+                            else
+                                Match_index2{ind_LAW_NO_LOS} (ind_LAW_NONLOS2)=nan; %if it not the first just clear the value to avoid repeateing it next
+                            end
+                        end
+                    end
+                end
+                if length(Z1_sh)<iZ
+                    Z1_sh(iZ) = nan; %if it passed all htes tests and it is nothere assign nan to keep length
+                    V1_sh(iZ)    = nan;
+                end
+                
+            else % if it is not in the matching groups assign to a new variable the values height and velocity according to the sorted values
+                Z1_sh(iZ)= Z(iZint);
+                V1_sh(iZ) = iV_vec_lidar (iZint);
+            end
+        end
+        Vshear_final = V1_sh(~isnan(V1_sh));
+        Zshear_final = Zh + Z1_sh(~isnan(Z1_sh));
+        %         Zshear_final = flip(Zshear_final);
+        clear V1_sh Z1_sh
+        
+        %Calculate the approximate Vhub (or take it from turbsim...)        
+        % % find least square fit for the average vertical line
+        if length(Vshear_final) == length(Zshear_final)
+            fcn     = @(alphaPL2) sum(( Vhub_shear(indSlice).*(Zshear_final/Zh).^(alphaPL2) - Vshear_final).^2); % least square defintion f
+            [s,~,~] = fminsearch(fcn, 0.14);        % Minimise Least-Squares error
+            ShearPL.lidar.TS(:,indSlice) = s;       %#ok<*SAGROW>
+        else
+            ShearPL.lidar.TS(:,indSlice) = nan;     %#ok<*SAGROW> % in case there arre many nans there is not enough data for a height so discard measurement
+        end
+        Match_index2 = Match_index;
+    end
+    ShearPL.lidar.Mean = mean(ShearPL.lidar.TS,'omitnan'); % total shear of the wind field
+    if timeStep_Measurements ~=0
+        ShearPL.lidar.TSTime = (timestep_pat_vec/2:timestep_pat_vec:fullTime); % We supose that measurements are in the center of the pattern. If do not create the same number of points in time we add the points(*)
+        if length(ShearPL.lidar.TSTime)<length(slicesTime)
+            No_difference_points = length(slicesTime)-length(ShearPL.lidar.TSTime);
+            for idifpoint = 1:No_difference_points
+                ShearPL.lidar.TSTime = [ShearPL.lidar.TSTime ShearPL.lidar.TSTime(end)+ timestep_pat_vec]; % (*)
+            end
+        end
+    else   % when we have all beams synchronized we dont need to average time
+        ShearPL.lidar.TSTime = slicesTime(1,:);
+    end
+        
+    %plot time series comparison
+    if input.flag_plot_shear == 1
+        figure('NAME','Shear')
+        plot(fullslicesTime,ShearPL.fullWF.TS,ShearPL.lidar.TSTime,ShearPL.lidar.TS,'Linewidth',2)
+        grid on
+        xlabel('Time [s]')
+        ylabel ('Shear exponent Alpha [-]')
+        legend({'Turbsim' 'Lidar'})
+        annotation('textbox', [0.36 0.15 0.266 0.0973], 'String', ['Mean value Turbsim=' num2str(ShearPL.fullWF.Mean,'%01.03f')...
+            char(10) 'Mean value Lidar=' num2str(ShearPL.lidar.Mean,'%01.03f')], 'FontSize',12,'FitBoxToText','on','LineStyle','none' )
+        set(gca,'FontSize',14)
+    end
+end
+
+%% Statistics
+    % obtain differences between real and interpolated WindField, mean, % of
+    % differences, STDV of the current Time series and STDV of the
+    % error...
+    
+    [statisticsOut.U]...
+        = statisticsFun(Y,VFinalTotal_U,VFinalTotal_Time_U,slices,slicesTime);
+    
+    
+    [statisticsOut.V]...
+        = statisticsFun(Y,VFinalTotal_V,VFinalTotal_Time_V,slices,slicesTime);
+    
+    [statisticsOut.W]...
+        = statisticsFun(Y,VFinalTotal_W,VFinalTotal_Time_W,slices,slicesTime);
+    
+if input.flag_plot_statistics==1
+    for ind_plot_stat=1:length(Y)
+        figure('Name',['Statistics Point ' num2str(ind_plot_stat)]), plot (statisticsOut.U.error.error_time{ind_plot_stat},statisticsOut.U.error.Abs_Error{ind_plot_stat},'Linewidth',2)
+        grid on
+        xlabel('Time [s]')
+        ylabel ('Absolut Error [m/s]')
+        legend({'Absolut error'})
+        annotation('textbox', [0.16 0.35 0.266 0.4973], 'String', ['RMS=' num2str(statisticsOut.U.lidar.RMSE(ind_plot_stat),'%01.03f')...
+            char(10) 'Mean Absolute error=' num2str(statisticsOut.U.error.Mean_Abs_Error(ind_plot_stat),'%01.03f')...
+            char(10) 'Max of the Error=' num2str(max(statisticsOut.U.error.Abs_Error{ind_plot_stat}),'%01.03f')...
+            char(10) 'STDV=' num2str(statisticsOut.U.error.STDV_Error(ind_plot_stat),'%01.03f')...
+            char(10) 'Variance=' num2str(statisticsOut.U.error.Variance_Error(ind_plot_stat),'%01.03f')], 'FontSize',12,'FitBoxToText','on','LineStyle','none' )
+        set(gca,'FontSize',14)
+        
+    end
+end
+
+%% plot the slice only requested by the user
+if input.flag_plot_pattern==1
+    plane_extract_slice=min(find(min(abs(slicesDistance-extract_distance_slice))==abs(slicesDistance-extract_distance_slice)));
+    if ~isempty(plane_extract_slice)
+        plot_slices(1,Y,gridy,gridz,squeeze(compU(:,plane_extract_slice,:)),LOS_points,extract_distance_slice,input.flag_apply_weightREWS);
+        if nComp==3 || nComp==2
+            plot_slices(2,Y,gridy,gridz,squeeze(compV(:,plane_extract_slice,:)),LOS_points,extract_distance_slice,input.flag_apply_weightREWS);
+        end
+        
+        if nComp==3
+            plot_slices(3,Y,gridy,gridz,squeeze(compW(:,plane_extract_slice,:)),LOS_points,extract_distance_slice,input.flag_apply_weightREWS);
+        end
+        
+    end
+end
+
+%% Resample Data (check the missmatch in time at the end of the series...!!)
+if input.flag_resampling==1
+    slicesTime2               = slicesTime;
+    clear slicesTime
+    for iPat= 1:length(Y)
+        %CompU
+        VFinalTotal_Time_U{iPat} = interpft(VFinalTotal_Time_U{iPat},length(VFinalTotal_Time_U{iPat})*resampling_factor);
+        VFinalTotal_Time_U{iPat} = VFinalTotal_Time_U{iPat}(1:end-resampling_factor+1);
+        %CompV
+        VFinalTotal_Time_V{iPat} = interpft(VFinalTotal_Time_V{iPat},length(VFinalTotal_Time_V{iPat})*resampling_factor);
+        VFinalTotal_Time_V{iPat} = VFinalTotal_Time_V{iPat}(1:end-resampling_factor+1);
+        %CompW
+        VFinalTotal_Time_W{iPat} = interpft(VFinalTotal_Time_W{iPat},length(VFinalTotal_Time_W{iPat})*resampling_factor);
+        VFinalTotal_Time_W{iPat} = VFinalTotal_Time_W{iPat}(1:end-resampling_factor+1);
+        
+        slicesTime(iPat,:)       = 0:(slicesTime2(iPat,2)-slicesTime2(iPat,1))/resampling_factor:slicesTime2(iPat,end);
+        %         slicesTime_resamp(iPat,:)       = 0:(slicesTime(iPat,2)-slicesTime(iPat,1))/resampling_factor:slicesTime(iPat,end)+(resampling_factor-1)*(slicesTime(iPat,2)-slicesTime(iPat,1))/resampling_factor;
+    end
+    % Matching the time vector with TurbSim time series:
+    slicesTime    = slicesTime(:,1:length(VFinalTotal_Time_U{1}));
+    timestep_pat_vec  = timestep_pat_vec/resampling_factor;
+    %     Analysistime  = TOTAL_TIME_SERIE_DURATION;
+else
+    [~,colNaNslicesTime]=find(isnan(slicesTime));
+    ncolsdelete=unique(colNaNslicesTime);
+    slicesTime=slicesTime(:,1:(end-length(ncolsdelete)));
+    %     Analysistime   = TOTAL_TIME_SERIE_DURATION; %max(slicesTime(1,end));%slicesTime(1,end)+timestep_pat_vec;
+end
+
+%% Save in TurbSim timeseries input format:
+
+if input.flag_save_turbsim_input==1
+    %First sort with heigths
+    [Z1,SortedIndex] = sort(Z);
+    Y1 = Y(SortedIndex);
+    %     count_sort=0;
+    for ind_sort=1:length(Y1)
+                VFinalTotal_CompU{ind_sort}=VFinalTotal_Time_U{SortedIndex(ind_sort)};
+%         VFinalTotal_U_test{ind_sort}=VFinalTotal_Time_U{SortedIndex(ind_sort)};
+    end
+    
+    t      = slicesTime(1,:)';  % what time to put here when they are not synchronized???? ASSUMPTION: project all data in a slice!!!!!!
+    %     t      = fullslicesTime(1,1:8:end)';  % what time to put here when they are not synchronized???? ASSUMPTION: project all data in a slice!!!!!!
+    
+    y      = Y1;
+    z      = Z1+Zh;
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%  Only want 1 component  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    if input.flag_VW_0 ==1 %this is because want to remove 2nd and 3rd components for turbsim since  we consider them 0.
+        VFinal = [];
+        for iTurb=1:length(Y)
+                        VFinal(:,iTurb)=(VFinalTotal_CompU{iTurb}');
+%             VFinal(:,iTurb)=(VFinalTotal_U_test{iTurb}');
+        end
+        nComp_TurbSim=1;
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    else
+        % Take the Time Series depending on the components requested
+        switch nComp
+            case 1
+                VFinal = [];
+                for iTurb=1:length(Y)
+                    VFinal(:,iTurb)=(VFinalTotal_CompU{iTurb}');
+                end
+                nComp_TurbSim=nComp;
+            case 2
+                for iTurb=1:length(Y)
+                    VFinal2{iTurb}=horzcat(VFinalTotal_CompU{iTurb}',(VFinalTotal_CompV{iTurb}.*0)');
+                end
+                VFinal = [];
+                for iTurb2=1:length(Y)
+                    VFinal=[VFinal,(VFinal2{iTurb2})]; %#ok<AGROW>
+                end
+                nComp_TurbSim=nComp;
+            case 3
+                for iTurb=1:length(Y)
+                    VFinal3{iTurb}=horzcat(VFinalTotal_CompU{iTurb}',(VFinalTotal_CompV{iTurb}.*0)',(VFinalTotal_CompW{iTurb}*0)');
+                end
+                VFinal = [];
+                for iTurb2=1:length(Y)
+                    VFinal=[VFinal,(VFinal3{iTurb2})]; %#ok<AGROW>
+                end
+                nComp_TurbSim=nComp;
+        end
+    end
+    
+    
+    %     check for Nans and remove them if turbsim cannot handle them
+    for iRowTS = 1:size(VFinal,1)
+        if any(isnan(VFinal(iRowTS,:)))
+            CntNan(iRowTS)=0;
+        else
+            CntNan(iRowTS)=1;
+        end
+    end
+    
+    VFinal =(VFinal(find(CntNan==1),:));  %#ok<FNDSB>
+    
+    %Cut the last "NumberRows2delete" rows because if there is any nan, we repeat the last row of values
+    VFinal = VFinal (1:end-NumberRows2delete,:);
+    
+    
+    if ~exist(SaveDirectory_TurbSim, 'dir')
+        mkdir(SaveDirectory_TurbSim);
+    end
+    addpath (genpath(SaveDirectory_TurbSim));
+    
+    input_file = strcat(SaveDirectory_TurbSim,OutSaveName,'_PatTStep',TSnam2,'.TimeSer');  %defines filename of user timeser file
+    
+    %     data_file = strcat(windfieldfile,'_DATAFILE_',num2str(nComp),'Components');    % string, which defines data origin file if needed
+    % string, which defines data origin file if needed
+    
+    [rowRefNode,colRefnode]=min(abs(abs(z)-Zh)+abs(Y1));
+    RefNode = colRefnode;    % Reference Node of measurements from the points. we find the closest one to zero and assign it
+    RefPtID = length(Y);
+    % Call function for generating turbsim timeusr inputs
+    % cut the time series to matcvh with the original:
+    %Here have to add the lines of code that finds the time in which all
+    %time series coincide: (script PruebaTotalTimeSeries in the desktop)
+    
+    %     time_row=find(t==Analysistime);
+    [Analysistime,time_row]=max(slicesTime(1,:)); %When time_pat=to the time step of the original WF gives problems.
+    %     Analysistime=298; % I added this to match the time series vector. Have to figure out how to do it automatically. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    writeTurbSimTimeSeriesInput(input_file, windfieldfile, VFinal(1:time_row,:), t(1:time_row,:), y, z, RefNode,nComp_TurbSim); % Write time series for TurbSim
+    disp(strcat('Time series of the wind field  ', windfieldfile(1:end-4),' for TurbSim is done'))
+    %Take the constraining timeseries, pass it to Turbsim and create the
+    %template for turbsim
+    GridHt=gridnz*dz-dz;
+    GridWt=gridny*dy-dz;
+    
+    % writing .inp file for turbsim
+    processingTurbsim(TSnam2,SaveDirectory_TurbSim,OutSaveName,RandSeed,gridnz,gridny,timestep_pat_vec,Analysistime,UsableTime,Zh,GridHt,GridWt,IECstandard,statisticsOut.U.lidar.TI_mean,RefHt,statisticsOut.U.lidar.Mean_TS_LiDAR,ShearPL.lidar.Mean,WindProfileType,SCMod1)
+    %     destination=strcat('..\Output\Output_TurbSim\V',MeanVstr,'\',Pattern,'_41_Pattern_WF\TimeStep',TSnam2) ;
+    %     origen='..\Output\Output_TurbSim\TurbSim_Win32.exe';
+    %     if ~exist([destination '\TurbSim_Win32.exe'])
+    %         copyfile ( origen,  destination);
+    %     end
+    disp([windfieldfile(1:end-4) ' template of the time series is done.' ])       
+end
+
+%% Save in pyconturb format (Check how i remove nans for turbsim!!! maybe we should do it earlier in the code: Done!!)
+if input.flag_save_pyconturb_input==1
+    LiDAR_ShearPL=ShearPL.lidar.Mean;
+    
+    CSV_Out2PyConTurb(SaveDirectory_PyCOnTurb,TSnam2,OutSaveName,NumberRows2delete,VFinalTotal_Time_U,VFinalTotal_Time_V,VFinalTotal_Time_W,gridy,gridz,Y,Z,Zh,slicesTime,nComp,statisticsOut.U.lidar.Mean_TS_LiDAR,coh_model,wsp_func,sig_func,spec_func,seed,nf_chunk,interp_data,LiDAR_ShearPL,turb_class)
+    disp([OutSaveName ' data for PyConTurb is saved.'])
+end
+
+%% Execute python: Does not work... cannot import PyCOnTurb packages
+% pyversion C:\Python27\Scripts\spyder.exe % Initializates Spyder
+
+% run Spyder code
+if input.flag_runPyConTurb==1
+    systemCommand = '..\Functions\Read_CSV_Run_PycConTurb.py ';
+    % system ('python X:\Documents\FranciscoCosta\GIT_HUB\LidarSimulator\LidarSimulator\Functions\Read_CSV_Run_PycConTurb.py');
+    % addpath('X:\Documents\FranciscoCosta\GIT_HUB\LidarSimulator\LidarSimulator\pyconturb');
+    % import py.pyconturb_wind_profiles.*
+    system(systemCommand)
+    
+end
+
+
+%% Create and save .mat output and figures
+if input.flag_getLidarOutput==1
+    save_data=[savedirectory windfieldfile];
+    savedirectory=strcat('..\Save4Comparison\V',MeanVstr,'_WF2\',Pattern,'\TStp_',nam2,'\',NameWF,'\');
+    if ~exist(savedirectory, 'dir')
+        mkdir(savedirectory);
+    end
+    savefigures=[savedirectory '\Figures\'];
+    if ~exist(savefigures, 'dir')
+        mkdir(savefigures);
+    end
+    addpath (genpath(savefigures));
+    
+    addpath (genpath(savedirectory));
+elseif input.flag_unconstrain==1
+    save_data=[savedirectory '_TimeStp_pat' TSnam2 '\' OutSaveName '_PatTStp' TSnam2]; % where do you want to save Output.mat file
+    savefigures=strcat(savedirectory,'_TimeStp_pat',TSnam2,'\Figures');
+    if ~exist(savefigures, 'dir')
+        mkdir(savefigures);
+    end
+    addpath (genpath(savefigures));
+    
+    if ~exist(strcat(savedirectory,'_TimeStp_pat',TSnam2), 'dir')
+        mkdir(strcat(savedirectory,'_TimeStp_pat',TSnam2));
+    end
+    addpath (genpath(savedirectory));
+end
+Output.REWS   = REWS;
+Output.Shear  = ShearPL;
+
+if input.flag_apply_noise==1
+    Output.Parameter.Noise  = [noise_U ;noise_V; noise_W];
+else
+    Output.Parameter.Noise  = [ ]    ;
+end
+
+Output.statistics       = statisticsOut;
+Output.TS.fullWF.time   = fullslicesTime;
+Output.Pattern.Coord    = [Y;Z];
+Output.Pattern.refplane = ref_plane_dist; %like focus distance
+Output.Pattern.timestep_pat_vec  = timestep_pat_vec; %like focus distance
+Output.Pattern.timeStep_Measurements = timeStep_Measurements; %like focus distance
+Output.Pattern.distance_av_slice  = distance_av_slice; %like focus distance
+Output.Pattern.points_av_slice    = points_av_slice;
+Output.Pattern.timestep_pat_vec   = timestep_pat_vec;
+Output.Parameter.rotor_radius = rotor_radius; % Radio of the Rotor [m]
+Output.Parameter.Zh   = Zh;
+for iPat= 1:length(Y)
+    Output.TS.fullWF.Uval{iPat} = VFinalTotal_U{iPat};
+    Output.TS.fullWF.Vval{iPat} = VFinalTotal_U{iPat};
+    Output.TS.fullWF.Wval{iPat} = VFinalTotal_U{iPat};
+    Output.TS.lidar.Uval{iPat}  = VFinalTotal_Time_U{iPat};
+    Output.TS.lidar.Vval{iPat}  = VFinalTotal_Time_V{iPat};
+    Output.TS.lidar.Wval{iPat}  = VFinalTotal_Time_W{iPat};
+    Output.TS.lidar.time{iPat}  = slicesTime(iPat,:);
+    Output.TS.lidar.Uval_LOS{iPat} = VFinalTotal_Time_LOS_U{iPat};
+end
+save(save_data,'Output')
+
+
+% FolderName = savefigures;
+% %     FigList = findobj(allchild(0), 'flat', 'Type', 'figure');
+% %     for iFig = 1:length(FigList)
+% %         FigHandle = FigList(iFig);
+% %         FigName   = get(FigHandle, 'Name');
+% %         savefig(FigHandle, fullfile(savefigures, [num2str(FigName) '.fig']));
+% %         saveas(FigHandle, fullfile(savefigures, [num2str(FigName) '.png']))
+% %     end
+% close all
+
+##### SOURCE END #####
+--></body></html>
