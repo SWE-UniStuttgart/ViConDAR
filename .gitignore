@@ -1,10 +1,12 @@
-# Don't keep  wind fields
+# Don't keep wind fields and figures
 *.wnd
 *.hh
 *.sum
 *.csv
 *.mat
-*.bts
+*.png
+*.eps
+!TestFiles/TEST_Sh25_SD01_V15_TI05.mat #keep only the test file
 
 # Ignore the folders with data
 OriginalWF/
@@ -17,5 +19,4 @@ Developer/
 *.asv
 
 # Specific files
-Main/LidarSimulatorCOPY.m
 Main/InputParameters.m
