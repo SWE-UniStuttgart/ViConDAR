@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>one_value_WF_SHEAR</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="one_value_WF_SHEAR.m"><style type="text/css">
+      --><title>one_value_WF_SHEAR</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="one_value_WF_SHEAR.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -70,7 +70,6 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 <span class="comment">% constant wind in every slice based on the .hh file. Additionally also shear can be added</span>
 <span class="comment">% to the wind file. V and W components are considered 0.</span>
 
-
 <span class="comment">% Francisco Costa</span>
 <span class="comment">% &copy; SWE</span>
 <span class="comment">%obtain Windfield data</span>
@@ -99,33 +98,32 @@ hub_h    = 119;
 
 <span class="comment">%Shear</span>
 shear_alpha = 0.0; <span class="comment">%Apply vertical shear if zero there will be uniform wind in each time slice</span>
-</pre><h2>Read in hh file<a name="3"></a></h2><pre class="codeinput">A=importdata(hh_input);
+</pre><h2>Read in hh file<a name="3"></a></h2><pre class="codeinput">HH_data=importdata(hh_input);
 </pre><h2>Start populating windfield with known values<a name="4"></a></h2><pre class="codeinput">windfield.ny = ny;
 windfield.nz = nz;
-windfield.dt = A.data(2,1)-A.data(1,1);
-windfield.URef = round (mean(A.data(:,2)));
+windfield.dt = HH_data.data(2,1)-HH_data.data(1,1);
+windfield.URef = round (mean(HH_data.data(:,2)));
 windfield.T_offset = 0;
-windfield.grid.nt = length(A.data(:,2));
+windfield.grid.nt = length(HH_data.data(:,2));
 windfield.grid.dy = dy;
 windfield.grid.ny = ny;
 windfield.grid.nz = nz;
 windfield.grid.dt = windfield.dt;
-windfield.grid.t  = A.data(:,1);
+windfield.grid.t  = HH_data.data(:,1);
 windfield.grid.dz = dz;
 windfield.grid.z = -gridLimZ:dz:gridLimZ;
 windfield.grid.y = -gridLimY:dz:gridLimY;
 windfield.grid.Y = repmat(windfield.grid.y,nz,1) ;
 windfield.grid.Z = repmat(windfield.grid.z',1,ny) ;
-windfield.v      = zeros (ny,length(A.data(:,2)),nz); <span class="comment">% v+w are considered zero in this implementation</span>
-windfield.w      = zeros (ny,length(A.data(:,2)),nz); <span class="comment">% v+w are considered zero in this implementation</span>
-windfield.u      = zeros (ny,length(A.data(:,2)),nz); <span class="comment">% preallocation</span>
+windfield.v      = zeros (ny,length(HH_data.data(:,2)),nz); <span class="comment">% v+w are considered zero in this implementation</span>
+windfield.w      = zeros (ny,length(HH_data.data(:,2)),nz); <span class="comment">% v+w are considered zero in this implementation</span>
+windfield.u      = zeros (ny,length(HH_data.data(:,2)),nz); <span class="comment">% preallocation</span>
 
 <span class="comment">%Create vertical shear for each slice and put in the correct slices</span>
 <span class="keyword">for</span> i = 1:windfield.grid.nt
-    u_vec(i,:) = A.data(i,2).*( (windfield.grid.z+hub_h)/hub_h).^shear_alpha; <span class="comment">%#ok&lt;SAGROW&gt;</span>
+    u_vec(i,:) = HH_data.data(i,2).*( (windfield.grid.z+hub_h)/hub_h).^shear_alpha; <span class="comment">%#ok&lt;SAGROW&gt;</span>
     windfield.u (:,i,:) = repmat(u_vec(i,:),ny,1);
 <span class="keyword">end</span>
-
 save([save_WF_directory FileName],<span class="string">'windfield'</span>)
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
@@ -134,7 +132,6 @@ save([save_WF_directory FileName],<span class="string">'windfield'</span>)
 % This code gets an .hh file and creates a .mat windfield (Turbsim style) with
 % constant wind in every slice based on the .hh file. Additionally also shear can be added
 % to the wind file. V and W components are considered 0. 
-
 
 % Francisco Costa
 % © SWE
@@ -170,35 +167,34 @@ shear_alpha = 0.0; %Apply vertical shear if zero there will be uniform wind in e
 
 %% Read in hh file
 
-A=importdata(hh_input);
+HH_data=importdata(hh_input);
 
 %% Start populating windfield with known values
 windfield.ny = ny;
 windfield.nz = nz;
-windfield.dt = A.data(2,1)-A.data(1,1);
-windfield.URef = round (mean(A.data(:,2)));
+windfield.dt = HH_data.data(2,1)-HH_data.data(1,1);
+windfield.URef = round (mean(HH_data.data(:,2)));
 windfield.T_offset = 0;
-windfield.grid.nt = length(A.data(:,2));
+windfield.grid.nt = length(HH_data.data(:,2));
 windfield.grid.dy = dy;
 windfield.grid.ny = ny;
 windfield.grid.nz = nz;
 windfield.grid.dt = windfield.dt;
-windfield.grid.t  = A.data(:,1);
+windfield.grid.t  = HH_data.data(:,1);
 windfield.grid.dz = dz;
 windfield.grid.z = -gridLimZ:dz:gridLimZ;
 windfield.grid.y = -gridLimY:dz:gridLimY;
 windfield.grid.Y = repmat(windfield.grid.y,nz,1) ;
 windfield.grid.Z = repmat(windfield.grid.z',1,ny) ;
-windfield.v      = zeros (ny,length(A.data(:,2)),nz); % v+w are considered zero in this implementation
-windfield.w      = zeros (ny,length(A.data(:,2)),nz); % v+w are considered zero in this implementation
-windfield.u      = zeros (ny,length(A.data(:,2)),nz); % preallocation
+windfield.v      = zeros (ny,length(HH_data.data(:,2)),nz); % v+w are considered zero in this implementation
+windfield.w      = zeros (ny,length(HH_data.data(:,2)),nz); % v+w are considered zero in this implementation
+windfield.u      = zeros (ny,length(HH_data.data(:,2)),nz); % preallocation
 
 %Create vertical shear for each slice and put in the correct slices 
 for i = 1:windfield.grid.nt
-    u_vec(i,:) = A.data(i,2).*( (windfield.grid.z+hub_h)/hub_h).^shear_alpha; %#ok<SAGROW>
+    u_vec(i,:) = HH_data.data(i,2).*( (windfield.grid.z+hub_h)/hub_h).^shear_alpha; %#ok<SAGROW>
     windfield.u (:,i,:) = repmat(u_vec(i,:),ny,1);
 end
-
 save([save_WF_directory FileName],'windfield')
 
 

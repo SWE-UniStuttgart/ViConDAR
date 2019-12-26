@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="plot_fullWF_timeseries.m"><style type="text/css">
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="plot_fullWF_timeseries.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Header</h1><p>Plotting the time series from full wind fields at grid points requested by the user</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> plot_fullWF_timeseries(input,perm_cell)
+  </style></head><body><div class="content"><h1>Header</h1><p>Plotting the time series from full wind fields at grid points requested by the user as defined in input.points_plot_WF_timeseries.</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> plot_fullWF_timeseries(input,perm_cell)
 
 pyconturbWFsFull = dir([input.PyconturbOut_dir <span class="string">'*.mat'</span>]);
 <span class="keyword">if</span> ~isempty(pyconturbWFsFull)
@@ -78,28 +78,27 @@ turbsimWFsFull = dir([input.TurbSimOut_dir <span class="string">'*.mat'</span>])
     turbsimWF_names =  extractfield(turbsimWFsFull,<span class="string">'name'</span>);
 <span class="keyword">end</span>
 
-
 <span class="keyword">for</span> iPoint = 1:size(input.points_plot_WF_timeseries,2) <span class="comment">% loop over requested points in space</span>
     Ypoint = input.points_plot_WF_timeseries(1,iPoint); <span class="comment">%Y point in meters</span>
     Zpoint = input.points_plot_WF_timeseries(2,iPoint); <span class="comment">%Z  point in meters</span>
-    legCell={};
 
     <span class="comment">%Go through orginal wind field folders to match the names</span>
-    figure
-    <span class="keyword">for</span> iNamOr = 1: length(perm_cell.namesOWF) <span class="comment">% loop over orifinal windfields</span>
+    <span class="keyword">for</span> iNamOr = 1:length(perm_cell.namesOWF) <span class="comment">% loop over orifinal windfields</span>
+        figure
+        legCell = {};
         curNamOr = perm_cell.namesOWF{iNamOr,1};
         load([input.OriginalWF_dir curNamOr]); <span class="comment">% variable windfield loaded</span>
         <span class="comment">% find the closesrt point in the grid as requeted by the user</span>
-        YpointGrid = find(abs(Ypoint-windfield.grid.y)==min(abs(Ypoint-windfield.grid.y)),1); <span class="comment">%Y point as index</span>
-        ZpointGrid = find(abs(Zpoint-windfield.grid.z)==min(abs(Zpoint-windfield.grid.z)),1); <span class="comment">%z point as index</span>
-        plot (windfield.grid.t,windfield.u(ZpointGrid,:,YpointGrid),<span class="string">'LineWidth'</span>,1.5)
-        legCell{1,end+1}= curNamOr; <span class="comment">%#ok&lt;*AGROW&gt;</span>
+        YpointGrid = find(abs(Ypoint-windfield.grid.y) == min(abs(Ypoint-windfield.grid.y)),1); <span class="comment">%Y point as index</span>
+        ZpointGrid = find(abs(Zpoint-windfield.grid.z) == min(abs(Zpoint-windfield.grid.z)),1); <span class="comment">%z point as index</span>
+        plot(windfield.grid.t,windfield.u(YpointGrid,:,ZpointGrid),<span class="string">'LineWidth'</span>,1.5)
+        legCell{1,end+1} = curNamOr; <span class="comment">%#ok&lt;*AGROW&gt;</span>
         hold <span class="string">on</span>
 
         <span class="comment">% loop over constrained wind fields with pyconturb that come from the same</span>
         <span class="comment">% original windfield</span>
         <span class="keyword">if</span> input.plot_WF_timeseries_Pyconturb == 1 ;
-            pyconWFsInd= ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); <span class="comment">%</span>
+            pyconWFsInd = ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); <span class="comment">%</span>
             pyconWFs = pyconturbWF_names(pyconWFsInd);
             <span class="keyword">for</span> ipyconWF = 1:size(pyconWFs,2)
                 curNamPycon = pyconWFs{ipyconWF};
@@ -107,7 +106,7 @@ turbsimWFsFull = dir([input.TurbSimOut_dir <span class="string">'*.mat'</span>])
                 <span class="comment">% find the closesrt point in the grid as requeted by the user</span>
                 YpointGrid = find(abs(Ypoint-windfield.grid.y)==min(abs(Ypoint-windfield.grid.y)),1); <span class="comment">%Y point as index</span>
                 ZpointGrid = find(abs(Zpoint-windfield.grid.z)==min(abs(Zpoint-windfield.grid.z)),1); <span class="comment">%z point as index</span>
-                plot (windfield.grid.t,windfield.u(ZpointGrid,:,YpointGrid),<span class="string">'LineWidth'</span>,1.5)
+                plot(windfield.grid.t,windfield.u(YpointGrid,:,ZpointGrid),<span class="string">'LineWidth'</span>,1.5)
                 legCell{1,end+1}= curNamPycon(1:end-4);
                 hold <span class="string">on</span>
             <span class="keyword">end</span>
@@ -116,20 +115,19 @@ turbsimWFsFull = dir([input.TurbSimOut_dir <span class="string">'*.mat'</span>])
         <span class="comment">% loop over constrained wind fields with turbsim that come from the same</span>
         <span class="comment">% original windfield</span>
         <span class="keyword">if</span> input.plot_WF_timeseries_Turbsim == 1 ;
-            turbsimWFsInd= ~cellfun(@isempty,strfind(turbsimWF_names,curNamOr)); <span class="comment">%</span>
+            turbsimWFsInd = ~cellfun(@isempty,strfind(turbsimWF_names,curNamOr)); <span class="comment">%</span>
             turbsimWFs = turbsimWF_names(turbsimWFsInd);
             <span class="keyword">for</span> iturbsimWF = 1:size(turbsimWFs,2)
                 curNamTurbsim = turbsimWFs{iturbsimWF};
                 load([input.TurbSimOut_dir curNamTurbsim]); <span class="comment">% variable windfield loaded</span>
                 <span class="comment">% find the closesrt point in the grid as requeted by the user</span>
-                YpointGrid = find(abs(Ypoint-windfield.grid.y)==min(abs(Ypoint-windfield.grid.y)),1); <span class="comment">%Y point as index</span>
-                ZpointGrid = find(abs(Zpoint-windfield.grid.z)==min(abs(Zpoint-windfield.grid.z)),1); <span class="comment">%z point as index</span>
-                plot (windfield.grid.t,windfield.u(ZpointGrid,:,YpointGrid),<span class="string">'LineWidth'</span>,1.5)
-                legCell{1,end+1}= curNamTurbsim(1:end-4);
+                YpointGrid = find(abs(Ypoint-windfield.grid.y) == min(abs(Ypoint-windfield.grid.y)),1); <span class="comment">%Y point as index</span>
+                ZpointGrid = find(abs(Zpoint-windfield.grid.z) == min(abs(Zpoint-windfield.grid.z)),1); <span class="comment">%z point as index</span>
+                plot (windfield.grid.t,windfield.u(YpointGrid,:,ZpointGrid),<span class="string">'LineWidth'</span>,1.5)
+                legCell{1,end+1} = curNamTurbsim(1:end-4);
                 hold <span class="string">on</span>
             <span class="keyword">end</span>
         <span class="keyword">end</span>
-
         grid <span class="string">on</span>
         title ([<span class="string">'Timeseries at Y:'</span> num2str(Ypoint) <span class="string">'m Z:'</span> num2str(Zpoint) <span class="string">'m'</span>])
         xlabel (<span class="string">'Time [s]'</span>)
@@ -144,7 +142,7 @@ turbsimWFsFull = dir([input.TurbSimOut_dir <span class="string">'*.mat'</span>])
 %% Header
 %
 % Plotting the time series from full wind fields at grid points requested by the
-% user
+% user as defined in input.points_plot_WF_timeseries.
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -161,28 +159,27 @@ if ~isempty(turbsimWFsFull)
     turbsimWF_names =  extractfield(turbsimWFsFull,'name');
 end
 
-
 for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested points in space
     Ypoint = input.points_plot_WF_timeseries(1,iPoint); %Y point in meters
-    Zpoint = input.points_plot_WF_timeseries(2,iPoint); %Z  point in meters
-    legCell={};
+    Zpoint = input.points_plot_WF_timeseries(2,iPoint); %Z  point in meters    
     
     %Go through orginal wind field folders to match the names
-    figure
-    for iNamOr = 1: length(perm_cell.namesOWF) % loop over orifinal windfields
+    for iNamOr = 1:length(perm_cell.namesOWF) % loop over orifinal windfields
+        figure
+        legCell = {};
         curNamOr = perm_cell.namesOWF{iNamOr,1};
         load([input.OriginalWF_dir curNamOr]); % variable windfield loaded
         % find the closesrt point in the grid as requeted by the user
-        YpointGrid = find(abs(Ypoint-windfield.grid.y)==min(abs(Ypoint-windfield.grid.y)),1); %Y point as index
-        ZpointGrid = find(abs(Zpoint-windfield.grid.z)==min(abs(Zpoint-windfield.grid.z)),1); %z point as index
-        plot (windfield.grid.t,windfield.u(ZpointGrid,:,YpointGrid),'LineWidth',1.5)
-        legCell{1,end+1}= curNamOr; %#ok<*AGROW>
+        YpointGrid = find(abs(Ypoint-windfield.grid.y) == min(abs(Ypoint-windfield.grid.y)),1); %Y point as index
+        ZpointGrid = find(abs(Zpoint-windfield.grid.z) == min(abs(Zpoint-windfield.grid.z)),1); %z point as index
+        plot(windfield.grid.t,windfield.u(YpointGrid,:,ZpointGrid),'LineWidth',1.5)
+        legCell{1,end+1} = curNamOr; %#ok<*AGROW>
         hold on
         
         % loop over constrained wind fields with pyconturb that come from the same
         % original windfield
         if input.plot_WF_timeseries_Pyconturb == 1 ;
-            pyconWFsInd= ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); %
+            pyconWFsInd = ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); %
             pyconWFs = pyconturbWF_names(pyconWFsInd);
             for ipyconWF = 1:size(pyconWFs,2)
                 curNamPycon = pyconWFs{ipyconWF};
@@ -190,7 +187,7 @@ for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested poi
                 % find the closesrt point in the grid as requeted by the user
                 YpointGrid = find(abs(Ypoint-windfield.grid.y)==min(abs(Ypoint-windfield.grid.y)),1); %Y point as index
                 ZpointGrid = find(abs(Zpoint-windfield.grid.z)==min(abs(Zpoint-windfield.grid.z)),1); %z point as index
-                plot (windfield.grid.t,windfield.u(ZpointGrid,:,YpointGrid),'LineWidth',1.5)
+                plot(windfield.grid.t,windfield.u(YpointGrid,:,ZpointGrid),'LineWidth',1.5)
                 legCell{1,end+1}= curNamPycon(1:end-4);
                 hold on
             end
@@ -199,20 +196,19 @@ for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested poi
         % loop over constrained wind fields with turbsim that come from the same
         % original windfield
         if input.plot_WF_timeseries_Turbsim == 1 ;
-            turbsimWFsInd= ~cellfun(@isempty,strfind(turbsimWF_names,curNamOr)); %
+            turbsimWFsInd = ~cellfun(@isempty,strfind(turbsimWF_names,curNamOr)); %
             turbsimWFs = turbsimWF_names(turbsimWFsInd);
             for iturbsimWF = 1:size(turbsimWFs,2)
                 curNamTurbsim = turbsimWFs{iturbsimWF};
                 load([input.TurbSimOut_dir curNamTurbsim]); % variable windfield loaded
                 % find the closesrt point in the grid as requeted by the user
-                YpointGrid = find(abs(Ypoint-windfield.grid.y)==min(abs(Ypoint-windfield.grid.y)),1); %Y point as index
-                ZpointGrid = find(abs(Zpoint-windfield.grid.z)==min(abs(Zpoint-windfield.grid.z)),1); %z point as index
-                plot (windfield.grid.t,windfield.u(ZpointGrid,:,YpointGrid),'LineWidth',1.5)
-                legCell{1,end+1}= curNamTurbsim(1:end-4);
+                YpointGrid = find(abs(Ypoint-windfield.grid.y) == min(abs(Ypoint-windfield.grid.y)),1); %Y point as index
+                ZpointGrid = find(abs(Zpoint-windfield.grid.z) == min(abs(Zpoint-windfield.grid.z)),1); %z point as index
+                plot (windfield.grid.t,windfield.u(YpointGrid,:,ZpointGrid),'LineWidth',1.5)
+                legCell{1,end+1} = curNamTurbsim(1:end-4);
                 hold on
             end
-        end
-        
+        end    
         grid on
         title (['Timeseries at Y:' num2str(Ypoint) 'm Z:' num2str(Zpoint) 'm'])
         xlabel ('Time [s]')
@@ -222,7 +218,6 @@ for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested poi
         clear legCell
     end
 end
-
 
 ##### SOURCE END #####
 --></body></html>

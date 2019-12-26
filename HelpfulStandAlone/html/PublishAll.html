@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="PublishAll.m"><style type="text/css">
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="PublishAll.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,63 +66,67 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Header</h1><!--introduction--><p>Publish all matlab code in the repository</p><!--/introduction--><pre class="codeinput">clc,clear <span class="string">all</span>
+  </style></head><body><div class="content"><h1>Header</h1><!--introduction--><p>Publish all matlab code in the repository (using native publish matlab function)</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><!--/introduction--><pre class="codeinput">clc
+clearvars
 
 tmp = matlab.desktop.editor.getActive;
 cd(fileparts(tmp.Filename));
-addpath (genpath(<span class="string">'..\Functions'</span>))
-addpath (genpath(<span class="string">'..\Main'</span>))
-addpath (genpath(<span class="string">'..\HelpfulStandAlone'</span>))
+addpath (genpath(<span class="string">'../Functions'</span>))
+addpath (genpath(<span class="string">'../Main'</span>))
+addpath (genpath(<span class="string">'../HelpfulStandAlone'</span>))
 
-files = dir([<span class="string">'..\Main\*.m'</span>]);
-files2 = dir([<span class="string">'..\Functions\*.m'</span>]);
-files3 = dir([<span class="string">'..\HelpfulStandAlone\*.m'</span>]);
+files  = dir(<span class="string">'../Main/*.m'</span>);
+files2 = dir(<span class="string">'../Functions/*.m'</span>);
+files3 = dir(<span class="string">'../HelpfulStandAlone/*.m'</span>);
 
-<span class="keyword">for</span> i =1:size(files,1)
-names_main = cellstr(files(i).name );
-publish([ names_main{1}],<span class="string">'evalCode'</span>,false);
+<span class="keyword">for</span> i = 1:size(files,1)
+    names_main = cellstr(files(i).name );
+    publish([ names_main{1}],<span class="string">'evalCode'</span>,false);
 <span class="keyword">end</span>
-<span class="keyword">for</span> i =1:size(files2,1)
-names_functions =cellstr(files2(i).name ) ;
-publish([names_functions{1}],<span class="string">'evalCode'</span>,false);
+<span class="keyword">for</span> i = 1:size(files2,1)
+    names_functions = cellstr(files2(i).name ) ;
+    publish([names_functions{1}],<span class="string">'evalCode'</span>,false);
 
 <span class="keyword">end</span>
-<span class="keyword">for</span> i =1:size(files3,1)
-names_help =cellstr(files3(i).name)  ;
-publish([ names_help{1}],<span class="string">'evalCode'</span>,false);
-
+<span class="keyword">for</span> i = 1:size(files3,1)
+    names_help = cellstr(files3(i).name)  ;
+    publish([ names_help{1}],<span class="string">'evalCode'</span>,false);
 <span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Header
-% Publish all matlab code in the repository
+%
+% Publish all matlab code in the repository (using native publish matlab function)
+%
+% V.Pettas/F.Costa
+% University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 %%
-clc,clear all
+clc
+clearvars
 
 tmp = matlab.desktop.editor.getActive;
 cd(fileparts(tmp.Filename));
-addpath (genpath('..\Functions'))
-addpath (genpath('..\Main'))
-addpath (genpath('..\HelpfulStandAlone'))
+addpath (genpath('../Functions'))
+addpath (genpath('../Main'))
+addpath (genpath('../HelpfulStandAlone'))
 
-files = dir(['..\Main\*.m']);
-files2 = dir(['..\Functions\*.m']);
-files3 = dir(['..\HelpfulStandAlone\*.m']);
+files  = dir('../Main/*.m');
+files2 = dir('../Functions/*.m');
+files3 = dir('../HelpfulStandAlone/*.m');
 
-for i =1:size(files,1)
-names_main = cellstr(files(i).name );
-publish([ names_main{1}],'evalCode',false);
+for i = 1:size(files,1)
+    names_main = cellstr(files(i).name );
+    publish([ names_main{1}],'evalCode',false);
 end
-for i =1:size(files2,1)
-names_functions =cellstr(files2(i).name ) ;
-publish([names_functions{1}],'evalCode',false);
-
+for i = 1:size(files2,1)
+    names_functions = cellstr(files2(i).name ) ;
+    publish([names_functions{1}],'evalCode',false);
+    
 end
-for i =1:size(files3,1)
-names_help =cellstr(files3(i).name)  ;
-publish([ names_help{1}],'evalCode',false);
-
+for i = 1:size(files3,1)
+    names_help = cellstr(files3(i).name)  ;
+    publish([ names_help{1}],'evalCode',false);
 end
 
 

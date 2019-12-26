@@ -32,7 +32,7 @@ if ~isempty(Av_ind)
         vec_test = Av_ind{i};
         for j = 1: length(Av_ind)
             if length(Av_ind{i}) == length(Av_ind{i})
-                if isequal(Av_ind{j},vec_test) && i~=j && ~isempty(vec_test) % check every vectorwith all the others
+                if isequal(Av_ind{j},vec_test) && i~=j && ~isempty(vec_test) % check every vector with all the others
                     Av_ind2{j} = [];
                 else
                     Av_ind2{j} = Av_ind{j}; %if not keep it

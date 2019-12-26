@@ -1,8 +1,8 @@
 %% Header
 %
-%Calculate all statistics from the lidar measured time series and original wind
-%field to store them in the Output variable. This function can be modified to
-%introduce new desired outputs.
+% Calculate all statistics from the lidar measured time series and original wind
+% field to store them in the Output variable. This function can be modified to
+% introduce new desired outputs.
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -20,7 +20,7 @@ for indstat=1:length(Y)
     RMSE(indstat)      = sqrt(sum( (VFinalTotal_full{indstat}(slices(indstat,:)) - VFinalTotal_Lidar{indstat}).^2) / length(VFinalTotal_Lidar{indstat}) ); % RMSE for each TS of the pattern
     LidarTime{indstat} = slicesTime(indstat,:);
     
-    ABSOLUT_Error{indstat}  = abs(Error{indstat}); %Absolut error  %%%%%%%%%%%% I removed the abs
+    ABSOLUT_Error{indstat}  = abs(Error{indstat}); %Absolut error 
     MeanError(indstat)      = mean(Error{indstat}); % mean error
     MeanAbsError(indstat)   = mean(ABSOLUT_Error{indstat});
     Max_Error(indstat)      = max(Error{indstat}); % Maximum of the error

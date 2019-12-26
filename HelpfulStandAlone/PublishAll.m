@@ -1,22 +1,23 @@
 %% Header
 %
-% Publish all matlab code in the repository
+% Publish all matlab code in the repository (using native publish matlab function)
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 %%
-clc,clear all %#ok<*CLALL>
+clc
+clearvars
 
 tmp = matlab.desktop.editor.getActive;
 cd(fileparts(tmp.Filename));
-addpath (genpath('..\Functions'))
-addpath (genpath('..\Main'))
-addpath (genpath('..\HelpfulStandAlone'))
+addpath(genpath('../Functions'))
+addpath(genpath('../Main'))
+addpath(genpath('../HelpfulStandAlone'))
 
-files  = dir('..\Main\*.m');
-files2 = dir('..\Functions\*.m');
-files3 = dir('..\HelpfulStandAlone\*.m');
+files  = dir('../Main/*.m');
+files2 = dir('../Functions/*.m');
+files3 = dir('../HelpfulStandAlone/*.m');
 
 for i = 1:size(files,1)
     names_main = cellstr(files(i).name );
@@ -31,8 +32,4 @@ for i = 1:size(files3,1)
     names_help = cellstr(files3(i).name)  ;
     publish([ names_help{1}],'evalCode',false);
 end
-
-
-
-
 

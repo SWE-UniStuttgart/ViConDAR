@@ -1,7 +1,10 @@
 %% Header
 %
 % Function creating all the permutations of names and relevant variables 
-% for all the files requested based on the input file
+% for all the files requested based on the input file. It also checks for
+% free inputs varrying without assigned names. Since the code works on a name
+% basis, if a free variable has more than one variation it should be included
+% inthe name.
 %
 % V.Pettas/F.Costa 
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -16,11 +19,11 @@ HiddenIndex  = find(ismember(AllFixed,fixedInp(:,1))==0);
 Hidden.Names = AllFixed(HiddenIndex);
 %assign values to the fixed inputs cell vector
 for iPat=1:numel(input.PatternNames)
-    for i = 1:length(fixedInp)
+    for i = 1:size(fixedInp,1)
         curNam = fixedInp{i};
         if strcmp(curNam,'Pat')
             fixedInp{i,2} = [iPat];
-        elseif any(strcmp(Hidden.Names,'Pat')) && length(input.PatternNames) ==1
+        elseif any(strcmp(Hidden.Names,'Pat')) && size(input.PatternNames,2) ==1
             index= find(strcmp(Hidden.Names,'Pat'));
             Hidden.Val{index,iPat} = input.PatternNames; %#ok<*FNDSB>
         else
@@ -30,7 +33,7 @@ for iPat=1:numel(input.PatternNames)
         end
         if strcmp(curNam,'Tp')
             fixedInp{i,2} = [input.timestep_pat_vec{iPat}];
-        elseif any(strcmp(Hidden.Names,'Tp')) && length(input.timestep_pat_vec{1}) ==1
+        elseif any(strcmp(Hidden.Names,'Tp')) && size(input.timestep_pat_vec{1},2) ==1
             index= find(strcmp(Hidden.Names,'Tp'));
             Hidden.Val{index,iPat} = input.timestep_pat_vec{iPat}; %#ok<*FNDSB>
         else
@@ -105,11 +108,11 @@ end
 
 %Create permutation names for all cases by adding the inputs together
 %Create names for lidar and processing
-for iPat=1:numel(input.PatternNames)
-    totalMat= [freeInp; UserFixed{iPat}];
-    [ArrayVar,~] = GetVariationArray(totalMat);
+for iPat = 1:numel(input.PatternNames)
+    totalMat = [freeInp; UserFixed{iPat}];
+    [ArrayVar,~] = GetVariationArray(totalMat); % Sorting them and finding all the unique combinations
     TotalArrayVar{iPat} = ArrayVar;
-    for iVary = 1:length(ArrayVar)
+    for iVary = 1:size(ArrayVar,1)
         if ~isempty(HiddenIndex)
             TotalArrayVarVal{iVary,iPat} = [num2cell(ArrayVar{iVary}) Hidden.Val(:,iPat)'];
         else
@@ -124,12 +127,12 @@ totalMatWF = [freeInp];
 
 %Create the total array for processing:
 FinalArrayVar = {};
-for i = 1:length( TotalArrayVar)
+for i = 1:size( TotalArrayVar,2)
     FinalArrayVar = [FinalArrayVar ; TotalArrayVar{i}];  
 end
 
-% Create the unoque names concatanating the vairables and assign the values
-for iAr =1:length(FinalArrayVar)
+% Create the unique names concatanating the variables and assign the values
+for iAr = 1:size(FinalArrayVar,1)
     CurArray = FinalArrayVar{iAr};
     CurNam = nameBase;
     for  iVar = 1:length(CurArray)  % in pattern we want tochange the numerical value to string

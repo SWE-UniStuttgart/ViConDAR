@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="RunPyconturb_Con_WF.m"><style type="text/css">
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="RunPyconturb_Con_WF.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,13 +66,16 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Header</h1><p>Running pyconturb from matlab calling a python script translating .csv files to inputs for pyconturb and running it. Alternatively ths could be done only in python by getting the name list and creting in loop in python</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> RunPyconturb_Con_WF(input,filename)
+  </style></head><body><div class="content"><h1>Header</h1><p>Running pyconturb from matlab calling a python script translating .csv files to inputs for pyconturb and running it. Alternatively this can be done only in python by getting the name list and creting in loop in python</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> RunPyconturb_Con_WF(input,filename)
 
 <span class="comment">% For this step is is needed to have python &gt;3.7 installed and added the path awith pyconturb package added.</span>
 <span class="comment">% "python &lt;fullpathtomyscript.py&gt; &lt;sys.argv1&gt;... &lt;sys.argv5&gt;" arg1: contc file</span>
 <span class="comment">% arg2: gridy file arg3: gridz file arg4: variables arg5: full path savename</span>
-dos([ input.PythonExe_path <span class="string">' ..\Functions\Read_CSV_Run_PycConTurb.py '</span> input.PyconturbInput_dir <span class="string">'con_tc_'</span> filename <span class="string">'.csv '</span> input.PyconturbInput_dir <span class="string">'GridY_'</span> filename <span class="string">'.csv '</span> input.PyconturbInput_dir <span class="string">'GridZ_'</span> filename <span class="string">'.csv '</span> input.PyconturbInput_dir <span class="string">'Variables_'</span> filename <span class="string">'.csv '</span> input.PyconturbOut_dir filename <span class="string">'_ConPyconturb.csv'</span>])
-
+[status,cmdout] = system([input.PythonExe_path <span class="string">' ../Functions/Read_CSV_Run_PycConTurb.py '</span> input.PyconturbInput_dir <span class="string">'con_tc_'</span> filename <span class="string">'.csv '</span> input.PyconturbInput_dir <span class="string">'GridY_'</span> filename <span class="string">'.csv '</span> input.PyconturbInput_dir <span class="string">'GridZ_'</span> filename <span class="string">'.csv '</span> input.PyconturbInput_dir <span class="string">'Variables_'</span> filename <span class="string">'.csv '</span> input.PyconturbOut_dir filename <span class="string">'_ConPyconturb.csv'</span>]);
+<span class="keyword">if</span> status ~= 0
+    disp(cmdout)
+    error([<span class="string">'Error in Pyconturb execution file '</span> inputfile <span class="string">'. Aborting...'</span>])
+<span class="keyword">end</span>
 <span class="comment">% Transform from .csv into .mat</span>
 Pyconturb_CSV2MAT(input,filename)
 disp([filename <span class="string">' PyConTurb constrained windfield is done.'</span>])
@@ -81,7 +84,7 @@ disp([filename <span class="string">' PyConTurb constrained windfield is done.'<
 %% Header
 %
 % Running pyconturb from matlab calling a python script translating .csv files
-% to inputs for pyconturb and running it. Alternatively ths could be done only
+% to inputs for pyconturb and running it. Alternatively this can be done only
 % in python by getting the name list and creting in loop in python 
 %
 % V.Pettas/F.Costa 
@@ -92,8 +95,11 @@ function RunPyconturb_Con_WF(input,filename)
 % For this step is is needed to have python >3.7 installed and added the path awith pyconturb package added.
 % "python <fullpathtomyscript.py> <sys.argv1>... <sys.argv5>" arg1: contc file
 % arg2: gridy file arg3: gridz file arg4: variables arg5: full path savename
-dos([ input.PythonExe_path ' ..\Functions\Read_CSV_Run_PycConTurb.py ' input.PyconturbInput_dir 'con_tc_' filename '.csv ' input.PyconturbInput_dir 'GridY_' filename '.csv ' input.PyconturbInput_dir 'GridZ_' filename '.csv ' input.PyconturbInput_dir 'Variables_' filename '.csv ' input.PyconturbOut_dir filename '_ConPyconturb.csv'])
-
+[status,cmdout] = system([input.PythonExe_path ' ../Functions/Read_CSV_Run_PycConTurb.py ' input.PyconturbInput_dir 'con_tc_' filename '.csv ' input.PyconturbInput_dir 'GridY_' filename '.csv ' input.PyconturbInput_dir 'GridZ_' filename '.csv ' input.PyconturbInput_dir 'Variables_' filename '.csv ' input.PyconturbOut_dir filename '_ConPyconturb.csv']);
+if status ~= 0
+    disp(cmdout)
+    error(['Error in Pyconturb execution file ' inputfile '. Aborting...'])   
+end
 % Transform from .csv into .mat
 Pyconturb_CSV2MAT(input,filename)
 disp([filename ' PyConTurb constrained windfield is done.'])

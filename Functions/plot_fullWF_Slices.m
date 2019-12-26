@@ -1,7 +1,7 @@
 %% Header
 %
 % Plotting requested slices from full wind fields at timesteps requested by the
-% user
+% user as defined in input.time_fullWF_Slices.
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -20,15 +20,14 @@ if ~isempty(turbsimWFsFull)
 end
 
 for iTimeSlice = 1:length(input.time_fullWF_Slices) % loop over requested slices in time
-    curTime = input.time_fullWF_Slices(iTimeSlice); %current requested time
+    curTime = input.time_fullWF_Slices(iTimeSlice); % current requested time
     
-    %Go through orginal wind field folders to match the names
-    
+    %Go through original windfield folder to match the names 
     for iNamOr = 1: length(perm_cell.namesOWF) % loop over orifinal windfields
         figure
         curNamOr = perm_cell.namesOWF{iNamOr,1};
         load([input.OriginalWF_dir curNamOr]); % variable windfield loaded
-        % find the closesrt timestep in the grid as requeted by the user
+        % find the closest timestep in the grid as requeted by the user
         TSlice = find(abs(curTime-windfield.grid.t)==min(abs(curTime-windfield.grid.t)),1); %Y point as index
         contour (windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))','Fill','on')
         colorbar('peer',gca);
@@ -52,7 +51,6 @@ for iTimeSlice = 1:length(input.time_fullWF_Slices) % loop over requested slices
                 figure
                 contour(windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))','Fill','on')
                 colorbar('peer',gca);
-%                 set(gca,'BoxStyle','full','CLim',CLimits,'Layer','top');
                 xlabel ('Y axis [m]')
                 ylabel ('Z axis [m]')
                 set(gca,'FontSize',14)

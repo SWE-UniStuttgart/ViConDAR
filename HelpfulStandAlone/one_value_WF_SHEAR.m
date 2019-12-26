@@ -13,16 +13,16 @@
 
 clc;
 close all;
-clear all; %#ok<*CLALL>
+clearvars
 
 %--------------------------------------------------------------------------%
 
 %% Input parameter definition:
 
-save_WF_directory  = '..\Output\'; % directory to save the output .mat file
+save_WF_directory  = '../Output/'; % directory to save the output .mat file
 FileName           = 'testWindfield_noshear'; % file name to be saved the variable will always be windfield
 
-hh_input  = '..\WindFiles\Senvion5MW_DLC12_ClassA_1_04_1.hh';  %input hh file to readin speeds and time
+hh_input  = '../WindFiles/DTU10MW_DLC12_ClassA_1_04_1.hh';  %input hh file to readin speeds and time
 
 %requested grid
 ny  = 41; %define amount of point in y direction of grid

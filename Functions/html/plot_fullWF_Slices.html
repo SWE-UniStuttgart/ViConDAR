@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="plot_fullWF_Slices.m"><style type="text/css">
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="plot_fullWF_Slices.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Header</h1><p>Plotting requested slices from full wind fields at timesteps requested by the user</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> plot_fullWF_Slices(input,perm_cell)
+  </style></head><body><div class="content"><h1>Header</h1><p>Plotting requested slices from full wind fields at timesteps requested by the user as defined in input.time_fullWF_Slices.</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> plot_fullWF_Slices(input,perm_cell)
 
 disp(<span class="string">'Starting plotting full wind field slices requested'</span>)
 pyconturbWFsFull = dir([input.PyconturbOut_dir <span class="string">'*.mat'</span>]);
@@ -76,19 +76,18 @@ pyconturbWFsFull = dir([input.PyconturbOut_dir <span class="string">'*.mat'</spa
 
 turbsimWFsFull = dir([input.TurbSimOut_dir <span class="string">'*.mat'</span>]);
 <span class="keyword">if</span> ~isempty(turbsimWFsFull)
-    turbsimWF_names =  extractfield(turbsimWFsFull,<span class="string">'name'</span>);
+    turbsimWF_names = extractfield(turbsimWFsFull,<span class="string">'name'</span>);
 <span class="keyword">end</span>
 
 <span class="keyword">for</span> iTimeSlice = 1:length(input.time_fullWF_Slices) <span class="comment">% loop over requested slices in time</span>
-    curTime = input.time_fullWF_Slices(iTimeSlice); <span class="comment">%current requested time</span>
+    curTime = input.time_fullWF_Slices(iTimeSlice); <span class="comment">% current requested time</span>
 
-    <span class="comment">%Go through orginal wind field folders to match the names</span>
-
+    <span class="comment">%Go through original windfield folder to match the names</span>
     <span class="keyword">for</span> iNamOr = 1: length(perm_cell.namesOWF) <span class="comment">% loop over orifinal windfields</span>
         figure
         curNamOr = perm_cell.namesOWF{iNamOr,1};
         load([input.OriginalWF_dir curNamOr]); <span class="comment">% variable windfield loaded</span>
-        <span class="comment">% find the closesrt timestep in the grid as requeted by the user</span>
+        <span class="comment">% find the closest timestep in the grid as requeted by the user</span>
         TSlice = find(abs(curTime-windfield.grid.t)==min(abs(curTime-windfield.grid.t)),1); <span class="comment">%Y point as index</span>
         contour (windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))',<span class="string">'Fill'</span>,<span class="string">'on'</span>)
         colorbar(<span class="string">'peer'</span>,gca);
@@ -102,17 +101,16 @@ turbsimWFsFull = dir([input.TurbSimOut_dir <span class="string">'*.mat'</span>])
         <span class="comment">% loop over constrained wind fields with pyconturb that come from the same</span>
         <span class="comment">% original windfield</span>
         <span class="keyword">if</span> input.plot_WF_slices_Pyconturb == 1 ;
-            pyconWFsInd= ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); <span class="comment">%</span>
-            pyconWFs = pyconturbWF_names(pyconWFsInd);
+            pyconWFsInd = ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); <span class="comment">%</span>
+            pyconWFs    = pyconturbWF_names(pyconWFsInd);
             <span class="keyword">for</span> ipyconWF = 1:size(pyconWFs,2)
                 curNamPycon = pyconWFs{ipyconWF};
                 load([input.PyconturbOut_dir curNamPycon]); <span class="comment">% variable windfield loaded</span>
                 <span class="comment">% find the closesrt timestep in the grid as requeted by the user</span>
-                TSlice = find(abs(curTime-windfield.grid.t)==min(abs(curTime-windfield.grid.t)),1); <span class="comment">%Y point as index</span>
+                TSlice = find(abs(curTime-windfield.grid.t) == min(abs(curTime-windfield.grid.t)),1); <span class="comment">%Y point as index</span>
                 figure
-                contour (windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))',<span class="string">'Fill'</span>,<span class="string">'on'</span>)
+                contour(windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))',<span class="string">'Fill'</span>,<span class="string">'on'</span>)
                 colorbar(<span class="string">'peer'</span>,gca);
-<span class="comment">%                 set(gca,'BoxStyle','full','CLim',CLimits,'Layer','top');</span>
                 xlabel (<span class="string">'Y axis [m]'</span>)
                 ylabel (<span class="string">'Z axis [m]'</span>)
                 set(gca,<span class="string">'FontSize'</span>,14)
@@ -123,13 +121,13 @@ turbsimWFsFull = dir([input.TurbSimOut_dir <span class="string">'*.mat'</span>])
         <span class="comment">% loop over constrained wind fields with turbsim that come from the same</span>
         <span class="comment">% original windfield</span>
         <span class="keyword">if</span> input.plot_WF_slices_Turbsim == 1 ;
-            turbsimWFsInd= ~cellfun(@isempty,strfind(turbsimWF_names,curNamOr)); <span class="comment">%</span>
+            turbsimWFsInd = ~cellfun(@isempty,strfind(turbsimWF_names,curNamOr)); <span class="comment">%</span>
             turbsimWFs = turbsimWF_names(turbsimWFsInd);
             <span class="keyword">for</span> iturbsimWF = 1:size(turbsimWFs,2)
                 curNamTurbsim = turbsimWFs{iturbsimWF};
                 load([input.TurbSimOut_dir curNamTurbsim]); <span class="comment">% variable windfield loaded</span>
                 <span class="comment">% find the closesrt timestep in the grid as requeted by the user</span>
-                TSlice = find(abs(curTime-windfield.grid.t)==min(abs(curTime-windfield.grid.t)),1); <span class="comment">%Y point as index</span>
+                TSlice = find(abs(curTime-windfield.grid.t) == min(abs(curTime-windfield.grid.t)),1); <span class="comment">%Y point as index</span>
                 figure
                 contour (windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))',<span class="string">'Fill'</span>,<span class="string">'on'</span>)
                 colorbar(<span class="string">'peer'</span>,gca);
@@ -149,7 +147,7 @@ turbsimWFsFull = dir([input.TurbSimOut_dir <span class="string">'*.mat'</span>])
 %% Header
 %
 % Plotting requested slices from full wind fields at timesteps requested by the
-% user
+% user as defined in input.time_fullWF_Slices.
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -164,19 +162,18 @@ end
 
 turbsimWFsFull = dir([input.TurbSimOut_dir '*.mat']);
 if ~isempty(turbsimWFsFull)
-    turbsimWF_names =  extractfield(turbsimWFsFull,'name');
+    turbsimWF_names = extractfield(turbsimWFsFull,'name');
 end
 
 for iTimeSlice = 1:length(input.time_fullWF_Slices) % loop over requested slices in time
-    curTime = input.time_fullWF_Slices(iTimeSlice); %current requested time
+    curTime = input.time_fullWF_Slices(iTimeSlice); % current requested time
     
-    %Go through orginal wind field folders to match the names
-    
+    %Go through original windfield folder to match the names 
     for iNamOr = 1: length(perm_cell.namesOWF) % loop over orifinal windfields
         figure
         curNamOr = perm_cell.namesOWF{iNamOr,1};
         load([input.OriginalWF_dir curNamOr]); % variable windfield loaded
-        % find the closesrt timestep in the grid as requeted by the user
+        % find the closest timestep in the grid as requeted by the user
         TSlice = find(abs(curTime-windfield.grid.t)==min(abs(curTime-windfield.grid.t)),1); %Y point as index
         contour (windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))','Fill','on')
         colorbar('peer',gca);
@@ -190,17 +187,16 @@ for iTimeSlice = 1:length(input.time_fullWF_Slices) % loop over requested slices
         % loop over constrained wind fields with pyconturb that come from the same
         % original windfield
         if input.plot_WF_slices_Pyconturb == 1 ;
-            pyconWFsInd= ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); %
-            pyconWFs = pyconturbWF_names(pyconWFsInd);
+            pyconWFsInd = ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); %
+            pyconWFs    = pyconturbWF_names(pyconWFsInd);
             for ipyconWF = 1:size(pyconWFs,2)
                 curNamPycon = pyconWFs{ipyconWF};
                 load([input.PyconturbOut_dir curNamPycon]); % variable windfield loaded
                 % find the closesrt timestep in the grid as requeted by the user
-                TSlice = find(abs(curTime-windfield.grid.t)==min(abs(curTime-windfield.grid.t)),1); %Y point as index
+                TSlice = find(abs(curTime-windfield.grid.t) == min(abs(curTime-windfield.grid.t)),1); %Y point as index
                 figure
-                contour (windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))','Fill','on')
+                contour(windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))','Fill','on')
                 colorbar('peer',gca);
-%                 set(gca,'BoxStyle','full','CLim',CLimits,'Layer','top');
                 xlabel ('Y axis [m]')
                 ylabel ('Z axis [m]')
                 set(gca,'FontSize',14)
@@ -211,13 +207,13 @@ for iTimeSlice = 1:length(input.time_fullWF_Slices) % loop over requested slices
         % loop over constrained wind fields with turbsim that come from the same
         % original windfield
         if input.plot_WF_slices_Turbsim == 1 ;
-            turbsimWFsInd= ~cellfun(@isempty,strfind(turbsimWF_names,curNamOr)); %
+            turbsimWFsInd = ~cellfun(@isempty,strfind(turbsimWF_names,curNamOr)); %
             turbsimWFs = turbsimWF_names(turbsimWFsInd);
             for iturbsimWF = 1:size(turbsimWFs,2)
                 curNamTurbsim = turbsimWFs{iturbsimWF};
                 load([input.TurbSimOut_dir curNamTurbsim]); % variable windfield loaded
                 % find the closesrt timestep in the grid as requeted by the user
-                TSlice = find(abs(curTime-windfield.grid.t)==min(abs(curTime-windfield.grid.t)),1); %Y point as index
+                TSlice = find(abs(curTime-windfield.grid.t) == min(abs(curTime-windfield.grid.t)),1); %Y point as index
                 figure
                 contour (windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))','Fill','on')
                 colorbar('peer',gca);

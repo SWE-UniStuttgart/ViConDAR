@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>getFullWF_statistics</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="getFullWF_statistics.m"><style type="text/css">
+      --><title>getFullWF_statistics</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="getFullWF_statistics.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,376 +66,599 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Header</a></li><li><a href="#2">IO/parameter definition</a></li><li><a href="#3">Check if these files exist in turbsim and pycoturb folders</a></li><li><a href="#5">Load windfield file</a></li><li><a href="#7">Obtain and create data</a></li><li><a href="#8">Discretization</a></li><li><a href="#9">Calculate REWS</a></li><li><a href="#10">Calculate Shear power law exponent from full windfield</a></li><li><a href="#11">Mean wind speed</a></li><li><a href="#12">HH wind speed TS, mean and TI</a></li><li><a href="#13">Create and save .mat output and figures</a></li></ul></div><h2>Header<a name="1"></a></h2><p>Creating statistics from wind fields requested. They include mean Windspeed shear, REWS, hhTI, fullTI, hh wind speed TS.</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> StatisticsWF = getFullWF_statistics(input,curFileInfo)
-</pre><h2>IO/parameter definition<a name="2"></a></h2><p>Turbine parameters</p><pre class="codeinput">rotor_radius = input.rotor_radius; <span class="comment">% Radio of the Rotor [m]</span>
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Header</a></li><li><a href="#2">parameter definition</a></li><li><a href="#3">Check if these files exist in turbsim and pycoturb folders</a></li><li><a href="#5">Load windfield file</a></li><li><a href="#7">Obtain and create data</a></li><li><a href="#8">Discretization</a></li><li><a href="#9">Calculate REWS</a></li><li><a href="#10">Calculate Shear power law exponent from full windfield</a></li><li><a href="#11">Mean wind speed</a></li><li><a href="#12">HH wind speed TS, mean and TI</a></li><li><a href="#13">Create and save .mat output</a></li></ul></div><h2>Header<a name="1"></a></h2><p>Creating statistics from windfields requested. They include mean windspeed shear, REWS, hhTI, fullTI, hh wind speed TS. Also errors between the constrained and the corresponding original data are stored together. There is no output in the function, it just saves directly to the directory defined from InputParameters file.</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> getFullWF_statistics(input,curFileInfo)
+</pre><h2>parameter definition<a name="2"></a></h2><p>Turbine parameters needed for REWS and shear calculations</p><pre class="codeinput">rotor_radius = input.rotor_radius; <span class="comment">% Radio of the Rotor [m]</span>
 Zh           = input.Zh;           <span class="comment">% HubHeight [m]</span>
 
 <span class="comment">%Processing REWS:</span>
 dist_REWS_nd = input.dist_REWS_nd; <span class="comment">% Non dimentional span position for rotor effective wind speed calculation [define from 0 to 1 inclusive]</span>
 Wi           = input.Wi;  <span class="comment">%Weight to be applied for rotor effective wind speed calculation</span>
-</pre><h2>Check if these files exist in turbsim and pycoturb folders<a name="3"></a></h2><pre class="codeinput"><span class="comment">% get pyconturb and turbsim constreind wind fields</span>
+dist_REWS = rotor_radius*[dist_REWS_nd 2]; <span class="comment">%convert ND spanwise to meters and treat the point outside with 0 weight</span>
+Wi        = [Wi 0];
+</pre><h2>Check if these files exist in turbsim and pycoturb folders<a name="3"></a></h2><pre class="codeinput"><span class="comment">% get pyconturb constrained wind field names from the output folder</span>
 pyconturbWFsFull = dir([input.PyconturbOut_dir <span class="string">'*.mat'</span>]);
 <span class="keyword">if</span> ~isempty(pyconturbWFsFull)
     pyconturbWF_names =  extractfield(pyconturbWFsFull,<span class="string">'name'</span>);
-    pyconWFsInd= ~cellfun(@isempty,strfind(pyconturbWF_names,curFileInfo.name)); <span class="comment">%</span>
-    pyconWF = [ input.PyconturbOut_dir pyconturbWF_names{pyconWFsInd}];
-    pyconWFname = pyconturbWF_names{pyconWFsInd};
+    pyconWFsInd = ~cellfun(@isempty,strfind(pyconturbWF_names,curFileInfo.name)); <span class="comment">%</span>
+    <span class="keyword">if</span> any(pyconWFsInd)
+        pyconWF = [ input.PyconturbOut_dir pyconturbWF_names{pyconWFsInd}];
+        pyconWFname = pyconturbWF_names{pyconWFsInd};
+    <span class="keyword">else</span>
+        pyconWF = [];
+        pyconWFname = [];
+    <span class="keyword">end</span>
 <span class="keyword">else</span>
     pyconWF = [];
     pyconWFname = [];
 <span class="keyword">end</span>
 
+<span class="comment">% get turbsim constrained wind field names from the output folder</span>
 turbsimWFsFull = dir([input.TurbSimOut_dir <span class="string">'*.mat'</span>]);
 <span class="keyword">if</span> ~isempty(turbsimWFsFull)
     turbsimWF_names =  extractfield(turbsimWFsFull,<span class="string">'name'</span>);
-    turbsimWFsInd= ~cellfun(@isempty,strfind(turbsimWF_names,curFileInfo.name)); <span class="comment">%</span>
-    turbsimWF = [input.TurbSimOut_dir turbsimWF_names{turbsimWFsInd}];
-    turbsimWF_name=turbsimWF_names{turbsimWFsInd};
+    turbsimWFsInd = ~cellfun(@isempty,strfind(turbsimWF_names,curFileInfo.name)); <span class="comment">%</span>
+    <span class="keyword">if</span> any(turbsimWFsInd)
+        turbsimWF = [input.TurbSimOut_dir turbsimWF_names{turbsimWFsInd}];
+        turbsimWF_name = turbsimWF_names{turbsimWFsInd};
+    <span class="keyword">else</span>
+        turbsimWF = [];
+        turbsimWF_name = [];
+    <span class="keyword">end</span>
 <span class="keyword">else</span>
-    turbsimWF =[];
-    turbsimWF_name =[];
+    turbsimWF = [];
+    turbsimWF_name = [];
 <span class="keyword">end</span>
 
+<span class="comment">% get original wind field names from the output folder</span>
 OrWFsFull = dir([input.OriginalWF_dir <span class="string">'*.mat'</span>]);
 <span class="keyword">if</span> ~isempty(OrWFsFull)
     OrWF_names =  extractfield(OrWFsFull,<span class="string">'name'</span>);
-    OrWFsInd= ~cellfun(@isempty,strfind(OrWF_names,curFileInfo.originalWF)); <span class="comment">%</span>
-    ORWF = [input.OriginalWF_dir OrWF_names{OrWFsInd}];
-    ORWF_name = curFileInfo.originalWF{1,1};
+    OrWFsInd   = ~cellfun(@isempty,strfind(OrWF_names,curFileInfo.originalWF)); <span class="comment">%</span>
+    <span class="keyword">if</span> any(OrWFsInd)
+        ORWF = [input.OriginalWF_dir OrWF_names{OrWFsInd}];
+        ORWF_name = curFileInfo.originalWF{1,1};
+    <span class="keyword">else</span>
+        ORWF = [];
+        ORWF_name = [];
+    <span class="keyword">end</span>
 <span class="keyword">else</span>
-    ORWF =[];
+    ORWF = [];
     ORWF_name = [];
 <span class="keyword">end</span>
 
 AllWf = [{ORWF} {turbsimWF} {pyconWF};{<span class="string">'original'</span>} {<span class="string">'turbsim'</span>} {<span class="string">'pyconturb'</span>};{ORWF_name} {turbsimWF_name} {pyconWFname}];
 
-<span class="keyword">for</span> iWF = 1:length(AllWf)
+<span class="comment">% since we fed the function with a specific case each time, there can be maximum 3</span>
+<span class="comment">% windfields in total here. Then we loop over the three [original</span>
+<span class="comment">% turbsimConstrained PyconturbConstrained] wind fields and calculate statistcs</span>
+<span class="comment">% and errors. When saving a constrained wind field the original and error</span>
+<span class="comment">% statistics are also attached. Warning: the loop will break if there is no</span>
+<span class="comment">% original wind field!</span>
+
+<span class="keyword">for</span> iWF = 1:size(AllWf,2)
 </pre><h2>Load windfield file<a name="5"></a></h2><pre class="codeinput">    <span class="keyword">if</span> ~isempty(AllWf{1,iWF})
 </pre><pre class="codeinput">        filenameWF =AllWf{1,iWF};
         load (filenameWF); <span class="comment">% windfield variable is loaded</span>
 </pre><h2>Obtain and create data<a name="7"></a></h2><pre class="codeinput">        <span class="comment">%extract components from the windfield variable</span>
-
-        compU               =  windfield.u;
-        compV               =  windfield.v;
-        compW               =  windfield.w;
-        dt                  =  windfield.dt; <span class="comment">%time step</span>
-        gridtime            =  windfield.grid.nt;
-        gridny              =  windfield.grid.ny;
-        gridnz              =  windfield.grid.nz;
-        gridz               =  -windfield.grid.z;
-        gridy               =  windfield.grid.y;
-        Uref                =  windfield.URef; <span class="comment">% Mean velocity of the windfied (m/s)</span>
-        dz                  =  windfield.grid.dz;
-        dy                  =  windfield.grid.dy;
+        compU    =  windfield.u;
+        compV    =  windfield.v;
+        compW    =  windfield.w;
+        dt       =  windfield.dt; <span class="comment">%time step</span>
+        gridtime =  windfield.grid.nt;
+        gridny   =  windfield.grid.ny;
+        gridnz   =  windfield.grid.nz;
+        gridz    =  -windfield.grid.z;
+        gridy    =  windfield.grid.y;
+        Uref     =  windfield.URef; <span class="comment">% Mean velocity of the windfied (m/s)</span>
+        dz       =  windfield.grid.dz;
+        dy       =  windfield.grid.dy;
 
         <span class="comment">% Manipulation of data before calculations:</span>
         <span class="keyword">for</span> i=1:gridtime
-            SqueezeCompU{i}=squeeze(compU(:,i,:));
-            compU(:,i,:)=flipud(SqueezeCompU{i}');
+            SqueezeCompU{i} = squeeze(compU(:,i,:));
+            compU(:,i,:) = flipud(SqueezeCompU{i}');
 
-            SqueezeCompV{i}=squeeze(compV(:,i,:));
-            compV(:,i,:)=flipud(SqueezeCompV{i}');
+            SqueezeCompV{i} = squeeze(compV(:,i,:));
+            compV(:,i,:) = flipud(SqueezeCompV{i}');
 
-            SqueezeCompW{i}=squeeze(compW(:,i,:)); <span class="comment">%#ok&lt;*AGROW&gt;</span>
-            compW(:,i,:)=flipud(SqueezeCompW{i}');
+            SqueezeCompW{i} = squeeze(compW(:,i,:)); <span class="comment">%#ok&lt;*AGROW&gt;</span>
+            compW(:,i,:) = flipud(SqueezeCompW{i}');
         <span class="keyword">end</span>
-</pre><h2>Discretization<a name="8"></a></h2><pre class="codeinput">        fullTime            =  (dt*gridtime)-dt; <span class="comment">%total time duration of the windfield</span>
-        fullslicesTime      =  0:dt:fullTime;
-        slicesDistance      =  fullslicesTime*Uref; <span class="comment">% vector with distance between slices(m)</span>
+</pre><h2>Discretization<a name="8"></a></h2><pre class="codeinput">        fullTime       =  (dt*gridtime)-dt; <span class="comment">%total time duration of the windfield</span>
+        fullslicesTime =  0:dt:fullTime;
+        slicesDistance =  fullslicesTime*Uref; <span class="comment">% vector with distance between slices(m)</span>
 </pre><h2>Calculate REWS<a name="9"></a></h2><pre class="codeinput">        <span class="comment">% distances of all points in the turbsim grid from center assuming hub center =0</span>
-        <span class="keyword">for</span> I=1:gridny
-            <span class="keyword">for</span> II=1:gridnz
-                Distances_of_Points_In_Plane(I,II)=sqrt((gridy(I)).^2+(gridz(II)).^2); <span class="comment">%Matrix of distances from center of rotor to each point in the grid</span>
+        <span class="keyword">for</span> I = 1:gridny
+            <span class="keyword">for</span> II = 1:gridnz
+                Distances_of_Points_In_Plane(I,II) = sqrt((gridy(I)).^2+(gridz(II)).^2); <span class="comment">%Matrix of distances from center of rotor to each point in the grid</span>
             <span class="keyword">end</span>
         <span class="keyword">end</span>
 
-
-        <span class="keyword">if</span> input.flag_apply_weightREWS==1
-            dist_REWS = rotor_radius*[dist_REWS_nd 2]; <span class="comment">%convert ND spanwise to meters and treat the point outside with 0 weight</span>
-            Wi        = [Wi 0];
-            <span class="comment">% calculate weigths for all the turbsim  grid points</span>
-            <span class="keyword">for</span> I=1:gridny
-                <span class="keyword">for</span> II=1:gridnz
-                    Weights_of_Points_In_Plane(I,II)=interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(I,II)); <span class="comment">%Matrix of weights for all grid points</span>
+        <span class="keyword">if</span> input.flag_apply_weightREWS == 1
+            <span class="comment">% calculate weigths for all the grid points</span>
+            <span class="keyword">for</span> I = 1:gridny
+                <span class="keyword">for</span> II = 1:gridnz
+                    Weights_of_Points_In_Plane(I,II) = interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(I,II)); <span class="comment">%Matrix of weights for all grid points</span>
                 <span class="keyword">end</span>
             <span class="keyword">end</span>
-            weigthTot_grid    = sum(sum(Weights_of_Points_In_Plane)); <span class="comment">%sum of weights needed for weighted average</span>
+            weigthTot_grid = sum(sum(Weights_of_Points_In_Plane)); <span class="comment">%sum of weights needed for weighted average</span>
         <span class="keyword">end</span>
 
-
         <span class="comment">%Transform Slices</span>
-        rad_values=Distances_of_Points_In_Plane&lt;=rotor_radius;       <span class="comment">%keep only points inside the rotor</span>
-        <span class="keyword">for</span> ind_slicesDistance =1:length (slicesDistance) <span class="comment">% loop over all the slices</span>
+        rad_values = Distances_of_Points_In_Plane&lt;=rotor_radius;       <span class="comment">%keep only points inside the rotor</span>
+        <span class="keyword">for</span> ind_slicesDistance = 1:length (slicesDistance) <span class="comment">% loop over all the slices</span>
             <span class="comment">% Take complete slice from turbsim:</span>
             ExSlice_U = squeeze(compU(:,ind_slicesDistance,:)); <span class="comment">% Values of the selected slice CompU</span>
             ExSlice_U = ExSlice_U.*rad_values; <span class="comment">%remove points out of rotor</span>
-            <span class="keyword">if</span> input.flag_apply_weightREWS==1
+            <span class="keyword">if</span> input.flag_apply_weightREWS == 1
                 ExSlice_U = ExSlice_U.*Weights_of_Points_In_Plane;         <span class="comment">%multiply with weights</span>
-                REWS.fullWF.TS(ind_slicesDistance) = sum(sum(ExSlice_U))/weigthTot_grid;
+                REWS.TS(ind_slicesDistance) = sum(sum(ExSlice_U))/weigthTot_grid;
             <span class="keyword">else</span>
                 noZeroSlice = nonzeros(ExSlice_U);
                 REWS.TS(ind_slicesDistance) = mean(noZeroSlice,<span class="string">'omitnan'</span>);
             <span class="keyword">end</span>
-
         <span class="keyword">end</span>
         REWS.mean = mean(REWS.TS,<span class="string">'omitnan'</span>);
-        <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
 </pre><h2>Calculate Shear power law exponent from full windfield<a name="10"></a></h2><pre class="codeinput">        <span class="comment">%maybe add an option to calculate shear on every nth slice of the ful field to reduce time</span>
-
-        zero_valueY=find(gridy==0);
-        zero_valueZ=find(gridz==0);
+        zero_valueY = find(gridy==0);
+        zero_valueZ = find(gridz==0);
         z_vec_Shear = (gridz)+Zh;             <span class="comment">%create vector of heights</span>
-        Vhub_shear = compU(zero_valueZ,:,zero_valueY); <span class="comment">%#ok&lt;*FNDSB&gt; %Velocity u at the hub height</span>
+        Vhub_HH = compU(zero_valueZ,:,zero_valueY); <span class="comment">%#ok&lt;*FNDSB&gt; %Velocity u at the hub height</span>
 
         <span class="comment">% calculate power law for full turbsim data:</span>
         <span class="keyword">for</span> ind_sliceLaW = 1:gridtime  <span class="comment">%for slices</span>
             V_slice = squeeze(compU(:,ind_sliceLaW,:)); <span class="comment">% velocity of point in slices</span>
-            v_hor = mean (V_slice,2);     <span class="comment">% take the average of all points in each horizontal line</span>
+            v_hor   = mean (V_slice,2);     <span class="comment">% take the average of all points in each horizontal line</span>
 
             <span class="comment">% find least square fit for the average vertical line</span>
-            fcn = @(alphaPL) sum((Vhub_shear(ind_sliceLaW)*(z_vec_Shear/Zh).^(alphaPL) - v_hor').^2); <span class="comment">% least square defintion f</span>
+            fcn = @(alphaPL) sum((Vhub_HH(ind_sliceLaW)*(z_vec_Shear/Zh).^(alphaPL) - v_hor').^2); <span class="comment">% least square defintion f</span>
             [s,~,~] = fminsearch(fcn, 0.14);        <span class="comment">% Minimise Least-Squares error</span>
-            <span class="keyword">if</span> abs(s) &lt; 0.005
-                s=0;
+            <span class="keyword">if</span> abs(s) &lt; 0.005 || s&lt;0
+                s = 0;
             <span class="keyword">end</span>
             ShearPL.TS(ind_sliceLaW) = s; <span class="comment">%#ok&lt;*SAGROW&gt;</span>
-
         <span class="keyword">end</span>
-        ShearPL.Mean=mean(ShearPL.TS); <span class="comment">% total shear of the wind field</span>
-</pre><h2>Mean wind speed<a name="11"></a></h2><pre class="codeinput">        <span class="keyword">for</span> iTim =1:size(compU,2)
+        ShearPL.mean = mean(ShearPL.TS); <span class="comment">% total shear of the wind field</span>
+</pre><h2>Mean wind speed<a name="11"></a></h2><pre class="codeinput">        <span class="keyword">for</span> iTim = 1:size(compU,2)
             UmeanTs(iTim) = mean(mean(squeeze(compU(:,iTim,:))));
         <span class="keyword">end</span>
-        StatisticsWF.Umean.TS = UmeanTs;
-        StatisticsWF.Umean.mean = mean(StatisticsWF.Umean.TS);
-        StatisticsWF.Umean.TI =std(StatisticsWF.Umean.TS)/ mean(StatisticsWF.Umean.TS);
-</pre><h2>HH wind speed TS, mean and TI<a name="12"></a></h2><pre class="codeinput">        StatisticsWF.HH.TS = Vhub_shear;
-        StatisticsWF.HH.mean = mean(Vhub_shear);
-        StatisticsWF.HH.TI =std(Vhub_shear)/mean(Vhub_shear);
-</pre><h2>Create and save .mat output and figures<a name="13"></a></h2><pre class="codeinput">        StatisticsWF.REWS   = REWS;
-        StatisticsWF.Shear  = ShearPL;
+        Umean.TS   = UmeanTs;
+        Umean.mean = mean(Umean.TS);
+        Umean.TI   = std(Umean.TS)/ mean(Umean.TS);
+</pre><h2>HH wind speed TS, mean and TI<a name="12"></a></h2><pre class="codeinput">        HH.TS   = Vhub_HH;
+        HH.mean = mean(Vhub_HH);
+        HH.TI   = std(Vhub_HH)/mean(Vhub_HH);
+</pre><h2>Create and save .mat output<a name="13"></a></h2><pre class="codeinput">        <span class="keyword">if</span> strcmp(AllWf{2,iWF},<span class="string">'original'</span>) <span class="comment">% save only the stuff for the original if this is an orginal field</span>
+            StatisticsWF.Original.Umean = Umean;
+            StatisticsWF.Original.HH    = HH;
+            StatisticsWF.Original.REWS  = REWS;
+            StatisticsWF.Original.Shear = ShearPL;
 
-        StatisticsWF.time   = fullslicesTime;
+            StatisticsWF.Original.time  = fullslicesTime;
 
-        StatisticsWF.Parameter.rotor_radius = rotor_radius; <span class="comment">% Radio of the Rotor [m]</span>
-        StatisticsWF.Parameter.Zh   = Zh;
+            StatisticsWF.Original.Parameter.rotor_radius = rotor_radius; <span class="comment">% Radio of the Rotor [m]</span>
+            StatisticsWF.Original.Parameter.Zh = Zh;
 
-        StatisticsWF.grid.nGridY = gridny;
-        StatisticsWF.grid.nGridZ = gridnz;
-        StatisticsWF.grid.dy = dy;
-        StatisticsWF.grid.dz = dz;
+            StatisticsWF.Original.grid.nGridY = gridny;
+            StatisticsWF.Original.grid.nGridZ = gridnz;
+            StatisticsWF.Original.grid.dy = dy;
+            StatisticsWF.Original.grid.dz = dz;
+            Original = StatisticsWF.Original;
+            OriginalWF.U = compU;
+            OriginalWF.T = fullslicesTime;
 
-        <span class="comment">%save</span>
-        save_data_full_path=[input.fullWF_statistics_dir AllWf{3,iWF} <span class="string">'_statistics.mat'</span>];
-        save(save_data_full_path,<span class="string">'StatisticsWF'</span>)
-        disp([curFileInfo.name <span class="string">' has been processed ('</span> datestr(datetime) <span class="string">'):'</span> ])
+            <span class="comment">%save</span>
+            <span class="keyword">if</span> strcmp(AllWf{3,iWF}(end-3:end),<span class="string">'.mat'</span>)
+                savename = AllWf{3,iWF}(1:end-4) ;
+            <span class="keyword">else</span>
+                savename = AllWf{3,iWF};
+            <span class="keyword">end</span>
+            save_data_full_path = [input.fullWF_statistics_dir savename <span class="string">'_statistics.mat'</span>];
+            save(save_data_full_path,<span class="string">'StatisticsWF'</span>)
+            disp([savename <span class="string">' has been processed ('</span> datestr(datetime) <span class="string">'):'</span> ])
+
+            clear <span class="string">windfield</span> <span class="string">ShearPL</span> <span class="string">REWS</span> <span class="string">UmeanTs</span> <span class="string">Vhub_shear</span> <span class="string">HH</span> <span class="string">Umean</span> <span class="string">StatisticsWF</span>
+        <span class="keyword">else</span>    <span class="comment">% save the original and the constrained data with the errors if you have a constrained windfield</span>
+
+            StatisticsWF.Constrained.Umean = Umean;
+            StatisticsWF.Constrained.HH    = HH;
+            StatisticsWF.Constrained.REWS  = REWS;
+            StatisticsWF.Constrained.Shear = ShearPL;
+            StatisticsWF.Constrained.time  = fullslicesTime;
+
+            StatisticsWF.Constrained.Parameter.rotor_radius = rotor_radius;
+            StatisticsWF.Constrained.Parameter.Zh = Zh;
+
+            StatisticsWF.Constrained.grid.nGridY = gridny;
+            StatisticsWF.Constrained.grid.nGridZ = gridnz;
+            StatisticsWF.Constrained.grid.dy = dy;
+            StatisticsWF.Constrained.grid.dz = dz;
+            StatisticsWF.Original = Original;
+
+            <span class="comment">% Calculate errors</span>
+            Error.Umean.mean = StatisticsWF.Constrained.Umean.mean-StatisticsWF.Original.Umean.mean;
+            Error.Umean.TS   = StatisticsWF.Constrained.Umean.TS -StatisticsWF.Original.Umean.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.Umean.TI   = StatisticsWF.Constrained.Umean.TI-StatisticsWF.Original.Umean.TI;
+            Error.HH.mean    = StatisticsWF.Constrained.HH.mean-StatisticsWF.Original.HH.mean;
+            Error.HH.TS      = StatisticsWF.Constrained.HH.TS -StatisticsWF.Original.HH.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.HH.TI      = StatisticsWF.Constrained.HH.TI-StatisticsWF.Original.HH.TI;
+            Error.Shear.mean = StatisticsWF.Constrained.Shear.mean-StatisticsWF.Original.Shear.mean;
+            Error.Shear.TS   = StatisticsWF.Constrained.Shear.TS -StatisticsWF.Original.Shear.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.REWS.mean  = StatisticsWF.Constrained.REWS.mean-StatisticsWF.Original.REWS.mean;
+            Error.REWS.TS    = StatisticsWF.Constrained.REWS.TS -StatisticsWF.Original.REWS.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            <span class="comment">% Calculate error per slice</span>
+            <span class="keyword">for</span> iTim = 1:size(compU,2)
+                [~,T_OrInd] = ismember(fullslicesTime(iTim),OriginalWF.T); <span class="comment">% get the correct time matching in the original wind field</span>
+                U_Slice_ErrAll = squeeze(compU(:,iTim,:))-squeeze(OriginalWF.U(:,T_OrInd,:));
+                U_Slice_ErrAllPerc = 100* U_Slice_ErrAll./squeeze(OriginalWF.U(:,T_OrInd,:));
+                U_Slice_Err(iTim)  = mean(mean(abs(U_Slice_ErrAll)));
+                U_Slice_ErrPerc(iTim) = mean(mean(abs(U_Slice_ErrAllPerc)));
+            <span class="keyword">end</span>
+            <span class="comment">% Frequency domain</span>
+            vWindowCon = hamming(floor(length(StatisticsWF.Constrained.time)/12)*2);
+            vWindowOr  = hamming(floor(length(StatisticsWF.Original.time)/12)*2);
+            dtOr       = diff(StatisticsWF.Original.time(1:2))';
+            dtCon      = diff(StatisticsWF.Constrained.time(1:2))';
+
+            <span class="keyword">for</span> iY = 1:length(gridy)
+                <span class="keyword">for</span> iZ = 1:length(gridz)
+                    <span class="comment">%                     ii=ii+1;</span>
+                    <span class="comment">%                     yCons{ii,1}=compU(iY,:,iZ);</span>
+                    <span class="comment">%                     yOr{ii,1}=OriginalWF.U(iY,find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)),iZ);</span>
+                    [U_coh.coh(iY,iZ,:), U_coh.f(iY,iZ,:)]        = mscohere(OriginalWF.U(iY,find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)),iZ),compU(iY,:,iZ),round(size(compU,2)/20),[],[],1/(StatisticsWF.Constrained.time(2)-StatisticsWF.Constrained.time(1)));
+                    [Fdom.Or.S(iY,iZ,:),Fdom.Or.f(iY,iZ,:)]       = pwelch(detrend(OriginalWF.U(iY,:,iZ),<span class="string">'constant'</span>),vWindowOr,[],[],1/dtOr,<span class="string">'onesided'</span>);
+                    [Fdom.Const.S(iY,iZ,:),Fdom.Const.f(iY,iZ,:)] = pwelch(detrend(compU(iY,:,iZ),<span class="string">'constant'</span>),vWindowCon,[],[],1/dtCon,<span class="string">'onesided'</span>);
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            <span class="comment">%             warning('off','all')</span>
+            <span class="comment">%             [Sxy,fYiyin] = CalcEstimateCPSD(yCons,yOr,'fs',0.5,'nFFT',202);</span>
+            <span class="comment">%             [SCon,~] = CalcEstimateCPSD(yCons,yCons,'fs',0.5,'nFFT',202);</span>
+            <span class="comment">%             [SOr,~] =CalcEstimateCPSD(yOr,yOr,'fs',0.5,'nFFT',202);</span>
+            <span class="comment">%             warning('on','all')</span>
+            <span class="comment">%             U_coh.YYmean_cxy = abs(Sxy).^2./abs(SCon)./abs(SOr);</span>
+            <span class="comment">%             U_coh.YYFmean =fYiyin;</span>
+            <span class="comment">%             [r,lags] =xcorr(OriginalWF.U(iY,:,iZ),compU(iY,:,iZ),20);</span>
+            <span class="comment">%             [rOr,lagsOr] =xcorr(OriginalWF.U(iY,find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)),iZ),20);</span>
+            <span class="comment">%             [rCon,lagsCon] =xcorr(compU(iY,:,iZ),20);</span>
+            U_coh.CohMean = squeeze(mean(mean(U_coh.coh,1)) );
+            U_coh.fMean   = squeeze(U_coh.f(1,1,:));
+            Error.Slice.TS   = U_Slice_Err;
+            Error.Slice.mean = mean(U_Slice_Err);
+            Error.Slice.TS_perc   = U_Slice_ErrPerc;
+            Error.Slice.mean_perc = mean(U_Slice_ErrPerc);
+            StatisticsWF.Error = Error;
+            StatisticsWF.U_coh = U_coh;
+            StatisticsWF.Fdom  = Fdom;
+            <span class="comment">%save</span>
+            <span class="keyword">if</span> strcmp(AllWf{3,iWF}(end-3:end),<span class="string">'.mat'</span>)
+                savename = AllWf{3,iWF}(1:end-4) ;
+            <span class="keyword">else</span>
+                savename = AllWf{3,iWF};
+            <span class="keyword">end</span>
+            save_data_full_path = [input.fullWF_statistics_dir savename <span class="string">'_statistics.mat'</span>];
+            save(save_data_full_path,<span class="string">'StatisticsWF'</span>)
+            disp([savename <span class="string">' has been processed ('</span> datestr(datetime) <span class="string">'):'</span> ])
+        <span class="keyword">end</span>
 </pre><pre class="codeinput">    <span class="keyword">else</span>
-        disp([<span class="string">'No file with name '</span> curFileInfo.name <span class="string">' found in'</span> AllWf{2,iWF} <span class="string">'folder'</span>])
+        disp([<span class="string">'No file with name '</span> curFileInfo.name <span class="string">' found in '</span> AllWf{2,iWF} <span class="string">' folder'</span>])
 
     <span class="keyword">end</span>
+    clear <span class="string">windfield</span> <span class="string">ShearPL</span> <span class="string">REWS</span> <span class="string">UmeanTs</span> <span class="string">Vhub_shear</span> <span class="string">HH</span> <span class="string">Umean</span> <span class="string">StatisticsWF</span>
 </pre><pre class="codeinput"><span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Header
 %
-% Creating statistics from wind fields requested. They include mean Windspeed
-% shear, REWS, hhTI, fullTI, hh wind speed TS.
+% Creating statistics from windfields requested. They include mean windspeed
+% shear, REWS, hhTI, fullTI, hh wind speed TS. Also errors between
+% the constrained and the corresponding original data are stored together. There
+% is no output in the function, it just saves directly to the directory defined
+% from InputParameters file.
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
-function StatisticsWF = getFullWF_statistics(input,curFileInfo)
+function getFullWF_statistics(input,curFileInfo)
 
-
-%% IO/parameter definition
-% Turbine parameters
+%% parameter definition
+% Turbine parameters needed for REWS and shear calculations
 rotor_radius = input.rotor_radius; % Radio of the Rotor [m]
 Zh           = input.Zh;           % HubHeight [m]
 
 %Processing REWS:
 dist_REWS_nd = input.dist_REWS_nd; % Non dimentional span position for rotor effective wind speed calculation [define from 0 to 1 inclusive]
 Wi           = input.Wi;  %Weight to be applied for rotor effective wind speed calculation
-
+dist_REWS = rotor_radius*[dist_REWS_nd 2]; %convert ND spanwise to meters and treat the point outside with 0 weight
+Wi        = [Wi 0];
 %% Check if these files exist in turbsim and pycoturb folders
 
-% get pyconturb and turbsim constreind wind fields
+% get pyconturb constrained wind field names from the output folder
 pyconturbWFsFull = dir([input.PyconturbOut_dir '*.mat']);
 if ~isempty(pyconturbWFsFull)
     pyconturbWF_names =  extractfield(pyconturbWFsFull,'name');
-    pyconWFsInd= ~cellfun(@isempty,strfind(pyconturbWF_names,curFileInfo.name)); %
-    pyconWF = [ input.PyconturbOut_dir pyconturbWF_names{pyconWFsInd}];
-    pyconWFname = pyconturbWF_names{pyconWFsInd};
+    pyconWFsInd = ~cellfun(@isempty,strfind(pyconturbWF_names,curFileInfo.name)); %
+    if any(pyconWFsInd)
+        pyconWF = [ input.PyconturbOut_dir pyconturbWF_names{pyconWFsInd}];
+        pyconWFname = pyconturbWF_names{pyconWFsInd};
+    else
+        pyconWF = [];
+        pyconWFname = [];
+    end
 else
     pyconWF = [];
     pyconWFname = [];
 end
 
+% get turbsim constrained wind field names from the output folder
 turbsimWFsFull = dir([input.TurbSimOut_dir '*.mat']);
 if ~isempty(turbsimWFsFull)
     turbsimWF_names =  extractfield(turbsimWFsFull,'name');
-    turbsimWFsInd= ~cellfun(@isempty,strfind(turbsimWF_names,curFileInfo.name)); %
-    turbsimWF = [input.TurbSimOut_dir turbsimWF_names{turbsimWFsInd}];
-    turbsimWF_name=turbsimWF_names{turbsimWFsInd};
+    turbsimWFsInd = ~cellfun(@isempty,strfind(turbsimWF_names,curFileInfo.name)); %
+    if any(turbsimWFsInd)
+        turbsimWF = [input.TurbSimOut_dir turbsimWF_names{turbsimWFsInd}];
+        turbsimWF_name = turbsimWF_names{turbsimWFsInd};
+    else
+        turbsimWF = [];
+        turbsimWF_name = [];
+    end
 else
-    turbsimWF =[];
-    turbsimWF_name =[];
+    turbsimWF = [];
+    turbsimWF_name = [];
 end
 
+% get original wind field names from the output folder
 OrWFsFull = dir([input.OriginalWF_dir '*.mat']);
 if ~isempty(OrWFsFull)
     OrWF_names =  extractfield(OrWFsFull,'name');
-    OrWFsInd= ~cellfun(@isempty,strfind(OrWF_names,curFileInfo.originalWF)); %
-    ORWF = [input.OriginalWF_dir OrWF_names{OrWFsInd}];
-    ORWF_name = curFileInfo.originalWF{1,1};
+    OrWFsInd   = ~cellfun(@isempty,strfind(OrWF_names,curFileInfo.originalWF)); %
+    if any(OrWFsInd)
+        ORWF = [input.OriginalWF_dir OrWF_names{OrWFsInd}];
+        ORWF_name = curFileInfo.originalWF{1,1};
+    else
+        ORWF = [];
+        ORWF_name = [];
+    end
 else
-    ORWF =[];
+    ORWF = [];
     ORWF_name = [];
 end
 
 AllWf = [{ORWF} {turbsimWF} {pyconWF};{'original'} {'turbsim'} {'pyconturb'};{ORWF_name} {turbsimWF_name} {pyconWFname}];
 
-for iWF = 1:length(AllWf)
+% since we fed the function with a specific case each time, there can be maximum 3
+% windfields in total here. Then we loop over the three [original
+% turbsimConstrained PyconturbConstrained] wind fields and calculate statistcs
+% and errors. When saving a constrained wind field the original and error
+% statistics are also attached. Warning: the loop will break if there is no
+% original wind field!
+
+for iWF = 1:size(AllWf,2)
     
-    %% Load windfield file 
+    %% Load windfield file
     if ~isempty(AllWf{1,iWF})
         filenameWF =AllWf{1,iWF};
         load (filenameWF); % windfield variable is loaded
         
         %% Obtain and create data
-        %extract components from the windfield variable
+        %extract components from the windfield variable        
+        compU    =  windfield.u;
+        compV    =  windfield.v;
+        compW    =  windfield.w;
+        dt       =  windfield.dt; %time step
+        gridtime =  windfield.grid.nt;
+        gridny   =  windfield.grid.ny;
+        gridnz   =  windfield.grid.nz;
+        gridz    =  -windfield.grid.z;
+        gridy    =  windfield.grid.y;
+        Uref     =  windfield.URef; % Mean velocity of the windfied (m/s)
+        dz       =  windfield.grid.dz;
+        dy       =  windfield.grid.dy;
         
-        compU               =  windfield.u;
-        compV               =  windfield.v;
-        compW               =  windfield.w;
-        dt                  =  windfield.dt; %time step
-        gridtime            =  windfield.grid.nt;
-        gridny              =  windfield.grid.ny;
-        gridnz              =  windfield.grid.nz;
-        gridz               =  -windfield.grid.z;
-        gridy               =  windfield.grid.y;
-        Uref                =  windfield.URef; % Mean velocity of the windfied (m/s)
-        dz                  =  windfield.grid.dz;
-        dy                  =  windfield.grid.dy;
-               
         % Manipulation of data before calculations:
         for i=1:gridtime
-            SqueezeCompU{i}=squeeze(compU(:,i,:));
-            compU(:,i,:)=flipud(SqueezeCompU{i}');
+            SqueezeCompU{i} = squeeze(compU(:,i,:));
+            compU(:,i,:) = flipud(SqueezeCompU{i}');
             
-            SqueezeCompV{i}=squeeze(compV(:,i,:));
-            compV(:,i,:)=flipud(SqueezeCompV{i}');
+            SqueezeCompV{i} = squeeze(compV(:,i,:));
+            compV(:,i,:) = flipud(SqueezeCompV{i}');
             
-            SqueezeCompW{i}=squeeze(compW(:,i,:)); %#ok<*AGROW>
-            compW(:,i,:)=flipud(SqueezeCompW{i}');
+            SqueezeCompW{i} = squeeze(compW(:,i,:)); %#ok<*AGROW>
+            compW(:,i,:) = flipud(SqueezeCompW{i}');
         end
-
         
         %% Discretization
         
-        fullTime            =  (dt*gridtime)-dt; %total time duration of the windfield
-        fullslicesTime      =  0:dt:fullTime;
-        slicesDistance      =  fullslicesTime*Uref; % vector with distance between slices(m)
+        fullTime       =  (dt*gridtime)-dt; %total time duration of the windfield
+        fullslicesTime =  0:dt:fullTime;
+        slicesDistance =  fullslicesTime*Uref; % vector with distance between slices(m)
         
         %% Calculate REWS
         
         % distances of all points in the turbsim grid from center assuming hub center =0
-        for I=1:gridny
-            for II=1:gridnz
-                Distances_of_Points_In_Plane(I,II)=sqrt((gridy(I)).^2+(gridz(II)).^2); %Matrix of distances from center of rotor to each point in the grid
+        for I = 1:gridny
+            for II = 1:gridnz
+                Distances_of_Points_In_Plane(I,II) = sqrt((gridy(I)).^2+(gridz(II)).^2); %Matrix of distances from center of rotor to each point in the grid
             end
         end
         
-        
-        if input.flag_apply_weightREWS==1
-            dist_REWS = rotor_radius*[dist_REWS_nd 2]; %convert ND spanwise to meters and treat the point outside with 0 weight
-            Wi        = [Wi 0];
-            % calculate weigths for all the turbsim  grid points
-            for I=1:gridny
-                for II=1:gridnz
-                    Weights_of_Points_In_Plane(I,II)=interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(I,II)); %Matrix of weights for all grid points
+        if input.flag_apply_weightREWS == 1
+            % calculate weigths for all the grid points
+            for I = 1:gridny
+                for II = 1:gridnz
+                    Weights_of_Points_In_Plane(I,II) = interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(I,II)); %Matrix of weights for all grid points
                 end
             end
-            weigthTot_grid    = sum(sum(Weights_of_Points_In_Plane)); %sum of weights needed for weighted average
+            weigthTot_grid = sum(sum(Weights_of_Points_In_Plane)); %sum of weights needed for weighted average
         end
-             
         
         %Transform Slices
-        rad_values=Distances_of_Points_In_Plane<=rotor_radius;       %keep only points inside the rotor
-        for ind_slicesDistance =1:length (slicesDistance) % loop over all the slices
+        rad_values = Distances_of_Points_In_Plane<=rotor_radius;       %keep only points inside the rotor
+        for ind_slicesDistance = 1:length (slicesDistance) % loop over all the slices
             % Take complete slice from turbsim:
             ExSlice_U = squeeze(compU(:,ind_slicesDistance,:)); % Values of the selected slice CompU
             ExSlice_U = ExSlice_U.*rad_values; %remove points out of rotor
-            if input.flag_apply_weightREWS==1
+            if input.flag_apply_weightREWS == 1
                 ExSlice_U = ExSlice_U.*Weights_of_Points_In_Plane;         %multiply with weights
-                REWS.fullWF.TS(ind_slicesDistance) = sum(sum(ExSlice_U))/weigthTot_grid;
+                REWS.TS(ind_slicesDistance) = sum(sum(ExSlice_U))/weigthTot_grid;
             else
                 noZeroSlice = nonzeros(ExSlice_U);
                 REWS.TS(ind_slicesDistance) = mean(noZeroSlice,'omitnan');
             end
-            
         end
         REWS.mean = mean(REWS.TS,'omitnan');
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         %% Calculate Shear power law exponent from full windfield
         %maybe add an option to calculate shear on every nth slice of the ful field to reduce time
-        
-        zero_valueY=find(gridy==0);
-        zero_valueZ=find(gridz==0);
+        zero_valueY = find(gridy==0);
+        zero_valueZ = find(gridz==0);
         z_vec_Shear = (gridz)+Zh;             %create vector of heights
-        Vhub_shear = compU(zero_valueZ,:,zero_valueY); %#ok<*FNDSB> %Velocity u at the hub height
+        Vhub_HH = compU(zero_valueZ,:,zero_valueY); %#ok<*FNDSB> %Velocity u at the hub height
         
         % calculate power law for full turbsim data:
         for ind_sliceLaW = 1:gridtime  %for slices
             V_slice = squeeze(compU(:,ind_sliceLaW,:)); % velocity of point in slices
-            v_hor = mean (V_slice,2);     % take the average of all points in each horizontal line
+            v_hor   = mean (V_slice,2);     % take the average of all points in each horizontal line
             
             % find least square fit for the average vertical line
-            fcn = @(alphaPL) sum((Vhub_shear(ind_sliceLaW)*(z_vec_Shear/Zh).^(alphaPL) - v_hor').^2); % least square defintion f
+            fcn = @(alphaPL) sum((Vhub_HH(ind_sliceLaW)*(z_vec_Shear/Zh).^(alphaPL) - v_hor').^2); % least square defintion f
             [s,~,~] = fminsearch(fcn, 0.14);        % Minimise Least-Squares error
-            if abs(s) < 0.005
-                s=0;
+            if abs(s) < 0.005 || s<0
+                s = 0;
             end
             ShearPL.TS(ind_sliceLaW) = s; %#ok<*SAGROW>
-            
         end
-        ShearPL.Mean=mean(ShearPL.TS); % total shear of the wind field
+        ShearPL.mean = mean(ShearPL.TS); % total shear of the wind field
         
         %% Mean wind speed
-        for iTim =1:size(compU,2)
+        for iTim = 1:size(compU,2)
             UmeanTs(iTim) = mean(mean(squeeze(compU(:,iTim,:))));
         end
-        StatisticsWF.Umean.TS = UmeanTs;
-        StatisticsWF.Umean.mean = mean(StatisticsWF.Umean.TS);
-        StatisticsWF.Umean.TI =std(StatisticsWF.Umean.TS)/ mean(StatisticsWF.Umean.TS);
+        Umean.TS   = UmeanTs;
+        Umean.mean = mean(Umean.TS);
+        Umean.TI   = std(Umean.TS)/ mean(Umean.TS);
         
         %% HH wind speed TS, mean and TI
-        StatisticsWF.HH.TS = Vhub_shear;
-        StatisticsWF.HH.mean = mean(Vhub_shear);
-        StatisticsWF.HH.TI =std(Vhub_shear)/mean(Vhub_shear);
+        HH.TS   = Vhub_HH;
+        HH.mean = mean(Vhub_HH);
+        HH.TI   = std(Vhub_HH)/mean(Vhub_HH);
         
-        %% Create and save .mat output and figures
-        
-        StatisticsWF.REWS   = REWS;
-        StatisticsWF.Shear  = ShearPL;
-        
-        StatisticsWF.time   = fullslicesTime;
-        
-        StatisticsWF.Parameter.rotor_radius = rotor_radius; % Radio of the Rotor [m]
-        StatisticsWF.Parameter.Zh   = Zh;
-        
-        StatisticsWF.grid.nGridY = gridny;
-        StatisticsWF.grid.nGridZ = gridnz;
-        StatisticsWF.grid.dy = dy;
-        StatisticsWF.grid.dz = dz;
-        
-        %save
-        save_data_full_path=[input.fullWF_statistics_dir AllWf{3,iWF} '_statistics.mat'];
-        save(save_data_full_path,'StatisticsWF')
-        disp([curFileInfo.name ' has been processed (' datestr(datetime) '):' ])
+        %% Create and save .mat output
+        if strcmp(AllWf{2,iWF},'original') % save only the stuff for the original if this is an orginal field
+            StatisticsWF.Original.Umean = Umean;
+            StatisticsWF.Original.HH    = HH;
+            StatisticsWF.Original.REWS  = REWS;
+            StatisticsWF.Original.Shear = ShearPL;
+            
+            StatisticsWF.Original.time  = fullslicesTime;
+            
+            StatisticsWF.Original.Parameter.rotor_radius = rotor_radius; % Radio of the Rotor [m]
+            StatisticsWF.Original.Parameter.Zh = Zh;
+            
+            StatisticsWF.Original.grid.nGridY = gridny;
+            StatisticsWF.Original.grid.nGridZ = gridnz;
+            StatisticsWF.Original.grid.dy = dy;
+            StatisticsWF.Original.grid.dz = dz;
+            Original = StatisticsWF.Original;
+            OriginalWF.U = compU;
+            OriginalWF.T = fullslicesTime;
+            
+            %save
+            if strcmp(AllWf{3,iWF}(end-3:end),'.mat')
+                savename = AllWf{3,iWF}(1:end-4) ;
+            else
+                savename = AllWf{3,iWF};
+            end
+            save_data_full_path = [input.fullWF_statistics_dir savename '_statistics.mat'];
+            save(save_data_full_path,'StatisticsWF')
+            disp([savename ' has been processed (' datestr(datetime) '):' ])
+            
+            clear windfield ShearPL REWS UmeanTs Vhub_shear HH Umean StatisticsWF
+        else    % save the original and the constrained data with the errors if you have a constrained windfield
+            
+            StatisticsWF.Constrained.Umean = Umean;
+            StatisticsWF.Constrained.HH    = HH;
+            StatisticsWF.Constrained.REWS  = REWS;
+            StatisticsWF.Constrained.Shear = ShearPL;
+            StatisticsWF.Constrained.time  = fullslicesTime;
+            
+            StatisticsWF.Constrained.Parameter.rotor_radius = rotor_radius;
+            StatisticsWF.Constrained.Parameter.Zh = Zh;
+            
+            StatisticsWF.Constrained.grid.nGridY = gridny;
+            StatisticsWF.Constrained.grid.nGridZ = gridnz;
+            StatisticsWF.Constrained.grid.dy = dy;
+            StatisticsWF.Constrained.grid.dz = dz;
+            StatisticsWF.Original = Original;
+            
+            % Calculate errors
+            Error.Umean.mean = StatisticsWF.Constrained.Umean.mean-StatisticsWF.Original.Umean.mean;
+            Error.Umean.TS   = StatisticsWF.Constrained.Umean.TS -StatisticsWF.Original.Umean.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.Umean.TI   = StatisticsWF.Constrained.Umean.TI-StatisticsWF.Original.Umean.TI;
+            Error.HH.mean    = StatisticsWF.Constrained.HH.mean-StatisticsWF.Original.HH.mean;
+            Error.HH.TS      = StatisticsWF.Constrained.HH.TS -StatisticsWF.Original.HH.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.HH.TI      = StatisticsWF.Constrained.HH.TI-StatisticsWF.Original.HH.TI;
+            Error.Shear.mean = StatisticsWF.Constrained.Shear.mean-StatisticsWF.Original.Shear.mean;
+            Error.Shear.TS   = StatisticsWF.Constrained.Shear.TS -StatisticsWF.Original.Shear.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.REWS.mean  = StatisticsWF.Constrained.REWS.mean-StatisticsWF.Original.REWS.mean;
+            Error.REWS.TS    = StatisticsWF.Constrained.REWS.TS -StatisticsWF.Original.REWS.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            % Calculate error per slice
+            for iTim = 1:size(compU,2)
+                [~,T_OrInd] = ismember(fullslicesTime(iTim),OriginalWF.T); % get the correct time matching in the original wind field
+                U_Slice_ErrAll = squeeze(compU(:,iTim,:))-squeeze(OriginalWF.U(:,T_OrInd,:));
+                U_Slice_ErrAllPerc = 100* U_Slice_ErrAll./squeeze(OriginalWF.U(:,T_OrInd,:));
+                U_Slice_Err(iTim)  = mean(mean(abs(U_Slice_ErrAll)));
+                U_Slice_ErrPerc(iTim) = mean(mean(abs(U_Slice_ErrAllPerc)));
+            end
+            % Frequency domain
+            vWindowCon = hamming(floor(length(StatisticsWF.Constrained.time)/12)*2);
+            vWindowOr  = hamming(floor(length(StatisticsWF.Original.time)/12)*2);
+            dtOr       = diff(StatisticsWF.Original.time(1:2))';
+            dtCon      = diff(StatisticsWF.Constrained.time(1:2))';
+ 
+            for iY = 1:length(gridy)
+                for iZ = 1:length(gridz)
+                    %                     ii=ii+1;
+                    %                     yCons{ii,1}=compU(iY,:,iZ);
+                    %                     yOr{ii,1}=OriginalWF.U(iY,find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)),iZ);
+                    [U_coh.coh(iY,iZ,:), U_coh.f(iY,iZ,:)]        = mscohere(OriginalWF.U(iY,find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)),iZ),compU(iY,:,iZ),round(size(compU,2)/20),[],[],1/(StatisticsWF.Constrained.time(2)-StatisticsWF.Constrained.time(1)));
+                    [Fdom.Or.S(iY,iZ,:),Fdom.Or.f(iY,iZ,:)]       = pwelch(detrend(OriginalWF.U(iY,:,iZ),'constant'),vWindowOr,[],[],1/dtOr,'onesided');
+                    [Fdom.Const.S(iY,iZ,:),Fdom.Const.f(iY,iZ,:)] = pwelch(detrend(compU(iY,:,iZ),'constant'),vWindowCon,[],[],1/dtCon,'onesided');
+                end
+            end
+            %             warning('off','all')
+            %             [Sxy,fYiyin] = CalcEstimateCPSD(yCons,yOr,'fs',0.5,'nFFT',202);
+            %             [SCon,~] = CalcEstimateCPSD(yCons,yCons,'fs',0.5,'nFFT',202);
+            %             [SOr,~] =CalcEstimateCPSD(yOr,yOr,'fs',0.5,'nFFT',202);
+            %             warning('on','all')
+            %             U_coh.YYmean_cxy = abs(Sxy).^2./abs(SCon)./abs(SOr);
+            %             U_coh.YYFmean =fYiyin;
+            %             [r,lags] =xcorr(OriginalWF.U(iY,:,iZ),compU(iY,:,iZ),20);
+            %             [rOr,lagsOr] =xcorr(OriginalWF.U(iY,find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)),iZ),20);
+            %             [rCon,lagsCon] =xcorr(compU(iY,:,iZ),20);
+            U_coh.CohMean = squeeze(mean(mean(U_coh.coh,1)) );
+            U_coh.fMean   = squeeze(U_coh.f(1,1,:));
+            Error.Slice.TS   = U_Slice_Err;
+            Error.Slice.mean = mean(U_Slice_Err);
+            Error.Slice.TS_perc   = U_Slice_ErrPerc;
+            Error.Slice.mean_perc = mean(U_Slice_ErrPerc);
+            StatisticsWF.Error = Error;
+            StatisticsWF.U_coh = U_coh;
+            StatisticsWF.Fdom  = Fdom;
+            %save
+            if strcmp(AllWf{3,iWF}(end-3:end),'.mat')
+                savename = AllWf{3,iWF}(1:end-4) ;
+            else
+                savename = AllWf{3,iWF};
+            end
+            save_data_full_path = [input.fullWF_statistics_dir savename '_statistics.mat'];
+            save(save_data_full_path,'StatisticsWF')
+            disp([savename ' has been processed (' datestr(datetime) '):' ])
+        end
     else
-        disp(['No file with name ' curFileInfo.name ' found in' AllWf{2,iWF} 'folder'])
+        disp(['No file with name ' curFileInfo.name ' found in ' AllWf{2,iWF} ' folder'])
         
     end
+    clear windfield ShearPL REWS UmeanTs Vhub_shear HH Umean StatisticsWF
 end
 
 ##### SOURCE END #####

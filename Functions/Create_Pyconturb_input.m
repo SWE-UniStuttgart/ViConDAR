@@ -6,10 +6,9 @@
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 function Create_Pyconturb_input(Output,input,Name2Save )
-NumberRows2delete = 0; %DELETE MEE!!!!
 % Variables:
 Npoints = size(Output.Pattern.Coord,2); % number of point inth pattern
-if input.nComp ==1
+if input.nComp == 1
     Y1 = repmat(Output.Pattern.Coord(1,:),[1,3]); % temporary fix for the bug in pyconturb not accepting u only input
     Z1 = repmat(Output.Pattern.Coord(2,:)+input.Zh,[1,3]); % temporary fix for the bug in pyconturb not accepting u only input
 else
@@ -76,9 +75,9 @@ for ind_comp=1:length(compo)
     end
 end
 
-% What is this part doing?????? Clean it up, write comments and make meaningful names
+% Creating vector with components u,v,w(k=0,1,2) required for pyconturb input con_tc
 indd = 0;
-if input.nComp ==1  % again  temporary fix for pyconturb bug
+if input.nComp == 1  % again  temporary fix for pyconturb bug
     for iCompVel = 0:(3-1)
         for ipoint = 1:(Npoints)
             indd = indd+1;
@@ -97,28 +96,27 @@ end
 % Obtain matrix of time/Velocities DataFrame:
     switch input.nComp
         case 1
-            for i=1:Npoints
+            for i = 1:Npoints
             VFinal_Time_U1(:,i) = Output.TS.lidar.Uval{i};
-            VFinal_Time_V1(:,i) = 0.075*Output.TS.lidar.Uval{i}; % temporary fix for the bug in pyconturb not accepting u only inpu
-            VFinal_Time_W1(:,i) = 0.05*Output.TS.lidar.Uval{i}; % temporary fix for the bug in pyconturb not accepting u only inpu
+            VFinal_Time_V1(:,i) = 0.075*Output.TS.lidar.Uval{i}; % temporary fix for the bug in pyconturb not accepting u only input
+            VFinal_Time_W1(:,i) = 0.05*Output.TS.lidar.Uval{i}; % temporary fix for the bug in pyconturb not accepting u only input
             end
-%             matrixVal = [lidar_time(1,1:end-NumberRows2delete)',VFinal_Time_U1(1:end-NumberRows2delete,:)];
-            matrixVal = [lidar_time(1,1:end-NumberRows2delete)',VFinal_Time_U1(1:end-NumberRows2delete,:),VFinal_Time_V1(1:end-NumberRows2delete,:),VFinal_Time_W1(1:end-NumberRows2delete,:)];
+            matrixVal = [lidar_time(1,1:end)',VFinal_Time_U1(1:end,:),VFinal_Time_V1(1:end,:),VFinal_Time_W1(1:end,:)];
         case 2
-            for i=1:Npoints
+            for i = 1:Npoints
             VFinal_Time_U1(:,i) = Output.TS.lidar.Uval{i};
             VFinal_Time_V1(:,i) = Output.TS.lidar.Vval{i};
             end
-            matrixVal = [lidar_time(1,1:end-NumberRows2delete)',VFinal_Time_U1(1:end-NumberRows2delete,:),VFinal_Time_V1(1:end-NumberRows2delete,:)];
-            matrixVal=matrixVal(:,any(matrixVal~=0)); % Remove columns of 0 if any
+            matrixVal = [lidar_time(1,1:end)',VFinal_Time_U1(1:end,:),VFinal_Time_V1(1:end,:)];
+            matrixVal = matrixVal(:,any(matrixVal~=0)); % Remove columns of 0 if any
         case 3
-            for i=1:Npoints
+            for i = 1:Npoints
             VFinal_Time_U1(:,i) = Output.TS.lidar.Uval{i};
             VFinal_Time_V1(:,i) = Output.TS.lidar.Vval{i};
             VFinal_Time_W1(:,i) = Output.TS.lidar.Wval{i};
             end
-            matrixVal = [lidar_time(1,1:end-NumberRows2delete)',VFinal_Time_U1(1:end-NumberRows2delete,:),VFinal_Time_V1(1:end-NumberRows2delete,:),VFinal_Time_W1(1:end-NumberRows2delete,:)];
-            matrixVal=matrixVal(:,any(matrixVal~=0)); % Remove columns of 0 if any
+            matrixVal = [lidar_time(1,1:end)',VFinal_Time_U1(1:end,:),VFinal_Time_V1(1:end,:),VFinal_Time_W1(1:end,:)];
+            matrixVal = matrixVal(:,any(matrixVal~=0)); % Remove columns of 0 if any
     end
 MatrixVal = num2cell(matrixVal); % Create the cell required to push to csv
 

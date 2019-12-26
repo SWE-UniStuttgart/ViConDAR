@@ -1,7 +1,7 @@
 %% Header
 %
 % Plotting the time series from full wind fields at grid points requested by the
-% user
+% user as defined in input.points_plot_WF_timeseries.
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -23,7 +23,7 @@ for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested poi
     Zpoint = input.points_plot_WF_timeseries(2,iPoint); %Z  point in meters    
     
     %Go through orginal wind field folders to match the names
-    for iNamOr = 1: length(perm_cell.namesOWF) % loop over orifinal windfields
+    for iNamOr = 1:length(perm_cell.namesOWF) % loop over orifinal windfields
         figure
         legCell = {};
         curNamOr = perm_cell.namesOWF{iNamOr,1};

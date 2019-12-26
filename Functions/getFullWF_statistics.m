@@ -1,8 +1,8 @@
 %% Header
 %
-% Creating statistics from windfields requested. They include mean Windspeed
+% Creating statistics from windfields requested. They include mean windspeed
 % shear, REWS, hhTI, fullTI, hh wind speed TS. Also errors between
-% the constraiend and the corresponding original data are stored together. There
+% the constrained and the corresponding original data are stored together. There
 % is no output in the function, it just saves directly to the directory defined
 % from InputParameters file.
 %
@@ -19,7 +19,8 @@ Zh           = input.Zh;           % HubHeight [m]
 %Processing REWS:
 dist_REWS_nd = input.dist_REWS_nd; % Non dimentional span position for rotor effective wind speed calculation [define from 0 to 1 inclusive]
 Wi           = input.Wi;  %Weight to be applied for rotor effective wind speed calculation
-
+dist_REWS = rotor_radius*[dist_REWS_nd 2]; %convert ND spanwise to meters and treat the point outside with 0 weight
+Wi        = [Wi 0];
 %% Check if these files exist in turbsim and pycoturb folders
 
 % get pyconturb constrained wind field names from the output folder
@@ -82,7 +83,7 @@ AllWf = [{ORWF} {turbsimWF} {pyconWF};{'original'} {'turbsim'} {'pyconturb'};{OR
 % statistics are also attached. Warning: the loop will break if there is no
 % original wind field!
 
-for iWF = 1:length(AllWf)
+for iWF = 1:size(AllWf,2)
     
     %% Load windfield file
     if ~isempty(AllWf{1,iWF})
@@ -106,21 +107,21 @@ for iWF = 1:length(AllWf)
         
         % Manipulation of data before calculations:
         for i=1:gridtime
-            SqueezeCompU{i}=squeeze(compU(:,i,:));
-            compU(:,i,:)=flipud(SqueezeCompU{i}');
+            SqueezeCompU{i} = squeeze(compU(:,i,:));
+            compU(:,i,:) = flipud(SqueezeCompU{i}');
             
-            SqueezeCompV{i}=squeeze(compV(:,i,:));
-            compV(:,i,:)=flipud(SqueezeCompV{i}');
+            SqueezeCompV{i} = squeeze(compV(:,i,:));
+            compV(:,i,:) = flipud(SqueezeCompV{i}');
             
-            SqueezeCompW{i}=squeeze(compW(:,i,:)); %#ok<*AGROW>
-            compW(:,i,:)=flipud(SqueezeCompW{i}');
+            SqueezeCompW{i} = squeeze(compW(:,i,:)); %#ok<*AGROW>
+            compW(:,i,:) = flipud(SqueezeCompW{i}');
         end
         
         %% Discretization
         
-        fullTime            =  (dt*gridtime)-dt; %total time duration of the windfield
-        fullslicesTime      =  0:dt:fullTime;
-        slicesDistance      =  fullslicesTime*Uref; % vector with distance between slices(m)
+        fullTime       =  (dt*gridtime)-dt; %total time duration of the windfield
+        fullslicesTime =  0:dt:fullTime;
+        slicesDistance =  fullslicesTime*Uref; % vector with distance between slices(m)
         
         %% Calculate REWS
         
@@ -132,9 +133,7 @@ for iWF = 1:length(AllWf)
         end
         
         if input.flag_apply_weightREWS == 1
-            dist_REWS = rotor_radius*[dist_REWS_nd 2]; %convert ND spanwise to meters and treat the point outside with 0 weight
-            Wi        = [Wi 0];
-            % calculate weigths for all the turbsim  grid points
+            % calculate weigths for all the grid points
             for I = 1:gridny
                 for II = 1:gridnz
                     Weights_of_Points_In_Plane(I,II) = interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(I,II)); %Matrix of weights for all grid points
@@ -151,7 +150,7 @@ for iWF = 1:length(AllWf)
             ExSlice_U = ExSlice_U.*rad_values; %remove points out of rotor
             if input.flag_apply_weightREWS == 1
                 ExSlice_U = ExSlice_U.*Weights_of_Points_In_Plane;         %multiply with weights
-                REWS.fullWF.TS(ind_slicesDistance) = sum(sum(ExSlice_U))/weigthTot_grid;
+                REWS.TS(ind_slicesDistance) = sum(sum(ExSlice_U))/weigthTot_grid;
             else
                 noZeroSlice = nonzeros(ExSlice_U);
                 REWS.TS(ind_slicesDistance) = mean(noZeroSlice,'omitnan');
@@ -246,9 +245,9 @@ for iWF = 1:length(AllWf)
             Error.Umean.mean = StatisticsWF.Constrained.Umean.mean-StatisticsWF.Original.Umean.mean;
             Error.Umean.TS   = StatisticsWF.Constrained.Umean.TS -StatisticsWF.Original.Umean.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
             Error.Umean.TI   = StatisticsWF.Constrained.Umean.TI-StatisticsWF.Original.Umean.TI;
-            Error.HH.mean = StatisticsWF.Constrained.HH.mean-StatisticsWF.Original.HH.mean;
-            Error.HH.TS   = StatisticsWF.Constrained.HH.TS -StatisticsWF.Original.HH.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
-            Error.HH.TI   = StatisticsWF.Constrained.HH.TI-StatisticsWF.Original.HH.TI;
+            Error.HH.mean    = StatisticsWF.Constrained.HH.mean-StatisticsWF.Original.HH.mean;
+            Error.HH.TS      = StatisticsWF.Constrained.HH.TS -StatisticsWF.Original.HH.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.HH.TI      = StatisticsWF.Constrained.HH.TI-StatisticsWF.Original.HH.TI;
             Error.Shear.mean = StatisticsWF.Constrained.Shear.mean-StatisticsWF.Original.Shear.mean;
             Error.Shear.TS   = StatisticsWF.Constrained.Shear.TS -StatisticsWF.Original.Shear.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
             Error.REWS.mean  = StatisticsWF.Constrained.REWS.mean-StatisticsWF.Original.REWS.mean;

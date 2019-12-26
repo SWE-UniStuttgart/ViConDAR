@@ -1,7 +1,8 @@
 %% Header
 %
-%Dirty script to batch process all lidar measurements and create contours from
-%statistics. It was done for a specific application but can be generalized
+% Dirty script to batch process all lidar measurements and create contours from
+% statistics included in the lidar output files. It was done for a specific 
+% application but can be generalized. 
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -24,7 +25,7 @@ TimestepPattern = 'Tp';
 TimestepMeas    = 'Tm';
 
 % lidar direcotrz
-LidarDir = '..\LidarOutput\';
+LidarDir = '../LidarOutput/';
 
 %Choose which value you want to plot (index)
 PlotNam = {'REWS mean of the TS abs error [%]' 'Shear mean of the TS abs error [%]' 'TI Error from mean of all points[%]' 'meanAbsError Error of the mean TS [%]' 'Error of the Mean Shear' 'Error of the mean REWS' 'Shear median of the TS abs error [%]' 'Shear mode of the TS abs error [%]'}; %corresponds to the outputs chosen see line 91-95
@@ -45,7 +46,7 @@ SeedVar = 1:6;
 
 % if pattern timestep is a varuable usethis
 if varPat== 1
-    cnt=1;
+    cnt = 1;
     for iVar1 = 1:length(Var1)
         for iVar2 = 1:length(Var2)
             for iSeed =SeedVar;
@@ -82,7 +83,7 @@ else % if you dont have timestep of pattern as a variable use this
 end
 
 %% load and save all usefull values in one cell
-for iNam = 1:length(ListLidar)
+for iNam = 1:size(ListLidar,1)
         try
     load(ListLidar{iNam,1}); % Output variable created REWS Shear TI meanAbsError
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -106,7 +107,7 @@ end
 ListLidarNum = cell2mat(ListLidar(:,4:end));
 cnt=0;
 if length(SeedVar) >1
-for i = 1:length(SeedVar):length(ListLidar)
+for i = 1:length(SeedVar):size(ListLidar,1)
     cnt=cnt+1;
     LidarSeedMean{cnt,1} = ListLidar{i,1};
     LidarSeedMean{cnt,2} = ListLidar{i,2};

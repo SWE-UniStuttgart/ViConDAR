@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="writeTurbSimTimeSeriesInput.m"><style type="text/css">
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="writeTurbSimTimeSeriesInput.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,12 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Header</h1><pre class="codeinput"><span class="comment">%Create Turbsim time .TimeSer input</span>
-<span class="comment">%</span>
-<span class="comment">% from NREL(?)</span>
-
-
-<span class="keyword">function</span> writeTurbSimTimeSeriesInput(input_file, data_file, uvw, t, y, z, nComp,RefNode)
+  </style></head><body><div class="content"><h1>Header</h1><p>Create turbsim .TimeSer input</p><p>forked from OpenFAST NREL repository and modified by SWE</p><pre class="codeinput"><span class="keyword">function</span> writeTurbSimTimeSeriesInput(input_file, data_file, uvw, t, y, z, nComp,RefNode)
 <span class="comment">% size uvw is (#timeSteps, 3*length(z))</span>
 
 <span class="keyword">if</span> isempty(y)
@@ -82,7 +77,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 fid = fopen(input_file,<span class="string">'wt'</span>);
-endline = char([10]); <span class="comment">%'\r\n';</span>
+endline = char([10]); <span class="comment">%#ok&lt;NBRAK&gt; %'\r\n';</span>
 
 fprintf(fid,<span class="string">'--------------TurbSim v2.00.* User Time Series Input File-----------------------%s'</span>, endline);
 fprintf(fid,<span class="string">'Time series input from %s. Using rotated series %s'</span>, data_file, endline);
@@ -92,6 +87,7 @@ fprintf(fid,<span class="string">' %10.0f  nPoints  - Number of time series poin
 fprintf(fid,<span class="string">' %10.0f  RefPtID  - Index of the reference point (1-nPoints)%s'</span>, RefNode, endline);
 fprintf(fid,<span class="string">'Pointyi     Pointzi %s'</span>, endline);
 fprintf(fid,<span class="string">'  (m)         (m)%s'</span>, endline);
+
 <span class="keyword">for</span> iz = 1:length(z)
     fprintf( fid, <span class="string">' %10.5f  %10.5f %s'</span>, y(iz), z(iz), endline );
 <span class="keyword">end</span>
@@ -99,89 +95,83 @@ fprintf(fid,<span class="string">'--------Time Series---------------------------
 fprintf(fid,<span class="string">' Elapsed Time     '</span> );
 
 <span class="keyword">if</span> nComp==3
-	<span class="keyword">for</span> iz=1:length(z)
-		fprintf (fid, <span class="string">'Point%02.0f%s_%03.0fm '</span>, iz, <span class="string">'u'</span>, z(iz), iz, <span class="string">'v'</span>, z(iz), iz, <span class="string">'w'</span>, z(iz) );
-	<span class="keyword">end</span>
-	fprintf( fid, <span class="string">'%s'</span>, endline);
-	fprintf(fid,<span class="string">'          (s)     '</span> );
-	<span class="keyword">for</span> iz=1:length(z)
-		<span class="keyword">for</span> ic=1:3
-		fprintf (fid, <span class="string">'    (m/s)     '</span>  );
-		<span class="keyword">end</span>
-	<span class="keyword">end</span>
-	fprintf( fid, <span class="string">'%s'</span>, endline);
+    <span class="keyword">for</span> iz=1:length(z)
+        fprintf (fid, <span class="string">'Point%02.0f%s_%03.0fm '</span>, iz, <span class="string">'u'</span>, z(iz), iz, <span class="string">'v'</span>, z(iz), iz, <span class="string">'w'</span>, z(iz) );
+    <span class="keyword">end</span>
+    fprintf( fid,<span class="string">'%s'</span>,endline);
+    fprintf(fid,<span class="string">'          (s)     '</span> );
+    <span class="keyword">for</span> iz=1:length(z)
+        <span class="keyword">for</span> ic=1:3
+            fprintf (fid, <span class="string">'    (m/s)     '</span>  );
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    fprintf(fid,<span class="string">'%s'</span>,endline);
 
-	fmtStr = repmat(<span class="string">'%13.4f '</span>,1,size(uvw,2)+1);
-	fmtStr = [fmtStr <span class="string">'%s'</span>];
+    fmtStr = repmat(<span class="string">'%13.4f '</span>,1,size(uvw,2)+1);
+    fmtStr = [fmtStr <span class="string">'%s'</span>];
 
-	<span class="keyword">for</span> it = 1:size(uvw,1)
-		fprintf( fid, fmtStr, t(it,1), uvw(it,:), endline );
+    <span class="keyword">for</span> it = 1:size(uvw,1)
+        fprintf( fid, fmtStr, t(it,1), uvw(it,:), endline );
     <span class="keyword">end</span>
 <span class="keyword">elseif</span> nComp==2
-	<span class="keyword">for</span> iz=1:length(z)
-		fprintf (fid, <span class="string">'Point%02.0f%s_%03.0fm '</span>, iz, <span class="string">'u'</span>, z(iz), iz, <span class="string">'v'</span>, z(iz));
-	<span class="keyword">end</span>
-	fprintf( fid, <span class="string">'%s'</span>, endline);
-	fprintf(fid,<span class="string">'          (s)     '</span> );
-	<span class="keyword">for</span> iz=1:length(z)
-		<span class="keyword">for</span> ic=1:2
-		fprintf (fid, <span class="string">'    (m/s)     '</span>  );
-		<span class="keyword">end</span>
-	<span class="keyword">end</span>
-	fprintf( fid, <span class="string">'%s'</span>, endline);
+    <span class="keyword">for</span> iz=1:length(z)
+        fprintf (fid, <span class="string">'Point%02.0f%s_%03.0fm '</span>, iz, <span class="string">'u'</span>, z(iz), iz, <span class="string">'v'</span>, z(iz));
+    <span class="keyword">end</span>
+    fprintf( fid, <span class="string">'%s'</span>, endline);
+    fprintf(fid,<span class="string">'          (s)     '</span> );
+    <span class="keyword">for</span> iz=1:length(z)
+        <span class="keyword">for</span> ic=1:2
+            fprintf (fid, <span class="string">'    (m/s)     '</span>  );
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    fprintf( fid, <span class="string">'%s'</span>, endline);
 
-	fmtStr = repmat(<span class="string">'%13.4f '</span>,1,size(uvw,2)+1);
-	fmtStr = [fmtStr <span class="string">'%s'</span>];
-
-	<span class="keyword">for</span> it = 1:size(uvw,1)
-		fprintf( fid, fmtStr, t(it,1), uvw(it,:), endline );
+    fmtStr = repmat(<span class="string">'%13.4f '</span>,1,size(uvw,2)+1);
+    fmtStr = [fmtStr <span class="string">'%s'</span>];
+    <span class="keyword">for</span> it = 1:size(uvw,1)
+        fprintf( fid, fmtStr, t(it,1), uvw(it,:), endline );
     <span class="keyword">end</span>
 <span class="keyword">elseif</span> nComp==1
-	<span class="keyword">for</span> iz=1:length(z)
-		fprintf (fid, <span class="string">'Point%02.0f%s_%03.0fm '</span>, iz, <span class="string">'u'</span>, z(iz));
-	<span class="keyword">end</span>
-	fprintf( fid, <span class="string">'%s'</span>, endline);
-	fprintf(fid,<span class="string">'          (s)     '</span> );
-	<span class="keyword">for</span> iz=1:length(z)
-		<span class="keyword">for</span> ic=1:1
-		fprintf (fid, <span class="string">'    (m/s)     '</span>  );
-		<span class="keyword">end</span>
-	<span class="keyword">end</span>
-	fprintf( fid, <span class="string">'%s'</span>, endline);
+    <span class="keyword">for</span> iz=1:length(z)
+        fprintf (fid, <span class="string">'Point%02.0f%s_%03.0fm '</span>, iz, <span class="string">'u'</span>, z(iz));
+    <span class="keyword">end</span>
+    fprintf( fid, <span class="string">'%s'</span>, endline);
+    fprintf(fid,<span class="string">'          (s)     '</span> );
+    <span class="keyword">for</span> iz=1:length(z)
+        <span class="keyword">for</span> ic=1:1
+            fprintf (fid, <span class="string">'    (m/s)     '</span>  );
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    fprintf( fid,<span class="string">'%s'</span>,endline);
 
-	fmtStr = repmat(<span class="string">'%13.4f '</span>,1,size(uvw,2)+1);
-	fmtStr = [fmtStr <span class="string">'%s'</span>];
-
-	<span class="keyword">for</span> it = 1:size(uvw,1)
-		fprintf( fid, fmtStr, t(it,1), uvw(it,:), endline );
+    fmtStr = repmat(<span class="string">'%13.4f '</span>,1,size(uvw,2)+1);
+    fmtStr = [fmtStr <span class="string">'%s'</span>];
+    <span class="keyword">for</span> it = 1:size(uvw,1)
+        fprintf(fid, fmtStr, t(it,1), uvw(it,:), endline );
     <span class="keyword">end</span>
 <span class="keyword">end</span>
-
 fclose(fid);
-
-<span class="keyword">return</span>
-<span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Header
 %
-%Create Turbsim time .TimeSer input 
+% Create turbsim .TimeSer input
 %
-% from NREL(?)
+% forked from OpenFAST NREL repository and modified by SWE
 
 
 function writeTurbSimTimeSeriesInput(input_file, data_file, uvw, t, y, z, nComp,RefNode)
 % size uvw is (#timeSteps, 3*length(z))
 
-if isempty(y) 
+if isempty(y)
     y = zeros(size(z));
 elseif isscalar(y)
     y = ones(size(z))*y;
 end
-    
+
 
 fid = fopen(input_file,'wt');
-endline = char([10]); %'\r\n';
+endline = char([10]); %#ok<NBRAK> %'\r\n';
 
 fprintf(fid,'REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHTurbSim v2.00.* User Time Series Input FileREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-%s', endline);
 fprintf(fid,'Time series input from %s. Using rotated series %s', data_file, endline);
@@ -191,75 +181,70 @@ fprintf(fid,' %10.0f  nPoints  - Number of time series points contained in this 
 fprintf(fid,' %10.0f  RefPtID  - Index of the reference point (1-nPoints)%s', RefNode, endline);
 fprintf(fid,'Pointyi     Pointzi %s', endline);
 fprintf(fid,'  (m)         (m)%s', endline);
-for iz = 1:length(z)   
-    fprintf( fid, ' %10.5f  %10.5f %s', y(iz), z(iz), endline );   
+
+for iz = 1:length(z)
+    fprintf( fid, ' %10.5f  %10.5f %s', y(iz), z(iz), endline );
 end
 fprintf(fid,'REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHTime SeriesREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-%s', endline);
 fprintf(fid,' Elapsed Time     ' );
 
 if nComp==3
-	for iz=1:length(z)
-		fprintf (fid, 'Point%02.0f%s_%03.0fm ', iz, 'u', z(iz), iz, 'v', z(iz), iz, 'w', z(iz) );
-	end
-	fprintf( fid, '%s', endline);
-	fprintf(fid,'          (s)     ' );
-	for iz=1:length(z)
-		for ic=1:3
-		fprintf (fid, '    (m/s)     '  );
-		end
-	end
-	fprintf( fid, '%s', endline);
-	
-	fmtStr = repmat('%13.4f ',1,size(uvw,2)+1);
-	fmtStr = [fmtStr '%s'];
-	
-	for it = 1:size(uvw,1)   
-		fprintf( fid, fmtStr, t(it,1), uvw(it,:), endline );   
+    for iz=1:length(z)
+        fprintf (fid, 'Point%02.0f%s_%03.0fm ', iz, 'u', z(iz), iz, 'v', z(iz), iz, 'w', z(iz) );
+    end
+    fprintf( fid,'%s',endline);
+    fprintf(fid,'          (s)     ' );
+    for iz=1:length(z)
+        for ic=1:3
+            fprintf (fid, '    (m/s)     '  );
+        end
+    end
+    fprintf(fid,'%s',endline);
+    
+    fmtStr = repmat('%13.4f ',1,size(uvw,2)+1);
+    fmtStr = [fmtStr '%s'];
+    
+    for it = 1:size(uvw,1)  
+        fprintf( fid, fmtStr, t(it,1), uvw(it,:), endline );
     end
 elseif nComp==2
-	for iz=1:length(z)
-		fprintf (fid, 'Point%02.0f%s_%03.0fm ', iz, 'u', z(iz), iz, 'v', z(iz));
-	end
-	fprintf( fid, '%s', endline);
-	fprintf(fid,'          (s)     ' );
-	for iz=1:length(z)
-		for ic=1:2
-		fprintf (fid, '    (m/s)     '  );
-		end
-	end
-	fprintf( fid, '%s', endline);
-	
-	fmtStr = repmat('%13.4f ',1,size(uvw,2)+1);
-	fmtStr = [fmtStr '%s'];
-	
-	for it = 1:size(uvw,1)   
-		fprintf( fid, fmtStr, t(it,1), uvw(it,:), endline );   
+    for iz=1:length(z)
+        fprintf (fid, 'Point%02.0f%s_%03.0fm ', iz, 'u', z(iz), iz, 'v', z(iz));
+    end
+    fprintf( fid, '%s', endline);
+    fprintf(fid,'          (s)     ' );
+    for iz=1:length(z)
+        for ic=1:2
+            fprintf (fid, '    (m/s)     '  );
+        end
+    end
+    fprintf( fid, '%s', endline);
+    
+    fmtStr = repmat('%13.4f ',1,size(uvw,2)+1);
+    fmtStr = [fmtStr '%s'];   
+    for it = 1:size(uvw,1)    
+        fprintf( fid, fmtStr, t(it,1), uvw(it,:), endline );
     end
 elseif nComp==1
-	for iz=1:length(z)
-		fprintf (fid, 'Point%02.0f%s_%03.0fm ', iz, 'u', z(iz));
-	end
-	fprintf( fid, '%s', endline);
-	fprintf(fid,'          (s)     ' );
-	for iz=1:length(z)
-		for ic=1:1
-		fprintf (fid, '    (m/s)     '  );
-		end
-	end
-	fprintf( fid, '%s', endline);
-	
-	fmtStr = repmat('%13.4f ',1,size(uvw,2)+1);
-	fmtStr = [fmtStr '%s'];
-	
-	for it = 1:size(uvw,1)   
-		fprintf( fid, fmtStr, t(it,1), uvw(it,:), endline );   
-    end       
+    for iz=1:length(z)
+        fprintf (fid, 'Point%02.0f%s_%03.0fm ', iz, 'u', z(iz));
+    end
+    fprintf( fid, '%s', endline);
+    fprintf(fid,'          (s)     ' );
+    for iz=1:length(z)
+        for ic=1:1
+            fprintf (fid, '    (m/s)     '  );
+        end
+    end
+    fprintf( fid,'%s',endline);
+    
+    fmtStr = repmat('%13.4f ',1,size(uvw,2)+1);
+    fmtStr = [fmtStr '%s'];    
+    for it = 1:size(uvw,1)  
+        fprintf(fid, fmtStr, t(it,1), uvw(it,:), endline );
+    end
 end
-
 fclose(fid);
-
-return
-end
 
 ##### SOURCE END #####
 --></body></html>

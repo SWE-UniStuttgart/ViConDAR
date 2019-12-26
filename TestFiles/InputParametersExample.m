@@ -17,7 +17,7 @@ input.nameBase = 'TEST'; %This is the first part of the name to be used for the 
 % in the name concatenation.
 input.freeInp = {'Sh' ,[25];
     'SD' ,[1];
-    'V'  ,[8];
+    'V'  ,[15];
     'TI' ,[5];
     }; %#ok<*NBRAK>
 
@@ -55,7 +55,7 @@ input.flag_calculate_fullWF_statistics = 1; % Calculate statistics from full win
 %Flags for virtual lidar measurements parameters
 input.flag_apply_noise      = 1; % Apply noise to measured points
 input.flag_apply_LOS        = 1; % Apply Line of sight of LiDAR
-input.flag_apply_weightREWS = 0; % Weight for the length of the blade for REWS caclulation
+input.flag_apply_weightREWS = 1; % Weight for the length of the blade for REWS caclulation
 input.flag_resampling       = 0; % Apply resampling to the lidar measurments. Currently based on frequency domain zero padding
 
 % Flags for plotting options
@@ -166,6 +166,6 @@ input.points_plot_WF_timeseries = [-54 70 0 45; 54 70 0 -63]; % point in meters 
 input.plot_WF_timeseries_Pyconturb = 1 ; % use constrained windfields with pyconturb for timeseries
 input.plot_WF_timeseries_Turbsim = 1 ; % use constrained windfields with turbsim for timeseries
 
-input.time_fullWF_Slices = [98 100]; % slices in time [s]
+input.time_fullWF_Slices = [52 100]; % slices in time [s]
 input.plot_WF_slices_Pyconturb = 1; % use constrained windfields with pyconturb for plotting slices
 input.plot_WF_slices_Turbsim = 1;   % use constrained windfields with turbsim for plotting slices

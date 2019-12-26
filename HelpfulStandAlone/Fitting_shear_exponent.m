@@ -4,10 +4,11 @@
 % over heights we can calculate the alpha exponent the fits better the
 % values
 %
-% Vasilis Pettas, Univeersity of Stuttgart, Stuttgart Wind Energy (SWE) 23.05.2019
+% Vasilis Pettas, Univeersity of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
-clc,clear all,close all %#ok<CLALL>
-
+clc
+clearvars
+close all 
 % rng(10); % just fixing random numbers for reproducabilitty
 
 %% Inputs

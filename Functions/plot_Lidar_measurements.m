@@ -1,7 +1,7 @@
 %% Header
 %
 % Plotting the lidar outputs. Comparison of original time series and lidar
-% measurements and convergence metrics
+% measurements and convergence metrics.
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -15,9 +15,9 @@ FreeInpInd = size(input.freeInp,1);
 MatchInd = [1:FreeInpInd PatInd];
 
 %find all combination of same inputs
-for iRow1 = 1:length(perm_cell.values)
-    for iRow2 = 1:length(perm_cell.values)
-        Comb(iRow1,iRow2) = isequal (cell2mat(perm_cell.values {iRow1,1}(1,MatchInd)),cell2mat(perm_cell.values{iRow2,1}(1,MatchInd)));
+for iRow1 = 1:size(perm_cell.values,1)
+    for iRow2 = 1:size(perm_cell.values,1)
+        Comb(iRow1,iRow2) = isequal(cell2mat(perm_cell.values {iRow1,1}(1,MatchInd)),cell2mat(perm_cell.values{iRow2,1}(1,MatchInd)));
     end
 end
 TotalComb = unique(Comb,'rows'); % get only the unique combinations
@@ -28,7 +28,7 @@ for iComb = 1:size(TotalComb,1)
     Case{iComb} = find(iTotalComb==1); %#ok<*AGROW>
 end
 
-for iCase = 1:length(Case) %loop over the groups of cases
+for iCase = 1:size(Case,2) %loop over the groups of cases
     curCase = Case{iCase};
     % plot all lidar points
     for iPoint = 1:length(input.PatternY{perm_cell.values{curCase(1),1}{1,PatInd},1}) % loop over pattern points

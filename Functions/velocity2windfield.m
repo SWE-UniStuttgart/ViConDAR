@@ -43,7 +43,7 @@ windfield.dt        = round(dt*100000)/100000; % issue with constrained time ste
 windfield.grid.dy   = dy;
 windfield.grid.dz   = dz;
 
-windfield.grid.t    = [0:windfield.dt:windfield.dt*(windfield.grid.nt-1)]';
+windfield.grid.t    = [0:windfield.dt:windfield.dt*(windfield.grid.nt-1)]'; %#ok<NBRAK>
 
 windfield.grid.z    = -windfield.grid.dz*(windfield.grid.nz-1)/2:windfield.grid.dz:windfield.grid.dz*(windfield.grid.nz-1)/2;
 windfield.grid.y    = -windfield.grid.dy*(windfield.grid.ny-1)/2:windfield.grid.dy:windfield.grid.dy*(windfield.grid.ny-1)/2;

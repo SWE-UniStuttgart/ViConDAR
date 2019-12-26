@@ -197,7 +197,7 @@ end
 for num_tr3 = 1:length (Y)
     LOS_points.slices(num_tr3,:)     = slices(num_tr3,:);
     LOS_points.slicesTime(num_tr3,:) = slicesTime(num_tr3,:);
-    for iTraj2 = 1:length(plane_traj)
+    for iTraj2 = 1:size(plane_traj,2)
         LOS_points.Coor{num_tr3}(:,iTraj2) = plane_traj{1,iTraj2}(:,num_tr3); %this variable saves coordinates according to trajectory points
     end
 end
@@ -206,7 +206,6 @@ end
 % the averaging (or any other mnanipulation) for the multiple slices. NO LOS here
 % Here is calculated the mean velocity of all the points in the pattern every time LiDAR completes one
 % pattern (frequency of the pattern) taking into account timstep_meas.
-% HERE ADD A AN OUTPUT WITH THE FIXED SLICESTIME SO THAT THEY  MATCH IN TIME!!!
 
 [VFinalTotal_U,VFinalTotal_Time_U,~,~] = interpolationFun(compU,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
 [VFinalTotal_V,VFinalTotal_Time_V,~,~] = interpolationFun(compV,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
@@ -297,7 +296,7 @@ end
 REWS.fullWF.mean = mean(REWS.fullWF.TS,'omitnan');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% For the pattern of LiDAR points %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% For the pattern of LiDAR points %%%%%%%%%%%%%%%%%%%%%%%%%
 rad_valuesLiDAR=Distances_LiDAR_Points <= rotor_radius; %logical index of pattern points inside the rotor
 for ind_LiDAR_REWS = 1:size(slicesTime,2) % here there is something to fix:  pointsToAverage sometimes (when TstepPattern=time step of the Original WF) gives errors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     for ind_point_LiDAR_REWS = 1:length(Y)
@@ -367,11 +366,11 @@ for indSlice = 1:size(VFinalTotal_Time_U{1},2)
     for iZ = 1:length(Z)
         iZint = Z_sorted_ind(iZ);                      % take the index of the original height vector corresponding to the order of sorted heights
         if any(Match_index_mat == iZint)                 % check if the height is included in the matching indices
-            for ind_LAW_NO_LOS=1:length(Match_index)   % loop ove all matching groups of heights
+            for ind_LAW_NO_LOS=1:size(Match_index,2)   % loop ove all matching groups of heights
                 iMatchIndex = Match_index2{ind_LAW_NO_LOS};
-                if any(iMatchIndex == iZint) % check if my value is in this group og matching values
+                if any(iMatchIndex == iZint) % check if my value is in this group of matching values
                     for ind_LAW_NONLOS2 = 1:length(iMatchIndex) %loop over the matching elements
-                        if ind_LAW_NONLOS2 == 1 % if it the first of the matching gorup assign the mean value and the gheight in the second sorted index
+                        if ind_LAW_NONLOS2 == 1 % if it is the first of the matching group assign the mean value and the height in the second sorted index
                             Z1_sh(iZ) = Z(iZint);
                             V1_sh(iZ) = mean(iV_vec_lidar(iMatchIndex),'omitnan');
                         else
@@ -394,8 +393,8 @@ for indSlice = 1:size(VFinalTotal_Time_U{1},2)
     Zshear_final = Zh + Z1_sh(~isnan(Z1_sh));
     clear V1_sh Z1_sh
     
-    %Calculate the approximate Vhub (or take it from turbsim...)
-    % % find least square fit for the average vertical line
+    % Calculate the approximate Vhub (or take it from turbsim...)
+    % Find least square fit for the average vertical line
     if length(Vshear_final) == length(Zshear_final)
         fcn     = @(alphaPL2) sum(( Vhub_shear(indSlice).*(Zshear_final/Zh).^(alphaPL2) - Vshear_final).^2); % least square defintion f
         [s,~,~] = fminsearch(fcn, 0.14);        % Minimise Least-Squares error
@@ -404,7 +403,7 @@ for indSlice = 1:size(VFinalTotal_Time_U{1},2)
         end
         ShearPL.lidar.TS(:,indSlice) = s;       %#ok<*SAGROW>
     else
-        ShearPL.lidar.TS(:,indSlice) = nan;     %#ok<*SAGROW> % in case there arre many nans there is not enough data for a height so discard measurement
+        ShearPL.lidar.TS(:,indSlice) = nan;     %#ok<*SAGROW> % in case there are many nans there is not enough data for a height so discard measurement
     end
     Match_index2 = Match_index;
 end
@@ -472,13 +471,13 @@ Output.statistics       = statisticsOut;
 Output.TS.fullWF.time   = fullslicesTime;
 Output.Pattern.Coord    = [Y;Z];
 Output.Pattern.refplane = ref_plane_dist; %like focus distance
-Output.Pattern.timestep_pat_vec  = timestep_pat_vec; %like focus distance
-Output.Pattern.timeStep_Measurements = timeStep_Measurements; %like focus distance
-Output.Pattern.distance_av_slice = distance_av_slice; %like focus distance
+Output.Pattern.timestep_pat_vec  = timestep_pat_vec; 
+Output.Pattern.timeStep_Measurements = timeStep_Measurements; 
+Output.Pattern.distance_av_slice = distance_av_slice; 
 Output.Pattern.points_av_slice   = points_av_slice;
 Output.Pattern.timestep_pat_vec  = timestep_pat_vec;
 Output.Pattern.name              = input.PatternNames{curFileInfo.values{find(strcmp(curFileInfo.variables{1, 1},'Pat'))}};
-Output.Parameter.rotor_radius = rotor_radius; % Radio of the Rotor [m]
+Output.Parameter.rotor_radius = rotor_radius; % Radius of the Rotor [m]
 Output.Parameter.Pos_Lidar    = input.Pos_LiDAR;
 
 for iPat= 1:length(Y)

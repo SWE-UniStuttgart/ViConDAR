@@ -3,7 +3,7 @@
 % Dirty script to batch process full windfield statistics and compare time series
 % betweeen constrained and original windfields. It can handel one original wind
 % field with may variations ofthe constraining (eg Pyconturb,turbsim, patterns, Tp and Tm)
-% It was done for a specific application but can be generalized
+% It was done for a specific application but can be generalized.
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -11,10 +11,10 @@
 clearvars
 clc
 close all
-addpath (genpath('..\Functions'))
+addpath (genpath('../Functions'))
 
 % direc=fullfile('X:','ViConDAR_Test_Hor_PL','ConstrainedWF','Statistics\');
-direc = '..\ConstrainedWF\Statistics\';
+direc = '../ConstrainedWF/Statistics/';
 filesAll = dir(fullfile(direc, '*.mat'));
 files    = extractfield(filesAll,'name')';
 
@@ -54,21 +54,11 @@ input.AllFixed = {'Pat';'Ns';'Tp';'Tm';'Pos';'Fd' ;'DAv';'SlAv'}; % This should 
 perm_cell = getNamesFromInputs(input);
 NamesInit = perm_cell.OutNames;
 
-Errcell = {'Error REWS' 'Error Umean' 'Error Shear'};
+Errcell = {'Error REWS' 'Error Umean' 'Error Shear [-]' 'Error TS [m/s]' 'Error Shear [-]' 'Error TS [%]' };
 VarCell = {'Umean' 'Shear' 'HH'};
-% We can combine in total 2 variations
-Var1 = 15; % shear variation1
-Var1Name = 'Shear';
 
-Var2 = 5; % TI variation 2
-Var3 = Var2/5;        % Tm variees only for names add the number of point in pattern here
-Var2Name = 'TI';
-varPat = 0; % flag to indicate that timestep of pattern is a variable (naming conventions)
-
-% if you have multiple seeds you want to average:
-SeedVar = 1;
 %%
-cunt=0;
+cunt = 0;
 for nWF = 1:size(NamesInit,1) % for each WF it arranges in different .structures for each time step
     
     curNam   = NamesInit{nWF,1};
@@ -93,7 +83,7 @@ for nWF = 1:size(NamesInit,1) % for each WF it arranges in different .structures
         WFdata{cunt,14} = abs(StatisticsWF.Error.Shear.TS); % %Error UShear  
         WFdata{cunt,15} = StatisticsWF.Error.Slice.TS_perc; % %Error Slice       
         WFdata{cunt,16} = StatisticsWF.Original.time; % %Time original
-        WFdata{cunt,17} = StatisticsWF.Error.Slice.TS_perc; % %Time constrained
+        WFdata{cunt,17} = StatisticsWF.Constrained.time; % Time constrained
     end
 end
 

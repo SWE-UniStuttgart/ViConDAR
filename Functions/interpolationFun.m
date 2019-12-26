@@ -1,6 +1,6 @@
 %% Header
 %
-% interpolate to get all points (even when we are not in the grid) taking
+% Interpolate to get all points (even when we are not in the grid) taking
 % into account LOS and position of LiDAR. 
 %
 % V.Pettas/F.Costa 
@@ -9,7 +9,7 @@
 
 function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(component,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2)
 
-if 2==1  %obsolete it shouldn't be used... Fix it later????    
+if 2==1  %obsolete it shouldn't be used... Fix it later???? Currently we use the closest grid point and the nearest time slice
     for slice = 1:1:fullTime/dt+1
         for i1 = 1:size(LOS_points.slices,1)
             
@@ -77,7 +77,7 @@ else %if you don't interpolate get the closest point
             indLoopT =  LOS_points.slices(i1,:)+LOS_points.slicesAv(iTSlice);
             
             indLoopT2 = indLoopT;
-            indNEg = find(indLoopT<=0); % find negative zeros or Nans
+            indNEg = find(indLoopT<=0); % find negative, zeros or Nans
             indNEg =  [indNEg find(isnan(indLoopT))]; % find negative or Nans
             indNEg = [indNEg find(indLoopT>size(component,2))]; % findd points outside of the grid
             indLoopT2(indNEg) = [];

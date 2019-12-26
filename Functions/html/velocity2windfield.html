@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="velocity2windfield.m"><style type="text/css">
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="velocity2windfield.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Header</h1><p>Who and what?</p><pre class="codeinput"><span class="keyword">function</span> [windfield] = velocity2windfield(velocity,dz,dy,dt,SummVars)
+  </style></head><body><div class="content"><h1>Header</h1><p>Function to create the windfield global format Forked from NREL OpenFAST repository and modified by SWE (2019)</p><pre class="codeinput"><span class="keyword">function</span> [windfield] = velocity2windfield(velocity,dz,dy,dt,SummVars)
 
 <span class="comment">% transform windfield structure (SWE)</span>
 <span class="comment">%        to velocity 4-D vector (NREL)</span>
@@ -100,20 +100,18 @@ windfield.grid.nz   = nz;
 
 windfield.ny        = ny;
 windfield.nz        = nz;
-windfield.dt        = dt;
 
-windfield.grid.dt   = dt;
-windfield.dt        = dt;
+windfield.grid.dt   = round(dt*100000)/100000; <span class="comment">% issue with constrained time steps off</span>
+windfield.dt        = round(dt*100000)/100000; <span class="comment">% issue with constrained time steps off</span>
 windfield.grid.dy   = dy;
 windfield.grid.dz   = dz;
 
-windfield.grid.t    = [0:windfield.dt:windfield.dt*(windfield.grid.nt-1)]';
+windfield.grid.t    = [0:windfield.dt:windfield.dt*(windfield.grid.nt-1)]'; <span class="comment">%#ok&lt;NBRAK&gt;</span>
 
 windfield.grid.z    = -windfield.grid.dz*(windfield.grid.nz-1)/2:windfield.grid.dz:windfield.grid.dz*(windfield.grid.nz-1)/2;
 windfield.grid.y    = -windfield.grid.dy*(windfield.grid.ny-1)/2:windfield.grid.dy:windfield.grid.dy*(windfield.grid.ny-1)/2;
 
 [windfield.grid.Y, windfield.grid.Z] = meshgrid(windfield.grid.y,windfield.grid.z);
-
 
 windfield.grid.dy   = dy;
 windfield.grid.dz   = dz;
@@ -133,7 +131,8 @@ windfield.T_offset  = windfield.grid.dy*(windfield.grid.ny-1)/windfield.URef/2+w
 ##### SOURCE BEGIN #####
 %% Header
 %
-% Who and what?
+% Function to create the windfield global format
+% Forked from NREL OpenFAST repository and modified by SWE (2019)
 
 function [windfield] = velocity2windfield(velocity,dz,dy,dt,SummVars)
 
@@ -169,20 +168,18 @@ windfield.grid.nz   = nz;
 
 windfield.ny        = ny;
 windfield.nz        = nz;
-windfield.dt        = dt;
 
-windfield.grid.dt   = dt;
-windfield.dt        = dt;
+windfield.grid.dt   = round(dt*100000)/100000; % issue with constrained time steps off
+windfield.dt        = round(dt*100000)/100000; % issue with constrained time steps off
 windfield.grid.dy   = dy;
 windfield.grid.dz   = dz;
 
-windfield.grid.t    = [0:windfield.dt:windfield.dt*(windfield.grid.nt-1)]';
+windfield.grid.t    = [0:windfield.dt:windfield.dt*(windfield.grid.nt-1)]'; %#ok<NBRAK>
 
 windfield.grid.z    = -windfield.grid.dz*(windfield.grid.nz-1)/2:windfield.grid.dz:windfield.grid.dz*(windfield.grid.nz-1)/2;
 windfield.grid.y    = -windfield.grid.dy*(windfield.grid.ny-1)/2:windfield.grid.dy:windfield.grid.dy*(windfield.grid.ny-1)/2;
 
 [windfield.grid.Y, windfield.grid.Z] = meshgrid(windfield.grid.y,windfield.grid.z);
-
 
 windfield.grid.dy   = dy;
 windfield.grid.dz   = dz;
@@ -198,8 +195,6 @@ end
 
 windfield.URef      = SummVars(3);    
 windfield.T_offset  = windfield.grid.dy*(windfield.grid.ny-1)/windfield.URef/2+windfield.grid.dt; %GridWidth/URef/2 % +dt(DS)
-
-
 
 ##### SOURCE END #####
 --></body></html>

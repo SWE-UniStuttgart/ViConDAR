@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="Create_Pyconturb_input.m"><style type="text/css">
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="Create_Pyconturb_input.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -67,17 +67,21 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
   </style></head><body><div class="content"><h1>Header</h1><p>Format the output of Lidar simulator into csv readable for pyconturb</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> Create_Pyconturb_input(Output,input,Name2Save )
-NumberRows2delete = 0; <span class="comment">%DELETE MEE!!!!</span>
 <span class="comment">% Variables:</span>
-Npoints   = size(Output.Pattern.Coord,2); <span class="comment">% number of point inth pattern</span>
-Y1        = repmat(Output.Pattern.Coord(1,:),[1,input.nComp]); <span class="comment">% grid</span>
-Z1        = repmat(Output.Pattern.Coord(2,:)+input.Zh,[1,input.nComp]); <span class="comment">% grid</span>
-dt        = Output.Pattern.timestep_pat_vec  ; <span class="comment">%dt of scans</span>
-TotalTime = Output.TS.lidar.time{1, 1}  (end); <span class="comment">% check the issue with time series (before sending the input here)</span>
-lidar_time= Output.TS.lidar.time{1, 1};
+Npoints = size(Output.Pattern.Coord,2); <span class="comment">% number of point inth pattern</span>
+<span class="keyword">if</span> input.nComp == 1
+    Y1 = repmat(Output.Pattern.Coord(1,:),[1,3]); <span class="comment">% temporary fix for the bug in pyconturb not accepting u only input</span>
+    Z1 = repmat(Output.Pattern.Coord(2,:)+input.Zh,[1,3]); <span class="comment">% temporary fix for the bug in pyconturb not accepting u only input</span>
+<span class="keyword">else</span>
+    Y1 = repmat(Output.Pattern.Coord(1,:),[1,input.nComp]); <span class="comment">% grid</span>
+    Z1 = repmat(Output.Pattern.Coord(2,:)+input.Zh,[1,input.nComp]); <span class="comment">% grid</span>
+<span class="keyword">end</span>
+dt         = Output.Pattern.timestep_pat_vec  ; <span class="comment">%dt of scans</span>
+TotalTime  = Output.TS.lidar.time{1, 1}  (end); <span class="comment">% check the issue with time series (before sending the input here)</span>
+lidar_time = Output.TS.lidar.time{1, 1};
 
 <span class="comment">% For running PyConTurb we need the following parameters:</span>
-Variables = {TotalTime,dt,Output.statistics.U.lidar.Mean_TS_LiDAR,input.nf_chunk,input.Zh,input.coh_model,input.wsp_func,input.sig_func,input.spec_func,input.seed,input.interp_data,Output.Shear.lidar.Mean,input.turb_class};
+Variables = {TotalTime,dt,Output.statistics.U.lidar.Mean_all_LiDAR,input.nf_chunk,input.Zh,input.coh_model,input.wsp_func,input.sig_func,input.spec_func,input.seed,input.interp_data,Output.Shear.lidar.Mean,input.turb_class};
 GridY     = -Output.TS.fullWF.dy*(Output.TS.fullWF.nGridY-1)/2:Output.TS.fullWF.dy:Output.TS.fullWF.dy*(Output.TS.fullWF.nGridY-1)/2;
 GridZ     = (-Output.TS.fullWF.dy*(Output.TS.fullWF.nGridZ-1)/2:Output.TS.fullWF.dz:Output.TS.fullWF.dz*(Output.TS.fullWF.nGridZ-1)/2)+input.Zh;
 name      = {<span class="string">'TotalTime'</span>,<span class="string">'dt'</span>,<span class="string">'u_ref'</span>,<span class="string">'nf_chunk'</span>,<span class="string">'z_hub'</span>,<span class="string">'coherence_model'</span>,<span class="string">'wsp_func'</span>,<span class="string">'sig_func'</span>,<span class="string">'spec_func'</span>,<span class="string">'seed'</span>,<span class="string">'interp_data'</span>,<span class="string">'LiDAR_Shear'</span>,<span class="string">'turb_class'</span>};
@@ -98,15 +102,14 @@ writetable(Var,strcat(input.PyconturbInput_dir,<span class="string">'Variables1_
 fclose(<span class="string">'all'</span>);
 fid  = fopen( strcat(input.PyconturbInput_dir,<span class="string">'Variables1_'</span>,Name2Save,<span class="string">'.csv'</span>),<span class="string">'rt'</span>);
 fid2 = fopen( strcat(input.PyconturbInput_dir,<span class="string">'Variables_'</span>,Name2Save,<span class="string">'.csv'</span>),<span class="string">'wt'</span>);
-id =0; <span class="comment">%Write comments on that or remove it!</span>
+id = 0; <span class="comment">%Write comments on that or remove it!</span>
 g  = fgets(fid);
 <span class="keyword">while</span>(ischar(g))
     id = id+1;
-    <span class="keyword">if</span> id==1
+    <span class="keyword">if</span> id == 1
         g = fgets(fid);
         <span class="keyword">continue</span>
     <span class="keyword">else</span>
-
         fprintf(fid2,g);
     <span class="keyword">end</span>
     g = fgets(fid);
@@ -115,11 +118,12 @@ fclose(<span class="string">'all'</span>);
 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
 
 <span class="comment">% Choose number of components</span>
-<span class="keyword">if</span> input.nComp==1
-    compo = {<span class="string">'u'</span>};
-<span class="keyword">elseif</span> input.nComp==2
+<span class="keyword">if</span> input.nComp == 1
+<span class="comment">%     compo = {'u'};</span>
+    compo = {<span class="string">'u'</span>,<span class="string">'v'</span>,<span class="string">'w'</span>}; <span class="comment">% temporary fix for the bug in pyconturb not accepting u only input for data_profile, dara_sig and data_spectrum options</span>
+<span class="keyword">elseif</span> input.nComp == 2
     compo = {<span class="string">'u'</span>,<span class="string">'v'</span>};
-<span class="keyword">elseif</span> input.nComp==3
+<span class="keyword">elseif</span> input.nComp == 3
     compo = {<span class="string">'u'</span>,<span class="string">'v'</span>,<span class="string">'w'</span>};
 <span class="keyword">end</span>
 
@@ -128,66 +132,75 @@ count_ind=1;
     <span class="keyword">for</span> ind_npoints=0:(Npoints-1)
         count_ind=count_ind+1;
         columns{1,1}=<span class="string">'index'</span>;
-        columns{1,count_ind}=horzcat(compo{ind_comp},<span class="string">'_p'</span>,num2str(ind_npoints));        <span class="comment">%#ok&lt;*AGROW&gt;</span>
+        columns{1,count_ind}=horzcat(compo{ind_comp},<span class="string">'_p'</span>,num2str(ind_npoints)); <span class="comment">%#ok&lt;*AGROW&gt;</span>
     <span class="keyword">end</span>
 <span class="keyword">end</span>
 
-<span class="comment">% What is this part doing?????? Clean it up, write comments and make meaningful names</span>
+<span class="comment">% Creating vector with components u,v,w(k=0,1,2) required for pyconturb input con_tc</span>
 indd = 0;
-<span class="keyword">for</span> iCompVel = 0:(input.nComp-1)
-    <span class="keyword">for</span> ipoint = 1:(Npoints)
-        indd = indd+1;
-        k(1,indd) = iCompVel*ones(1,length(ipoint));
+<span class="keyword">if</span> input.nComp == 1  <span class="comment">% again  temporary fix for pyconturb bug</span>
+    <span class="keyword">for</span> iCompVel = 0:(3-1)
+        <span class="keyword">for</span> ipoint = 1:(Npoints)
+            indd = indd+1;
+            k(1,indd) = iCompVel*ones(1,length(ipoint));
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">else</span>
+    <span class="keyword">for</span> iCompVel = 0:(input.nComp-1)
+        <span class="keyword">for</span> ipoint = 1:(Npoints)
+            indd = indd+1;
+            k(1,indd) = iCompVel*ones(1,length(ipoint));
+        <span class="keyword">end</span>
     <span class="keyword">end</span>
 <span class="keyword">end</span>
 
 <span class="comment">% Obtain matrix of time/Velocities DataFrame:</span>
-
     <span class="keyword">switch</span> input.nComp
         <span class="keyword">case</span> 1
-            <span class="keyword">for</span> i=1:Npoints
+            <span class="keyword">for</span> i = 1:Npoints
             VFinal_Time_U1(:,i) = Output.TS.lidar.Uval{i};
+            VFinal_Time_V1(:,i) = 0.075*Output.TS.lidar.Uval{i}; <span class="comment">% temporary fix for the bug in pyconturb not accepting u only input</span>
+            VFinal_Time_W1(:,i) = 0.05*Output.TS.lidar.Uval{i}; <span class="comment">% temporary fix for the bug in pyconturb not accepting u only input</span>
             <span class="keyword">end</span>
-            matrixVal = [lidar_time(1,1:end-NumberRows2delete)',VFinal_Time_U1(1:end-NumberRows2delete,:)];
+            matrixVal = [lidar_time(1,1:end)',VFinal_Time_U1(1:end,:),VFinal_Time_V1(1:end,:),VFinal_Time_W1(1:end,:)];
         <span class="keyword">case</span> 2
-            <span class="keyword">for</span> i=1:Npoints
+            <span class="keyword">for</span> i = 1:Npoints
             VFinal_Time_U1(:,i) = Output.TS.lidar.Uval{i};
             VFinal_Time_V1(:,i) = Output.TS.lidar.Vval{i};
             <span class="keyword">end</span>
-            matrixVal = [lidar_time(1,1:end-NumberRows2delete)',VFinal_Time_U1(1:end-NumberRows2delete,:),VFinal_Time_V1(1:end-NumberRows2delete,:)];
-            matrixVal=matrixVal(:,any(matrixVal~=0)); <span class="comment">% Remove columns of 0 if any</span>
+            matrixVal = [lidar_time(1,1:end)',VFinal_Time_U1(1:end,:),VFinal_Time_V1(1:end,:)];
+            matrixVal = matrixVal(:,any(matrixVal~=0)); <span class="comment">% Remove columns of 0 if any</span>
         <span class="keyword">case</span> 3
-            <span class="keyword">for</span> i=1:Npoints
+            <span class="keyword">for</span> i = 1:Npoints
             VFinal_Time_U1(:,i) = Output.TS.lidar.Uval{i};
             VFinal_Time_V1(:,i) = Output.TS.lidar.Vval{i};
             VFinal_Time_W1(:,i) = Output.TS.lidar.Wval{i};
             <span class="keyword">end</span>
-            matrixVal = [lidar_time(1,1:end-NumberRows2delete)',VFinal_Time_U1(1:end-NumberRows2delete,:),VFinal_Time_V1(1:end-NumberRows2delete,:),VFinal_Time_W1(1:end-NumberRows2delete,:)];
-            matrixVal=matrixVal(:,any(matrixVal~=0)); <span class="comment">% Remove columns of 0 if any</span>
+            matrixVal = [lidar_time(1,1:end)',VFinal_Time_U1(1:end,:),VFinal_Time_V1(1:end,:),VFinal_Time_W1(1:end,:)];
+            matrixVal = matrixVal(:,any(matrixVal~=0)); <span class="comment">% Remove columns of 0 if any</span>
     <span class="keyword">end</span>
 MatrixVal = num2cell(matrixVal); <span class="comment">% Create the cell required to push to csv</span>
 
 <span class="comment">% Obtain matrix of spatial DataFrame:</span>
-x = (zeros(1,length(Y1))); <span class="comment">% Pycont turb can also have shifts in X axis (parrallel to wind)</span>
-<span class="keyword">for</span> i=1:length(columns)
-    <span class="keyword">if</span> i==1
-        cell1{1,i}=<span class="string">'k'</span>; <span class="comment">% requires u=0,v=1,w=2</span>
-        cell1{2,i}=<span class="string">'x'</span>;
-        cell1{3,i}=<span class="string">'y'</span>;
-        cell1{4,i}=<span class="string">'z'</span>;
+x = (zeros(1,length(Y1))); <span class="comment">% Pycont turb can also have shifts in X axis (parrallel to wind) (not working yet...)</span>
+<span class="keyword">for</span> i = 1:size(columns,2)
+    <span class="keyword">if</span> i == 1
+        cell1{1,i} = <span class="string">'k'</span>; <span class="comment">% requires u=0,v=1,w=2</span>
+        cell1{2,i} = <span class="string">'x'</span>;
+        cell1{3,i} = <span class="string">'y'</span>;
+        cell1{4,i} = <span class="string">'z'</span>;
     <span class="keyword">else</span>
         jj=i-1;
-        cell1{1,i}=k(jj);
-        cell1{2,i}=x(jj);
-        cell1{3,i}=Y1(jj);
-        cell1{4,i}=Z1(jj);
+        cell1{1,i} = k(jj);
+        cell1{2,i} = x(jj);
+        cell1{3,i} = Y1(jj);
+        cell1{4,i} = Z1(jj);
     <span class="keyword">end</span>
 <span class="keyword">end</span>
 
 <span class="comment">%Final cell with the  time, velocities an spatial (constraining points)</span>
 <span class="comment">%data: Remove columns with 0</span>
-
-FinalCell =[columns(:,1:size(matrixVal,2));cell1(:,1:size(matrixVal,2));MatrixVal];
+FinalCell = [columns(:,1:size(matrixVal,2));cell1(:,1:size(matrixVal,2));MatrixVal];
 
 <span class="comment">% Convert cell to a table and use first row as variable names</span>
 warning (<span class="string">'off'</span>,<span class="string">'all'</span>);
@@ -198,7 +211,7 @@ warning (<span class="string">'on'</span>,<span class="string">'all'</span>);
 writetable(T,strcat(input.PyconturbInput_dir,<span class="string">'con_tc1_'</span>,Name2Save,<span class="string">'.csv'</span>));
 
 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
-<span class="comment">% This part removes the first line. TO DO: find a better and fster way to do it</span>
+<span class="comment">% This part removes the first line. TO DO: find a better and faster way to do it</span>
 fclose(<span class="string">'all'</span>);
 fid  = fopen(strcat(input.PyconturbInput_dir,<span class="string">'con_tc1_'</span>,Name2Save,<span class="string">'.csv'</span>),<span class="string">'rt'</span>);
 fid2 = fopen(strcat(input.PyconturbInput_dir,<span class="string">'con_tc_'</span>,Name2Save,<span class="string">'.csv'</span>),<span class="string">'wt'</span>);
@@ -206,11 +219,10 @@ id = 0;
 a  = fgets(fid);
 <span class="keyword">while</span>(ischar(a))
     id = id+1;
-    <span class="keyword">if</span> id==1
+    <span class="keyword">if</span> id == 1
         a = fgets(fid);
         <span class="keyword">continue</span>
     <span class="keyword">else</span>
-
         fprintf(fid2,a);
     <span class="keyword">end</span>
     a = fgets(fid);
@@ -218,7 +230,7 @@ a  = fgets(fid);
 fclose(<span class="string">'all'</span>);
 <span class="comment">%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%</span>
 
-<span class="comment">% delete useless files... This could be a problem when read/write rights are not available or when a file is open in pther program</span>
+<span class="comment">% Delete useless files. This could be a problem when read/write rights are not available or when a file is open in another program</span>
 delete (strcat(input.PyconturbInput_dir,<span class="string">'con_tc1_'</span>,Name2Save,<span class="string">'.csv'</span>))
 delete (strcat(input.PyconturbInput_dir,<span class="string">'Variables1_'</span>,Name2Save,<span class="string">'.csv'</span>))
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
@@ -231,17 +243,21 @@ delete (strcat(input.PyconturbInput_dir,<span class="string">'Variables1_'</span
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 function Create_Pyconturb_input(Output,input,Name2Save )
-NumberRows2delete = 0; %DELETE MEE!!!!
 % Variables:
-Npoints   = size(Output.Pattern.Coord,2); % number of point inth pattern
-Y1        = repmat(Output.Pattern.Coord(1,:),[1,input.nComp]); % grid
-Z1        = repmat(Output.Pattern.Coord(2,:)+input.Zh,[1,input.nComp]); % grid
-dt        = Output.Pattern.timestep_pat_vec  ; %dt of scans
-TotalTime = Output.TS.lidar.time{1, 1}  (end); % check the issue with time series (before sending the input here)
-lidar_time= Output.TS.lidar.time{1, 1};
+Npoints = size(Output.Pattern.Coord,2); % number of point inth pattern
+if input.nComp == 1
+    Y1 = repmat(Output.Pattern.Coord(1,:),[1,3]); % temporary fix for the bug in pyconturb not accepting u only input
+    Z1 = repmat(Output.Pattern.Coord(2,:)+input.Zh,[1,3]); % temporary fix for the bug in pyconturb not accepting u only input
+else
+    Y1 = repmat(Output.Pattern.Coord(1,:),[1,input.nComp]); % grid
+    Z1 = repmat(Output.Pattern.Coord(2,:)+input.Zh,[1,input.nComp]); % grid
+end
+dt         = Output.Pattern.timestep_pat_vec  ; %dt of scans
+TotalTime  = Output.TS.lidar.time{1, 1}  (end); % check the issue with time series (before sending the input here)
+lidar_time = Output.TS.lidar.time{1, 1};
 
 % For running PyConTurb we need the following parameters:
-Variables = {TotalTime,dt,Output.statistics.U.lidar.Mean_TS_LiDAR,input.nf_chunk,input.Zh,input.coh_model,input.wsp_func,input.sig_func,input.spec_func,input.seed,input.interp_data,Output.Shear.lidar.Mean,input.turb_class};
+Variables = {TotalTime,dt,Output.statistics.U.lidar.Mean_all_LiDAR,input.nf_chunk,input.Zh,input.coh_model,input.wsp_func,input.sig_func,input.spec_func,input.seed,input.interp_data,Output.Shear.lidar.Mean,input.turb_class};
 GridY     = -Output.TS.fullWF.dy*(Output.TS.fullWF.nGridY-1)/2:Output.TS.fullWF.dy:Output.TS.fullWF.dy*(Output.TS.fullWF.nGridY-1)/2;
 GridZ     = (-Output.TS.fullWF.dy*(Output.TS.fullWF.nGridZ-1)/2:Output.TS.fullWF.dz:Output.TS.fullWF.dz*(Output.TS.fullWF.nGridZ-1)/2)+input.Zh;
 name      = {'TotalTime','dt','u_ref','nf_chunk','z_hub','coherence_model','wsp_func','sig_func','spec_func','seed','interp_data','LiDAR_Shear','turb_class'};
@@ -262,15 +278,14 @@ writetable(Var,strcat(input.PyconturbInput_dir,'Variables1_',Name2Save,'.csv'));
 fclose('all');
 fid  = fopen( strcat(input.PyconturbInput_dir,'Variables1_',Name2Save,'.csv'),'rt');
 fid2 = fopen( strcat(input.PyconturbInput_dir,'Variables_',Name2Save,'.csv'),'wt');
-id =0; %Write comments on that or remove it!
+id = 0; %Write comments on that or remove it!
 g  = fgets(fid);
-while(ischar(g))
+while(ischar(g)) 
     id = id+1;
-    if id==1
+    if id == 1
         g = fgets(fid);
         continue
-    else
-        
+    else        
         fprintf(fid2,g);
     end
     g = fgets(fid);
@@ -279,11 +294,12 @@ fclose('all');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Choose number of components
-if input.nComp==1
-    compo = {'u'};
-elseif input.nComp==2
+if input.nComp == 1
+%     compo = {'u'};
+    compo = {'u','v','w'}; % temporary fix for the bug in pyconturb not accepting u only input for data_profile, dara_sig and data_spectrum options
+elseif input.nComp == 2
     compo = {'u','v'};
-elseif input.nComp==3
+elseif input.nComp == 3
     compo = {'u','v','w'};
 end
 
@@ -292,66 +308,75 @@ for ind_comp=1:length(compo)
     for ind_npoints=0:(Npoints-1)
         count_ind=count_ind+1;
         columns{1,1}='index';
-        columns{1,count_ind}=horzcat(compo{ind_comp},'_p',num2str(ind_npoints));        %#ok<*AGROW>
+        columns{1,count_ind}=horzcat(compo{ind_comp},'_p',num2str(ind_npoints)); %#ok<*AGROW>
     end
 end
 
-% What is this part doing?????? Clean it up, write comments and make meaningful names
+% Creating vector with components u,v,w(k=0,1,2) required for pyconturb input con_tc
 indd = 0;
-for iCompVel = 0:(input.nComp-1)
-    for ipoint = 1:(Npoints)
-        indd = indd+1;
-        k(1,indd) = iCompVel*ones(1,length(ipoint));
+if input.nComp == 1  % again  temporary fix for pyconturb bug
+    for iCompVel = 0:(3-1)
+        for ipoint = 1:(Npoints)
+            indd = indd+1;
+            k(1,indd) = iCompVel*ones(1,length(ipoint));
+        end
+    end
+else
+    for iCompVel = 0:(input.nComp-1)
+        for ipoint = 1:(Npoints)
+            indd = indd+1;
+            k(1,indd) = iCompVel*ones(1,length(ipoint));
+        end
     end
 end
 
 % Obtain matrix of time/Velocities DataFrame:
-
     switch input.nComp
         case 1
-            for i=1:Npoints
+            for i = 1:Npoints
             VFinal_Time_U1(:,i) = Output.TS.lidar.Uval{i};
+            VFinal_Time_V1(:,i) = 0.075*Output.TS.lidar.Uval{i}; % temporary fix for the bug in pyconturb not accepting u only input
+            VFinal_Time_W1(:,i) = 0.05*Output.TS.lidar.Uval{i}; % temporary fix for the bug in pyconturb not accepting u only input
             end
-            matrixVal = [lidar_time(1,1:end-NumberRows2delete)',VFinal_Time_U1(1:end-NumberRows2delete,:)];
+            matrixVal = [lidar_time(1,1:end)',VFinal_Time_U1(1:end,:),VFinal_Time_V1(1:end,:),VFinal_Time_W1(1:end,:)];
         case 2
-            for i=1:Npoints
+            for i = 1:Npoints
             VFinal_Time_U1(:,i) = Output.TS.lidar.Uval{i};
             VFinal_Time_V1(:,i) = Output.TS.lidar.Vval{i};
             end
-            matrixVal = [lidar_time(1,1:end-NumberRows2delete)',VFinal_Time_U1(1:end-NumberRows2delete,:),VFinal_Time_V1(1:end-NumberRows2delete,:)];
-            matrixVal=matrixVal(:,any(matrixVal~=0)); % Remove columns of 0 if any
+            matrixVal = [lidar_time(1,1:end)',VFinal_Time_U1(1:end,:),VFinal_Time_V1(1:end,:)];
+            matrixVal = matrixVal(:,any(matrixVal~=0)); % Remove columns of 0 if any
         case 3
-            for i=1:Npoints
+            for i = 1:Npoints
             VFinal_Time_U1(:,i) = Output.TS.lidar.Uval{i};
             VFinal_Time_V1(:,i) = Output.TS.lidar.Vval{i};
             VFinal_Time_W1(:,i) = Output.TS.lidar.Wval{i};
             end
-            matrixVal = [lidar_time(1,1:end-NumberRows2delete)',VFinal_Time_U1(1:end-NumberRows2delete,:),VFinal_Time_V1(1:end-NumberRows2delete,:),VFinal_Time_W1(1:end-NumberRows2delete,:)];
-            matrixVal=matrixVal(:,any(matrixVal~=0)); % Remove columns of 0 if any
+            matrixVal = [lidar_time(1,1:end)',VFinal_Time_U1(1:end,:),VFinal_Time_V1(1:end,:),VFinal_Time_W1(1:end,:)];
+            matrixVal = matrixVal(:,any(matrixVal~=0)); % Remove columns of 0 if any
     end
 MatrixVal = num2cell(matrixVal); % Create the cell required to push to csv
 
 % Obtain matrix of spatial DataFrame:
-x = (zeros(1,length(Y1))); % Pycont turb can also have shifts in X axis (parrallel to wind)
-for i=1:length(columns)
-    if i==1
-        cell1{1,i}='k'; % requires u=0,v=1,w=2
-        cell1{2,i}='x';
-        cell1{3,i}='y';
-        cell1{4,i}='z';
+x = (zeros(1,length(Y1))); % Pycont turb can also have shifts in X axis (parrallel to wind) (not working yet...)
+for i = 1:size(columns,2)
+    if i == 1
+        cell1{1,i} = 'k'; % requires u=0,v=1,w=2
+        cell1{2,i} = 'x';
+        cell1{3,i} = 'y';
+        cell1{4,i} = 'z';
     else
         jj=i-1;
-        cell1{1,i}=k(jj);
-        cell1{2,i}=x(jj);
-        cell1{3,i}=Y1(jj);
-        cell1{4,i}=Z1(jj);
+        cell1{1,i} = k(jj);
+        cell1{2,i} = x(jj);
+        cell1{3,i} = Y1(jj);
+        cell1{4,i} = Z1(jj);
     end
 end
 
 %Final cell with the  time, velocities an spatial (constraining points)
 %data: Remove columns with 0
-
-FinalCell =[columns(:,1:size(matrixVal,2));cell1(:,1:size(matrixVal,2));MatrixVal];
+FinalCell = [columns(:,1:size(matrixVal,2));cell1(:,1:size(matrixVal,2));MatrixVal];
 
 % Convert cell to a table and use first row as variable names
 warning ('off','all');
@@ -362,7 +387,7 @@ warning ('on','all');
 writetable(T,strcat(input.PyconturbInput_dir,'con_tc1_',Name2Save,'.csv'));
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This part removes the first line. TO DO: find a better and fster way to do it
+% This part removes the first line. TO DO: find a better and faster way to do it
 fclose('all');
 fid  = fopen(strcat(input.PyconturbInput_dir,'con_tc1_',Name2Save,'.csv'),'rt');
 fid2 = fopen(strcat(input.PyconturbInput_dir,'con_tc_',Name2Save,'.csv'),'wt');
@@ -370,11 +395,10 @@ id = 0;
 a  = fgets(fid);
 while(ischar(a))
     id = id+1;
-    if id==1
+    if id == 1
         a = fgets(fid);
         continue
-    else
-        
+    else       
         fprintf(fid2,a);
     end
     a = fgets(fid);
@@ -382,7 +406,7 @@ end
 fclose('all');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% delete useless files... This could be a problem when read/write rights are not available or when a file is open in pther program
+% Delete useless files. This could be a problem when read/write rights are not available or when a file is open in another program
 delete (strcat(input.PyconturbInput_dir,'con_tc1_',Name2Save,'.csv'))
 delete (strcat(input.PyconturbInput_dir,'Variables1_',Name2Save,'.csv'))
 

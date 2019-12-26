@@ -1,6 +1,9 @@
 %% Header
 %
-% Create the .TimeSer inpt file for turbsim constrained turbulence
+% Create the .TimeSer input file for turbsim constrained turbulence
+%
+% TODO: find a way to cut the time series to avoid the Delta frequency error
+% from turbsim
 %
 % V.Pettas/F.Costa 
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -16,7 +19,7 @@ function [VFinal,t_lidar,Y1,Z1] = Create_Turbsim_Vinput(LidarOutput,input)
     t_lidar = LidarOutput.TS.lidar.time{1, 1}  ;
     nComp   = input.nComp ;
         
-    % DO SOMETHING FOR THE CASE THAT POINTS ARE NOTE THE SAME time stamp!     
+    % DO SOMETHING FOR THE CASE THAT POINTS ARE NOT THE SAME time stamp     
     [Z1,SortedIndex] = sort(Z);
     Y1 = Y(SortedIndex);
     for ind_sort = 1:length(Y1)
@@ -64,7 +67,8 @@ function [VFinal,t_lidar,Y1,Z1] = Create_Turbsim_Vinput(LidarOutput,input)
     end
     
     VFinal = (VFinal(find(CntNan==1),:));  %#ok<FNDSB>    
-    
+
+% TODO:
 %     % Call function for generating turbsim timeusr inputs
 %     % cut the time series to matcvh with the original:
 %     %Here have to add the lines of code that finds the time in which all

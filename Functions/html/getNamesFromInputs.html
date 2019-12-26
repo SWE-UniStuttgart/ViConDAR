@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="getNamesFromInputs.m"><style type="text/css">
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="getNamesFromInputs.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,21 +66,21 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Header</h1><p>function creating the names and relevant variables for all the files requested based on the input file</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> perm_cell = getNamesFromInputs(input)
+  </style></head><body><div class="content"><h1>Header</h1><p>Function creating all the permutations of names and relevant variables for all the files requested based on the input file. It also checks for free inputs varrying without assigned names. Since the code works on a name basis, if a free variable has more than one variation it should be included inthe name.</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> perm_cell = getNamesFromInputs(input)
 
-nameBase = input.nameBase ;
-freeInp  = input.freeInp  ;
-fixedInp = input.fixedInp ;
-AllFixed = input.AllFixed ;
-HiddenIndex= find(ismember(AllFixed,fixedInp(:,1))==0);
+nameBase = input.nameBase;
+freeInp  = input.freeInp;
+fixedInp = input.fixedInp;
+AllFixed = input.AllFixed;
+HiddenIndex  = find(ismember(AllFixed,fixedInp(:,1))==0);
 Hidden.Names = AllFixed(HiddenIndex);
 <span class="comment">%assign values to the fixed inputs cell vector</span>
 <span class="keyword">for</span> iPat=1:numel(input.PatternNames)
-    <span class="keyword">for</span> i = 1:length(fixedInp)
+    <span class="keyword">for</span> i = 1:size(fixedInp,1)
         curNam = fixedInp{i};
         <span class="keyword">if</span> strcmp(curNam,<span class="string">'Pat'</span>)
             fixedInp{i,2} = [iPat];
-        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'Pat'</span>)) &amp;&amp; length(input.PatternNames) ==1
+        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'Pat'</span>)) &amp;&amp; size(input.PatternNames,2) ==1
             index= find(strcmp(Hidden.Names,<span class="string">'Pat'</span>));
             Hidden.Val{index,iPat} = input.PatternNames; <span class="comment">%#ok&lt;*FNDSB&gt;</span>
         <span class="keyword">else</span>
@@ -90,7 +90,7 @@ Hidden.Names = AllFixed(HiddenIndex);
         <span class="keyword">end</span>
         <span class="keyword">if</span> strcmp(curNam,<span class="string">'Tp'</span>)
             fixedInp{i,2} = [input.timestep_pat_vec{iPat}];
-        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'Tp'</span>)) &amp;&amp; length(input.timestep_pat_vec{1}) ==1
+        <span class="keyword">elseif</span> any(strcmp(Hidden.Names,<span class="string">'Tp'</span>)) &amp;&amp; size(input.timestep_pat_vec{1},2) ==1
             index= find(strcmp(Hidden.Names,<span class="string">'Tp'</span>));
             Hidden.Val{index,iPat} = input.timestep_pat_vec{iPat}; <span class="comment">%#ok&lt;*FNDSB&gt;</span>
         <span class="keyword">else</span>
@@ -165,11 +165,11 @@ Hidden.Names = AllFixed(HiddenIndex);
 
 <span class="comment">%Create permutation names for all cases by adding the inputs together</span>
 <span class="comment">%Create names for lidar and processing</span>
-<span class="keyword">for</span> iPat=1:numel(input.PatternNames)
-    totalMat= [freeInp; UserFixed{iPat}];
-    [ArrayVar,VariationPerVariable] = GetVariationArray(totalMat);
+<span class="keyword">for</span> iPat = 1:numel(input.PatternNames)
+    totalMat = [freeInp; UserFixed{iPat}];
+    [ArrayVar,~] = GetVariationArray(totalMat); <span class="comment">% Sorting them and finding all the unique combinations</span>
     TotalArrayVar{iPat} = ArrayVar;
-    <span class="keyword">for</span> iVary = 1:length(ArrayVar)
+    <span class="keyword">for</span> iVary = 1:size(ArrayVar,1)
         <span class="keyword">if</span> ~isempty(HiddenIndex)
             TotalArrayVarVal{iVary,iPat} = [num2cell(ArrayVar{iVary}) Hidden.Val(:,iPat)'];
         <span class="keyword">else</span>
@@ -179,24 +179,24 @@ Hidden.Names = AllFixed(HiddenIndex);
 <span class="keyword">end</span>
 
 <span class="comment">%retrieve names of original windfields</span>
-totalMatWF= [freeInp];
+totalMatWF = [freeInp];
 [ArrayVarWF,~] = GetVariationArray(totalMatWF);
 
 <span class="comment">%Create the total array for processing:</span>
 FinalArrayVar = {};
-<span class="keyword">for</span> i =1:length( TotalArrayVar)
+<span class="keyword">for</span> i = 1:size( TotalArrayVar,2)
     FinalArrayVar = [FinalArrayVar ; TotalArrayVar{i}];
 <span class="keyword">end</span>
 
-<span class="comment">% Create the unoque names concatanating the vairables and assign the values</span>
-<span class="keyword">for</span> iAr =1:length(FinalArrayVar)
+<span class="comment">% Create the unique names concatanating the variables and assign the values</span>
+<span class="keyword">for</span> iAr = 1:size(FinalArrayVar,1)
     CurArray = FinalArrayVar{iAr};
-    CurNam =nameBase;
-    <span class="keyword">for</span>  iVar=1:length(CurArray)  <span class="comment">% in pattern we want tochange the numerical value to string</span>
+    CurNam = nameBase;
+    <span class="keyword">for</span>  iVar = 1:length(CurArray)  <span class="comment">% in pattern we want tochange the numerical value to string</span>
         <span class="keyword">if</span> strcmp(totalMat{iVar},<span class="string">'Pat'</span>)
             CurNam = [CurNam <span class="string">'_'</span>  input.PatternNames{CurArray(iVar)} ];
         <span class="keyword">else</span>
-            <span class="keyword">if</span> mod(CurArray(iVar),1)==0  <span class="comment">% check if the number is integer and change the notation accordingly</span>
+            <span class="keyword">if</span> mod(CurArray(iVar),1) == 0  <span class="comment">% check if the number is integer and change the notation accordingly</span>
                 CurNam = [CurNam <span class="string">'_'</span> totalMat{iVar} num2str(CurArray(iVar),<span class="string">'%02.f'</span>) ];
             <span class="keyword">else</span>
                 CurNam = [CurNam <span class="string">'_'</span> totalMat{iVar} num2str(CurArray(iVar),<span class="string">'%02.1f'</span>) ];
@@ -204,55 +204,57 @@ FinalArrayVar = {};
             CurNam = strrep(CurNam,<span class="string">'.'</span>,<span class="string">'d'</span>);
         <span class="keyword">end</span>
     <span class="keyword">end</span>
-    perm_cell.OutNames{iAr,1} =CurNam;
+    perm_cell.OutNames{iAr,1} = CurNam;
 <span class="keyword">end</span>
 TotalArrayVarVal = reshape(TotalArrayVarVal,numel(TotalArrayVarVal),1);
 <span class="keyword">for</span> i = 1:size(FinalArrayVar,1)
-<span class="comment">%     CurArrayCell = num2cell(CurArray);</span>
-    perm_cell.values(i,:) =TotalArrayVarVal(i,:);
+    perm_cell.values(i,:) = TotalArrayVarVal(i,:);
 <span class="keyword">end</span>
 
 <span class="keyword">if</span> ~isempty(HiddenIndex)
-    perm_cell.variables{:,1} =[totalMat(:,1); Hidden.Names];
+    perm_cell.variables{:,1} = [totalMat(:,1); Hidden.Names];
 <span class="keyword">else</span>
-    perm_cell.variables{:,1} =totalMat(:,1);
+    perm_cell.variables{:,1} = totalMat(:,1);
 <span class="keyword">end</span>
 
 <span class="comment">%Create the total array for creating original WF names:</span>
-<span class="keyword">for</span> iAroWF =1:length(ArrayVarWF)
+<span class="keyword">for</span> iAroWF = 1:length(ArrayVarWF)
     CurArrayOWF = ArrayVarWF{iAroWF};
-    CurNamWF =nameBase;
-    <span class="keyword">for</span>  iVar=1:length(CurArrayOWF)  <span class="comment">% in pattern we want tochange the numerical value to string</span>
+    CurNamWF = nameBase;
+    <span class="keyword">for</span>  iVar = 1:length(CurArrayOWF)  <span class="comment">% in pattern we want to change the numerical value to string</span>
         CurNamWF = [CurNamWF <span class="string">'_'</span> totalMatWF{iVar} num2str(CurArrayOWF(iVar),<span class="string">'%02.f'</span>) ];
         CurNamWF = strrep(CurNamWF,<span class="string">'.'</span>,<span class="string">'d'</span>);
     <span class="keyword">end</span>
-    perm_cell.namesOWF{iAroWF,1} =CurNamWF;
+    perm_cell.namesOWF{iAroWF,1} = CurNamWF;
 <span class="keyword">end</span>
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015b</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Header
 %
-% function creating the names and relevant variables for all the files requested
-% based on the input file
+% Function creating all the permutations of names and relevant variables 
+% for all the files requested based on the input file. It also checks for
+% free inputs varrying without assigned names. Since the code works on a name
+% basis, if a free variable has more than one variation it should be included
+% inthe name.
 %
 % V.Pettas/F.Costa 
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 function perm_cell = getNamesFromInputs(input)
 
-nameBase = input.nameBase ; 
-freeInp  = input.freeInp  ;
-fixedInp = input.fixedInp ;
-AllFixed = input.AllFixed ;
-HiddenIndex= find(ismember(AllFixed,fixedInp(:,1))==0);
+nameBase = input.nameBase; 
+freeInp  = input.freeInp;
+fixedInp = input.fixedInp;
+AllFixed = input.AllFixed;
+HiddenIndex  = find(ismember(AllFixed,fixedInp(:,1))==0);
 Hidden.Names = AllFixed(HiddenIndex);
 %assign values to the fixed inputs cell vector
 for iPat=1:numel(input.PatternNames)
-    for i = 1:length(fixedInp)
+    for i = 1:size(fixedInp,1)
         curNam = fixedInp{i};
         if strcmp(curNam,'Pat')
             fixedInp{i,2} = [iPat];
-        elseif any(strcmp(Hidden.Names,'Pat')) && length(input.PatternNames) ==1
+        elseif any(strcmp(Hidden.Names,'Pat')) && size(input.PatternNames,2) ==1
             index= find(strcmp(Hidden.Names,'Pat'));
             Hidden.Val{index,iPat} = input.PatternNames; %#ok<*FNDSB>
         else
@@ -262,7 +264,7 @@ for iPat=1:numel(input.PatternNames)
         end
         if strcmp(curNam,'Tp')
             fixedInp{i,2} = [input.timestep_pat_vec{iPat}];
-        elseif any(strcmp(Hidden.Names,'Tp')) && length(input.timestep_pat_vec{1}) ==1
+        elseif any(strcmp(Hidden.Names,'Tp')) && size(input.timestep_pat_vec{1},2) ==1
             index= find(strcmp(Hidden.Names,'Tp'));
             Hidden.Val{index,iPat} = input.timestep_pat_vec{iPat}; %#ok<*FNDSB>
         else
@@ -337,11 +339,11 @@ end
 
 %Create permutation names for all cases by adding the inputs together
 %Create names for lidar and processing
-for iPat=1:numel(input.PatternNames)
-    totalMat= [freeInp; UserFixed{iPat}];
-    [ArrayVar,VariationPerVariable] = GetVariationArray(totalMat);
+for iPat = 1:numel(input.PatternNames)
+    totalMat = [freeInp; UserFixed{iPat}];
+    [ArrayVar,~] = GetVariationArray(totalMat); % Sorting them and finding all the unique combinations
     TotalArrayVar{iPat} = ArrayVar;
-    for iVary = 1:length(ArrayVar)
+    for iVary = 1:size(ArrayVar,1)
         if ~isempty(HiddenIndex)
             TotalArrayVarVal{iVary,iPat} = [num2cell(ArrayVar{iVary}) Hidden.Val(:,iPat)'];
         else
@@ -351,24 +353,24 @@ for iPat=1:numel(input.PatternNames)
 end
 
 %retrieve names of original windfields
-totalMatWF= [freeInp];
+totalMatWF = [freeInp];
 [ArrayVarWF,~] = GetVariationArray(totalMatWF);
 
 %Create the total array for processing:
 FinalArrayVar = {};
-for i =1:length( TotalArrayVar)
+for i = 1:size( TotalArrayVar,2)
     FinalArrayVar = [FinalArrayVar ; TotalArrayVar{i}];  
 end
 
-% Create the unoque names concatanating the vairables and assign the values
-for iAr =1:length(FinalArrayVar)
+% Create the unique names concatanating the variables and assign the values
+for iAr = 1:size(FinalArrayVar,1)
     CurArray = FinalArrayVar{iAr};
-    CurNam =nameBase;
-    for  iVar=1:length(CurArray)  % in pattern we want tochange the numerical value to string
+    CurNam = nameBase;
+    for  iVar = 1:length(CurArray)  % in pattern we want tochange the numerical value to string
         if strcmp(totalMat{iVar},'Pat')
             CurNam = [CurNam '_'  input.PatternNames{CurArray(iVar)} ];
         else
-            if mod(CurArray(iVar),1)==0  % check if the number is integer and change the notation accordingly
+            if mod(CurArray(iVar),1) == 0  % check if the number is integer and change the notation accordingly
                 CurNam = [CurNam '_' totalMat{iVar} num2str(CurArray(iVar),'%02.f') ];                
             else
                 CurNam = [CurNam '_' totalMat{iVar} num2str(CurArray(iVar),'%02.1f') ];
@@ -376,29 +378,28 @@ for iAr =1:length(FinalArrayVar)
             CurNam = strrep(CurNam,'.','d');
         end
     end
-    perm_cell.OutNames{iAr,1} =CurNam; 
+    perm_cell.OutNames{iAr,1} = CurNam; 
 end
 TotalArrayVarVal = reshape(TotalArrayVarVal,numel(TotalArrayVarVal),1);
 for i = 1:size(FinalArrayVar,1)
-%     CurArrayCell = num2cell(CurArray);
-    perm_cell.values(i,:) =TotalArrayVarVal(i,:); 
+    perm_cell.values(i,:) = TotalArrayVarVal(i,:); 
 end
 
 if ~isempty(HiddenIndex)
-    perm_cell.variables{:,1} =[totalMat(:,1); Hidden.Names];
+    perm_cell.variables{:,1} = [totalMat(:,1); Hidden.Names];
 else
-    perm_cell.variables{:,1} =totalMat(:,1);    
+    perm_cell.variables{:,1} = totalMat(:,1);    
 end
 
 %Create the total array for creating original WF names:
-for iAroWF =1:length(ArrayVarWF)
+for iAroWF = 1:length(ArrayVarWF)
     CurArrayOWF = ArrayVarWF{iAroWF};
-    CurNamWF =nameBase;
-    for  iVar=1:length(CurArrayOWF)  % in pattern we want tochange the numerical value to string
+    CurNamWF = nameBase;
+    for  iVar = 1:length(CurArrayOWF)  % in pattern we want to change the numerical value to string
         CurNamWF = [CurNamWF '_' totalMatWF{iVar} num2str(CurArrayOWF(iVar),'%02.f') ];
         CurNamWF = strrep(CurNamWF,'.','d');
     end
-    perm_cell.namesOWF{iAroWF,1} =CurNamWF;
+    perm_cell.namesOWF{iAroWF,1} = CurNamWF;
 end
 
 

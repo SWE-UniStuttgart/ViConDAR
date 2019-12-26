@@ -1,6 +1,6 @@
 %% Header
 %
-% function creating the total permutations ofnames and relevant variables 
+% Function creating the total permutations of names and relevant variables 
 % for all the files requested based on the input file
 %
 % V.Pettas/F.Costa 

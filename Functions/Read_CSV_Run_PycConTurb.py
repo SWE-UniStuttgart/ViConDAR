@@ -11,8 +11,10 @@ Created on Wed Jul 10 09:30:19 2019
 
 Read_CSV_Run_PyConturb:
     
-Script that imports outputs from LidarSimulator.m and creates a turbulence Wind field using PyConTurb.
-The output of this script is a turbulence wind field saved in .csv format in order to use it as input for LidarSimulator.m.
+Script that imports outputs from ViConDAR and creates a turbulence Wind field using PyConTurb. It is meant to be called directly 
+from matlab with arguments defined in the matlab code in order to ryn PyConTurb from Matlab. Expects that python is in the root and 
+the base environment is compatible with pyconturb.
+The output of this script is a turbulence wind field saved in .csv format.
 I/O:
     The main inputs are choosen in matlab.
     - Variables contains info about:
@@ -26,22 +28,12 @@ I/O:
         > Turbulence class
     - GridY and gridZ contains info about the used grid of points in space (velocities[m/s])
     - con_df contains info about the velocities of the constrained points along "Total time" in steps of "dt" seconds
-    - PyConTurb_Simulation: Output for LidarSimulator in .csv format.
-    - flag_plot give the user of plotting:
-        > plotting the grid and measurement points.
-        > Visualization of the locations of the constraining points in space.
-        > Visualize the constraining time series
-TODOs
-
-- Do we need all these parts of pyconturb imported  one by one???
-
-- Define inputs for  wsp_func, sig_func, spec_func  can we run it with a list or how?
+    - PyConTurb_Simulation: Output for ViConDAR in .csv format.
 
 """
 #%% Import
 
 import sys 
-#sys.path.append("X:\\Documents\\FranciscoCosta\\GIT_HUB\\LidarSimulator\\LidarSimulator\\pyconturb")
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt  # matplotlib for some plotting
@@ -52,31 +44,23 @@ from pyconturb.sig_models import iec_sig, data_sig # IEC 61400-1 turbulence std 
 from pyconturb import gen_turb, gen_spat_grid, TimeConstraint # generate turbulence, useful helper
 
 # parse arguments
-if len(sys.argv) < 4:
-    condf_name = '..\InputsForConstrainedTurb\PyconturbInput\con_tc_DTU10MW_Sh15_SD01_V08_TI05_5P_Squared.csv'
-    gridy_name = '..\InputsForConstrainedTurb\PyconturbInput\GridY_DTU10MW_Sh15_SD01_V08_TI05_5P_Squared.csv'
-    gridz_name = '..\InputsForConstrainedTurb\PyconturbInput\GridZ_DTU10MW_Sh15_SD01_V08_TI05_5P_Squared.csv'
-    variables_name ='..\InputsForConstrainedTurb\PyconturbInput\Variables_DTU10MW_Sh15_SD01_V08_TI05_5P_Squared.csv'
-    savename = '..\ConstrainedWF\PyConTurbDTU10MW_Sh15_SD01_V08_TI05_5P_SquaredConPyconturb'
-else:
-    condf_name = sys.argv[1]
-    gridy_name = sys.argv[2]
-    gridz_name = sys.argv[3]
-    variables_name = sys.argv[4]
-    savename   = sys.argv[5]
+condf_name = sys.argv[1]
+gridy_name = sys.argv[2]
+gridz_name = sys.argv[3]
+variables_name = sys.argv[4]
+savename   = sys.argv[5]
 
-
-#%%  Reading CSV File from Matlab an running PyConTurb
+#  Reading CSV File from Matlab an running PyConTurb
 
 Variables = pd.read_csv(variables_name,index_col=None)
 GridY = pd.read_csv(gridy_name,index_col=None)
 GridZ = pd.read_csv(gridz_name,index_col=None)
 #import pdb; pdb.set_trace()
 con_df=pd.read_csv(condf_name,index_col=0)
-#
+
 #import pdb; pdb.set_trace()
 
-##              Time Constraints:
+## Time Constraints:
 con_tc =  TimeConstraint(con_df)  # Constraining in time
 con_tc.index = con_tc.index.map(lambda x: float(x) if (x not in 'kxyz') else x)  
                  

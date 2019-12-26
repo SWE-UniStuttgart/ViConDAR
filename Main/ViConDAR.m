@@ -10,37 +10,37 @@
 
 clc;
 close all;
-clear all; %#ok<*CLALL>
+clearvars; 
 tmp = matlab.desktop.editor.getActive;
 cd(fileparts(tmp.Filename));
-addpath (genpath('..\Functions'))
-addpath (genpath('..\Main'))
-addpath (genpath('..\HelpfulStandAlone'))
+% Add functions, Main and HelpfulStandAlone folders to the path
+addpath(genpath('../Functions'))
+addpath(genpath('../Main'))
+addpath(genpath('../HelpfulStandAlone'))
 
-%% Input variables:
+%% Input variables and directory creation
 input = InputParameters(); % Get all the inputs
+perm_cell = getNamesFromInputs(input); % Reading the InputParameters and assign parameters for each name permutation
 
-% Adding directories if do not exist (here because input. should exist):
+% Creating directories if they don't exist (here because input.<path> should exist):
 for indDirec = 1:length(input.AddUserDir)
     FolderName = input.AddUserDir{indDirec};
-    if ~exist(FolderName, 'dir')
+    if ~exist(FolderName,'dir')
         mkdir(FolderName);
     end
 end
 
-perm_cell = getNamesFromInputs(input); % Reading the InputParameters and assign parameters for each name permutation
-
 %% Obtain the lidar output form virtual lidar
 if input.flag_getLidarOutput == 1
     % Loop over requested wind fields
-    for iProcess = 1:length(perm_cell.OutNames)
-        % pass information to getLidarPutput
-        curFileInfo.name   = perm_cell.OutNames{iProcess}  ;
-        curFileInfo.values = perm_cell.values{iProcess}  ;
-        curFileInfo.variables = perm_cell.variables  ;
+    for iProcess = 1:size(perm_cell.OutNames,1)
+        % pass information to getLidarOutput
+        curFileInfo.name   = perm_cell.OutNames{iProcess};
+        curFileInfo.values = perm_cell.values{iProcess};
+        curFileInfo.variables = perm_cell.variables;
         
         % find the corresponding original WF based on names
-        for iName = 1:length(perm_cell.namesOWF)
+        for iName = 1:size(perm_cell.namesOWF,1)
             Indexi = strfind (perm_cell.OutNames{iProcess},perm_cell.namesOWF{iName});
             if Indexi == 1
                 indexvec(iName) = 1;
@@ -49,7 +49,7 @@ if input.flag_getLidarOutput == 1
             end
         end
         curFileInfo.originalWF = perm_cell.namesOWF (find(indexvec==1))  ; %#ok<*FNDSB>
-        Output = getLidarOutput(input,curFileInfo); % Obtain lidar measurementsa
+        Output = getLidarOutput(input,curFileInfo); % Obtain lidar measurements
         disp([curFileInfo.name ' has been processed (' datestr(datetime) '):' ])
     end
     disp('Creating virtual lidar output finished successfully')
@@ -57,9 +57,9 @@ end
 
 %% Obtain the inputs for constraining WF with turbsim
 
-if input.flag_getTurbsimInput==1
-    for iProcess = 1:length(perm_cell.OutNames)
-        % passs information to turbsim input
+if input.flag_getTurbsimInput == 1
+    for iProcess = 1:size(perm_cell.OutNames,1)
+        % pass information to turbsim input
         curFileInfo.name   = perm_cell.OutNames{iProcess};
         curFileInfo.values = perm_cell.values{iProcess};
         curFileInfo.variables = perm_cell.variables  ;
@@ -68,9 +68,9 @@ if input.flag_getTurbsimInput==1
         catch e
             fprintf(1,'The identifier was:\n%s',e.identifier);
             fprintf(1,'There was an error! The message was:\n%s',e.message);
-            error (['Error loading lidar measurements for creating Turbsim inputfile ' curFileInfo.name '. Check if the lidar measurement exists and is in the correct folder.'])
+            error(['Error loading lidar measurements for creating Turbsim inputfile ' curFileInfo.name '. Check if the lidar measurement exists and is in the correct folder.'])
         end
-        [VFinal,t_lidar,Y1,Z1] = Create_Turbsim_Vinput(Output,input); %Creating time series and information needed for turbsim timeSR file 
+        [VFinal,t_lidar,Y1,Z1] = Create_Turbsim_Vinput(Output,input); % Creating time series and information needed for turbsim timeSR file 
         [~,RefNode] = min(abs(Z1-input.Zh)+abs(Y1));
         writeTurbSimTimeSeriesInput([input.TurbSimInput_dir curFileInfo.name '.TimeSer'], curFileInfo.name, VFinal, t_lidar', Y1,Z1,input.nComp,RefNode); % Write time series file for TurbSim
         CreateInpTurbsim([input.TurbSimInput_dir curFileInfo.name '_ConTurbSim.inp'],[curFileInfo.name '.TimeSer'],t_lidar,input,Output); %create .inp file for turbsim based on the template
@@ -81,7 +81,7 @@ end
 %% Obtain the inputs for constraining WF with pyconturb
 
 if input.flag_getPyconturbInput==1
-    for iProcess = 1:length(perm_cell.OutNames)
+    for iProcess = 1:size(perm_cell.OutNames,1) % Get data from all requested wind fields. Based on names it takes variables and values.
         curFileInfo.name   = perm_cell.OutNames{iProcess}  ;
         curFileInfo.values = perm_cell.values{iProcess}  ;
         curFileInfo.variables = perm_cell.variables  ;
@@ -93,8 +93,8 @@ if input.flag_getPyconturbInput==1
             fprintf(1,'There was an error! The message was:\n%s',e.message);
             error (['Error loading lidar measurements for creating Pyconturb input file ' curFileInfo.name '. Check if the lidar measurement exists and is in the correct folder.'])
         end
-        Create_Pyconturb_input(Output,input,curFileInfo.name)% writing the csv files con_tc,variables,gridY and gridZ
-        disp([curFileInfo.name 'input for PyConTurb done'])
+        Create_Pyconturb_input(Output,input,curFileInfo.name)% writing the csv files con_tc,variables,gridY and gridZ we need to run pyconturb
+        disp([curFileInfo.name ' input for PyConTurb done'])
     end
 end
 
@@ -127,11 +127,11 @@ end
 %% Obtain constrained windfield with Turbsim
 
 if input.flag_obtain_Con_Turbsim == 1
-    for iProcess = 1:length(perm_cell.OutNames)  % try parfor here 
-        curFileInfo.name   = perm_cell.OutNames{iProcess};
+    for iProcess = 1:size(perm_cell.OutNames,1)  % try parfor here 
+        curFileInfo.name   = perm_cell.OutNames{iProcess}; 
         curFileInfo.values = perm_cell.values{iProcess};
         curFileInfo.variables = perm_cell.variables;
-        filenamTurbSimConInp  =  [curFileInfo.name];
+        filenamTurbSimConInp  =  [curFileInfo.name]; 
         RunTurbSimCon_WF(input,filenamTurbSimConInp) % runs turbsim with system command
     end
 end
@@ -139,7 +139,7 @@ end
 %% Obtain constrained windfield with Pyconturb running from matlab
 
 if input.flag_obtain_Con_Pyconturb_Matlab ==1
-    for iProcess = 1:length(perm_cell.OutNames)
+    for iProcess = 1:size(perm_cell.OutNames,1)
         curFileInfo.name = perm_cell.OutNames{iProcess};
         RunPyconturb_Con_WF(input,curFileInfo.name) % requires python.exe path with PyConturb compatible environment
     end
@@ -147,16 +147,18 @@ end
 
 %% Obtain constrained windfield with Pyconturb running externally with python wrapper
 
-if input.flag_obtain_Con_Pyconturb_python ==1
-    for iProcess = 1:length(perm_cell.OutNames)
+if input.flag_obtain_Con_Pyconturb_python == 1
+    for iProcess = 1:size(perm_cell.OutNames,1)
         curFileInfo.name = perm_cell.OutNames{iProcess};
-        %create names for python wrapper
+        %create names for the python wrapper
         Pythonwrapperin{iProcess,1} = [input.PyconturbInput_dir 'con_tc_' curFileInfo.name '.csv,' input.PyconturbInput_dir 'GridY_' curFileInfo.name '.csv,' input.PyconturbInput_dir 'GridZ_' curFileInfo.name '.csv,' input.PyconturbInput_dir 'Variables_' curFileInfo.name '.csv,' input.PyconturbOut_dir curFileInfo.name '_ConPyconturb.csv']; %#ok<*SAGROW>
     end
-    % write a .csv file with all the inputs for the python wrapper
+    % write a .csv file with all the inputs for the python wrapper. It will
+    % be read from PyConTurb. Wrapper.csv is saved in the same folder as the
+    % rest of .csv files
     disp('Starting creating input for python wrapper for PyConTurb')
     filePh = fopen([input.PyconturbInput_dir 'PythonWrapperInput.csv'],'w');
-    for iNamCsv = 1:length(Pythonwrapperin)+1
+    for iNamCsv = 1:size(Pythonwrapperin,1)+1
         if   iNamCsv == 1
             fprintf(filePh,'%s\n','contc,gridy,gridz,variables,savename');
         else
@@ -168,7 +170,7 @@ if input.flag_obtain_Con_Pyconturb_python ==1
     % After having finished the simulation in python this part translates CSV
     % to global windfield .mat format
     if input.flag_obtain_Con_Pyconturb_ConverToMat == 1
-        for iProcess = 1:length(perm_cell.OutNames)
+        for iProcess = 1:size(perm_cell.OutNames,1)
             curFileInfo.name = perm_cell.OutNames{iProcess};
             Pyconturb_CSV2MAT(input,curFileInfo.name)
         end
@@ -178,14 +180,14 @@ end
 %% Calculate statistics from full wind fields
 if input.flag_calculate_fullWF_statistics == 1
     disp('Starting calculations of statistics for full wind fields ')
-    for iProcess = 1:length(perm_cell.OutNames)
+    for iProcess = 1:size(perm_cell.OutNames,1)
         % pass required information about windfields
         curFileInfo.name   = perm_cell.OutNames{iProcess}  ;
         curFileInfo.values = perm_cell.values{iProcess}  ;
         curFileInfo.variables = perm_cell.variables  ;
         
-        % find the corresponding original WF
-        for iName = 1:length(perm_cell.namesOWF)
+        % find the corresponding original WF 
+        for iName = 1:size(perm_cell.namesOWF,1)
             Indexi = strfind (perm_cell.OutNames{iProcess},perm_cell.namesOWF{iName});
             if Indexi == 1
                 indexvec(iName) = 1;

@@ -1,6 +1,6 @@
 %% Header
 %
-% Create Turbsim time .TimeSer input
+% Create turbsim .TimeSer input
 %
 % forked from OpenFAST NREL repository and modified by SWE
 
@@ -90,4 +90,3 @@ elseif nComp==1
     end
 end
 fclose(fid);
-

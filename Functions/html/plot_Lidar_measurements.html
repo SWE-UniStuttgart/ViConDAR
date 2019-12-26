@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-11-12"><meta name="DC.source" content="plot_Lidar_measurements.m"><style type="text/css">
+      --><title>Header</title><meta name="generator" content="MATLAB 8.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-12-26"><meta name="DC.source" content="plot_Lidar_measurements.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,43 +66,42 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Header</h1><p>Plotting the lidar outputs</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> plot_Lidar_measurements(input,perm_cell)
+  </style></head><body><div class="content"><h1>Header</h1><p>Plotting the lidar outputs. Comparison of original time series and lidar measurements and convergence metrics.</p><p>V.Pettas/F.Costa University of Stuttgart, Stuttgart Wind Energy (SWE) 2019</p><pre class="codeinput"><span class="keyword">function</span> plot_Lidar_measurements(input,perm_cell)
 
-
-<span class="comment">%get names of files with lidar outputs that have the same name base, free inputs</span>
-<span class="comment">%and pattern to plot them together</span>
+<span class="comment">% get names of files with lidar outputs that have the same name base, free inputs</span>
+<span class="comment">% and pattern to plot them together</span>
 PatInd = find(strcmp((perm_cell.variables{1, 1}),<span class="string">'Pat'</span>)==1);
 FreeInpInd = size(input.freeInp,1);
 MatchInd = [1:FreeInpInd PatInd];
 
 <span class="comment">%find all combination of same inputs</span>
-<span class="keyword">for</span> iRow1 = 1:length(perm_cell.values)
-    <span class="keyword">for</span> iRow2 = 1:length(perm_cell.values)
-        Comb(iRow1,iRow2)= isequal (cell2mat(perm_cell.values {iRow1,1}(1,MatchInd)),cell2mat(perm_cell.values{iRow2,1}(1,MatchInd)));
+<span class="keyword">for</span> iRow1 = 1:size(perm_cell.values,1)
+    <span class="keyword">for</span> iRow2 = 1:size(perm_cell.values,1)
+        Comb(iRow1,iRow2) = isequal(cell2mat(perm_cell.values {iRow1,1}(1,MatchInd)),cell2mat(perm_cell.values{iRow2,1}(1,MatchInd)));
     <span class="keyword">end</span>
 <span class="keyword">end</span>
-TotalComb =unique(Comb,<span class="string">'rows'</span>); <span class="comment">% get only the unique combinations</span>
+TotalComb = unique(Comb,<span class="string">'rows'</span>); <span class="comment">% get only the unique combinations</span>
 
-<span class="comment">%Cases that should be plot together:</span>
-<span class="keyword">for</span> iComb =1:size(TotalComb,1)
-    iTotalComb = (TotalComb(iComb,:));
-    Case{iComb} = find (iTotalComb==1); <span class="comment">%#ok&lt;*AGROW&gt;</span>
+<span class="comment">% Cases that should be plot together:</span>
+<span class="keyword">for</span> iComb = 1:size(TotalComb,1)
+    iTotalComb  = (TotalComb(iComb,:));
+    Case{iComb} = find(iTotalComb==1); <span class="comment">%#ok&lt;*AGROW&gt;</span>
 <span class="keyword">end</span>
 
-<span class="keyword">for</span> iCase =1:length(Case) <span class="comment">%loop over the groups of cases</span>
+<span class="keyword">for</span> iCase = 1:size(Case,2) <span class="comment">%loop over the groups of cases</span>
     curCase = Case{iCase};
-    <span class="comment">%plot all lidar points</span>
+    <span class="comment">% plot all lidar points</span>
     <span class="keyword">for</span> iPoint = 1:length(input.PatternY{perm_cell.values{curCase(1),1}{1,PatInd},1}) <span class="comment">% loop over pattern points</span>
         figure
-        <span class="keyword">for</span> iCase1=1:length(curCase) <span class="comment">%loop over different cases for the same point in the pattern</span>
+        <span class="keyword">for</span> iCase1 = 1:length(curCase) <span class="comment">%loop over different cases for the same point in the pattern</span>
             curNam = perm_cell.OutNames{curCase(iCase1),1};
             <span class="keyword">try</span>
                 load ([input.LidarOutput_dir curNam <span class="string">'.mat'</span>])
             <span class="keyword">catch</span>
                 error([<span class="string">'Could not find lidar ouptut file '</span> input.LidarOutput_dir curNam <span class="string">'.mat'</span>])
             <span class="keyword">end</span>
-            <span class="keyword">if</span> iCase1==1
-                <span class="comment">%                 plot(Output.TS.fullWF.time,Output.TS.fullWF.Uval{1, ii})</span>
+            <span class="keyword">if</span> iCase1 == 1
+                <span class="comment">%  plot(Output.TS.fullWF.time,Output.TS.fullWF.Uval{1, ii})</span>
                 plot(Output.TS.fullWF.time,Output.TS.fullWF.Uval{1, iPoint}, Output.TS.lidar.time{1, iPoint},Output.TS.lidar.Uval{1, iPoint},<span class="string">'LineWidth'</span>,1.5)
                 legCell = {<span class="string">'Original WF'</span>, curNam};
             <span class="keyword">else</span>
@@ -122,19 +121,18 @@ TotalComb =unique(Comb,<span class="string">'rows'</span>); <span class="comment
     <span class="keyword">end</span>
     clear <span class="string">curNam</span>
 
-    <span class="comment">%plot Shear</span>
+    <span class="comment">% plot Shear</span>
     figure
-    <span class="keyword">for</span> iCase2=1:length(curCase) <span class="comment">%loop over different cases for the group of cases</span>
+    <span class="keyword">for</span> iCase2 = 1:length(curCase) <span class="comment">%loop over different cases for the group of cases</span>
         curNam = perm_cell.OutNames{curCase(iCase2),1};
         load ([input.LidarOutput_dir curNam <span class="string">'.mat'</span>])
-        <span class="keyword">if</span> iCase2==1
+        <span class="keyword">if</span> iCase2 == 1
             plot(Output.TS.fullWF.time,Output.Shear.fullWF.TS,Output.Shear.lidar.TSTime,Output.Shear.lidar.TS,<span class="string">'LineWidth'</span>,1.5)
             legCell = {<span class="string">'Original WF'</span>, curNam};
         <span class="keyword">else</span>
             plot(Output.Shear.lidar.TSTime,Output.Shear.lidar.TS,<span class="string">'LineWidth'</span>,1.5)
             legCell{1,end+1} = curNam;
         <span class="keyword">end</span>
-
         grid <span class="string">on</span>
         hold <span class="string">on</span>
     <span class="keyword">end</span>
@@ -146,19 +144,18 @@ TotalComb =unique(Comb,<span class="string">'rows'</span>); <span class="comment
     clear <span class="string">curNam</span>
     hold <span class="string">off</span>
 
-    <span class="comment">%plot Shear</span>
+    <span class="comment">% plot REWS</span>
     figure
-    <span class="keyword">for</span> iCase2=1:length(curCase) <span class="comment">%loop over different cases for the group of cases</span>
+    <span class="keyword">for</span> iCase2 = 1:length(curCase) <span class="comment">%loop over different cases for the group of cases</span>
         curNam = perm_cell.OutNames{curCase(iCase2),1};
         load ([input.LidarOutput_dir curNam <span class="string">'.mat'</span>])
-        <span class="keyword">if</span> iCase2==1
+        <span class="keyword">if</span> iCase2 == 1
             plot(Output.TS.fullWF.time,Output.REWS.fullWF.TS,Output.REWS.lidar.TSTime,Output.REWS.lidar.TS,<span class="string">'LineWidth'</span>,1.5)
             legCell = {<span class="string">'Original WF'</span>, curNam};
         <span class="keyword">else</span>
             plot(Output.REWS.lidar.TSTime,Output.REWS.lidar.TS,<span class="string">'LineWidth'</span>,1.5)
             legCell{1,end+1} = curNam;
         <span class="keyword">end</span>
-
         grid <span class="string">on</span>
         hold <span class="string">on</span>
     <span class="keyword">end</span>
@@ -174,48 +171,48 @@ TotalComb =unique(Comb,<span class="string">'rows'</span>); <span class="comment
 ##### SOURCE BEGIN #####
 %% Header
 %
-% Plotting the lidar outputs
+% Plotting the lidar outputs. Comparison of original time series and lidar
+% measurements and convergence metrics.
 %
 % V.Pettas/F.Costa
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 function plot_Lidar_measurements(input,perm_cell)
 
-
-%get names of files with lidar outputs that have the same name base, free inputs
-%and pattern to plot them together
+% get names of files with lidar outputs that have the same name base, free inputs
+% and pattern to plot them together
 PatInd = find(strcmp((perm_cell.variables{1, 1}),'Pat')==1);
 FreeInpInd = size(input.freeInp,1);
 MatchInd = [1:FreeInpInd PatInd];
 
 %find all combination of same inputs
-for iRow1 = 1:length(perm_cell.values)
-    for iRow2 = 1:length(perm_cell.values)
-        Comb(iRow1,iRow2)= isequal (cell2mat(perm_cell.values {iRow1,1}(1,MatchInd)),cell2mat(perm_cell.values{iRow2,1}(1,MatchInd)));
+for iRow1 = 1:size(perm_cell.values,1)
+    for iRow2 = 1:size(perm_cell.values,1)
+        Comb(iRow1,iRow2) = isequal(cell2mat(perm_cell.values {iRow1,1}(1,MatchInd)),cell2mat(perm_cell.values{iRow2,1}(1,MatchInd)));
     end
 end
-TotalComb =unique(Comb,'rows'); % get only the unique combinations
+TotalComb = unique(Comb,'rows'); % get only the unique combinations
 
-%Cases that should be plot together:
-for iComb =1:size(TotalComb,1)
-    iTotalComb = (TotalComb(iComb,:));
-    Case{iComb} = find (iTotalComb==1); %#ok<*AGROW>
+% Cases that should be plot together:
+for iComb = 1:size(TotalComb,1)
+    iTotalComb  = (TotalComb(iComb,:));
+    Case{iComb} = find(iTotalComb==1); %#ok<*AGROW>
 end
 
-for iCase =1:length(Case) %loop over the groups of cases
+for iCase = 1:size(Case,2) %loop over the groups of cases
     curCase = Case{iCase};
-    %plot all lidar points
+    % plot all lidar points
     for iPoint = 1:length(input.PatternY{perm_cell.values{curCase(1),1}{1,PatInd},1}) % loop over pattern points
         figure
-        for iCase1=1:length(curCase) %loop over different cases for the same point in the pattern
+        for iCase1 = 1:length(curCase) %loop over different cases for the same point in the pattern
             curNam = perm_cell.OutNames{curCase(iCase1),1};
             try
                 load ([input.LidarOutput_dir curNam '.mat'])
             catch
                 error(['Could not find lidar ouptut file ' input.LidarOutput_dir curNam '.mat'])
             end
-            if iCase1==1
-                %                 plot(Output.TS.fullWF.time,Output.TS.fullWF.Uval{1, ii})
+            if iCase1 == 1
+                %  plot(Output.TS.fullWF.time,Output.TS.fullWF.Uval{1, ii})
                 plot(Output.TS.fullWF.time,Output.TS.fullWF.Uval{1, iPoint}, Output.TS.lidar.time{1, iPoint},Output.TS.lidar.Uval{1, iPoint},'LineWidth',1.5)
                 legCell = {'Original WF', curNam};
             else
@@ -235,19 +232,18 @@ for iCase =1:length(Case) %loop over the groups of cases
     end
     clear curNam
     
-    %plot Shear
+    % plot Shear
     figure
-    for iCase2=1:length(curCase) %loop over different cases for the group of cases
+    for iCase2 = 1:length(curCase) %loop over different cases for the group of cases
         curNam = perm_cell.OutNames{curCase(iCase2),1};
         load ([input.LidarOutput_dir curNam '.mat'])
-        if iCase2==1
+        if iCase2 == 1
             plot(Output.TS.fullWF.time,Output.Shear.fullWF.TS,Output.Shear.lidar.TSTime,Output.Shear.lidar.TS,'LineWidth',1.5)
             legCell = {'Original WF', curNam};
         else
             plot(Output.Shear.lidar.TSTime,Output.Shear.lidar.TS,'LineWidth',1.5)
             legCell{1,end+1} = curNam;
-        end
-        
+        end      
         grid on
         hold on
     end
@@ -259,19 +255,18 @@ for iCase =1:length(Case) %loop over the groups of cases
     clear curNam
     hold off
     
-    %plot Shear
+    % plot REWS
     figure
-    for iCase2=1:length(curCase) %loop over different cases for the group of cases
+    for iCase2 = 1:length(curCase) %loop over different cases for the group of cases
         curNam = perm_cell.OutNames{curCase(iCase2),1};
         load ([input.LidarOutput_dir curNam '.mat'])
-        if iCase2==1
+        if iCase2 == 1
             plot(Output.TS.fullWF.time,Output.REWS.fullWF.TS,Output.REWS.lidar.TSTime,Output.REWS.lidar.TS,'LineWidth',1.5)
             legCell = {'Original WF', curNam};
         else
             plot(Output.REWS.lidar.TSTime,Output.REWS.lidar.TS,'LineWidth',1.5)
             legCell{1,end+1} = curNam;
-        end
-        
+        end       
         grid on
         hold on
     end
@@ -283,8 +278,6 @@ for iCase =1:length(Case) %loop over the groups of cases
     clear curNam curCase
     hold off
 end
-
-
 
 ##### SOURCE END #####
 --></body></html>

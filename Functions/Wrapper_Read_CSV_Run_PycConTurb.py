@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Script to process all requested inputs for constraining turbulence with Pyconturb
-with ViConDAR
+with ViConDAR. It is meant to run as a wrapper outside ViConDAR
 
 Authors: V.Pettas/F.Costa
 University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -39,7 +39,7 @@ abspath = os.path.abspath(__file__)
 dname   = os.path.dirname(abspath)
 os.chdir(dname)
 
-Input = pd.read_csv(r'..\InputsForConstrainedTurb\PyconturbInput\PythonWrapperInput.csv',index_col=None)   
+Input = pd.read_csv(r'../InputsForConstrainedTurb/PyconturbInput/PythonWrapperInput.csv',index_col=None)   
 
 #%%
 for i in range(0,Input.shape[0]):
@@ -73,13 +73,11 @@ for i in range(0,Input.shape[0]):
         elif wsp_funcin=='constant_profile':
             wsp_func = constant_profile
         elif wsp_funcin=='data_profile':
-            wsp_func = data_profile
-    #        wsp_func(GridY.iloc[0, :],GridZ.iloc[0, :],con_tc=None,**kwargs)                  
+            wsp_func = data_profile               
         if sig_funcin=='iec_sig':
            sig_func = iec_sig  
         elif sig_funcin=='data_sig':
-           sig_func = data_sig       
-    #       sig_func(0,GridY.iloc[0, :],GridZ.iloc[0, :],**kwargs)      data_spectrum should be used            
+           sig_func = data_sig          
         if spec_funcin=='kaimal_spectrum':
            spec_func = kaimal_spectrum
         elif spec_funcin=='data_spectrum':
@@ -94,7 +92,6 @@ for i in range(0,Input.shape[0]):
     # Executing PyConTurb
     if interp_data2=="Take_list":
         # import pdb; pdb.set_trace()
-#        sim_turb_df = gen_turb(spat_df,con_tc=con_tc, wsp_func=interp_data[0],sig_func=interp_data[1],spec_func=interp_data[2],coh_model_in=Variables.iloc[0, 5],**kwargs)
         sim_turb_df = gen_turb(spat_df,con_tc=con_tc, wsp_func=interp_data[0],sig_func=interp_data[1],spec_func=interp_data[2],nf_chunk= nf_chunkin,verbose=True,**kwargs)
     else:
         sim_turb_df = gen_turb(spat_df,con_tc=con_tc,interp_data=interp_data, **kwargs)
