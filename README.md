@@ -57,3 +57,20 @@ In order to report a bug or a feature request as well as any other comment pleas
 If you use ViConDAR for a publication, use the following citation:
 
 Pettas V, Costa García F, Kretschmer M, Rinker JM, Clifton A, Cheng PW. A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations. In: AIAA Scitech 2020 Forum. American Institute of Aeronautics and Astronautics; 2020:1-6. doi:10.2514/6.2020-0993
+
+or in .bib format: 
+
+@inproceedings{Pettas2020,
+address = {Reston, Virginia},
+author = {Pettas, Vasilis and {Costa Garc{\'{i}}a}, Francisco and Kretschmer, Matthias and Rinker, Jennifer M. and Clifton, Andrew and Cheng, Po Wen},
+booktitle = {AIAA Scitech 2020 Forum},
+doi = {10.2514/6.2020-0993},
+isbn = {978-1-62410-595-1},
+month = {jan},
+number = {January},
+pages = {1--6},
+publisher = {American Institute of Aeronautics and Astronautics},
+title = {{A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations}},
+url = {https://arc.aiaa.org/doi/10.2514/6.2020-0993},
+year = {2020}
+}
