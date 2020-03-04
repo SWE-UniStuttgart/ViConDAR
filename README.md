@@ -48,7 +48,7 @@ In order to report a bug or a feature request as well as any other comment pleas
 - The framework is developed and tested with Matlab 2015b 64bit. We have done some tests with Matlab 2018b 64bit but not all functionalities are guaranteed to work properly.
 
 ## Resources
-1. A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations V.Pettas, F.Costa Garcia, M. Kretschmer, J. Rinker, A. Clifton, P.W. Cheng
+1. Pettas V, Costa García F, Kretschmer M, Rinker JM, Clifton A, Cheng PW. A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations. In: AIAA Scitech 2020 Forum. American Institute of Aeronautics and Astronautics; 2020:1-6. doi:10.2514/6.2020-0993
 2. Rinker, J. M., “PyConTurb: an open-source constrained turbulence generator,” Journal of Physics: Conference Series, Vol.
 1037, 2018, p. 062032. URL http://stacks.iop.org/1742-6596/1037/i=6/a=062032?key=crossref.e906e6eebbe4b3f8b1b8ad8e740718b1.
 3. NWTC Information Portal (Alpha Versions).  https://nwtc.nrel.gov/Alphas. Last modified 14-June-2016 ;
@@ -56,5 +56,21 @@ In order to report a bug or a feature request as well as any other comment pleas
 ## Citing
 If you use ViConDAR for a publication, use the following citation:
 
-A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations  V.Pettas, F.Costa Garcia, M. Kretschmer, J. Rinker, A. Clifton, P.W. Cheng
+Pettas V, Costa García F, Kretschmer M, Rinker JM, Clifton A, Cheng PW. A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations. In: AIAA Scitech 2020 Forum. American Institute of Aeronautics and Astronautics; 2020:1-6. doi:10.2514/6.2020-0993
 
+or in .bib format: 
+
+@inproceedings{Pettas2020,
+address = {Reston, Virginia},
+author = {Pettas, Vasilis and {Costa Garc{\'{i}}a}, Francisco and Kretschmer, Matthias and Rinker, Jennifer M. and Clifton, Andrew and Cheng, Po Wen},
+booktitle = {AIAA Scitech 2020 Forum},
+doi = {10.2514/6.2020-0993},
+isbn = {978-1-62410-595-1},
+month = {jan},
+number = {January},
+pages = {1--6},
+publisher = {American Institute of Aeronautics and Astronautics},
+title = {{A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations}},
+url = {https://arc.aiaa.org/doi/10.2514/6.2020-0993},
+year = {2020}
+}
