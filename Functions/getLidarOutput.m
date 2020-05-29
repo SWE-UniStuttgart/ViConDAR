@@ -328,7 +328,14 @@ end
 %TODO: maybe add an option to calculate shear on every nth slice of the full field to reduce time
 
 zero_valueY = find(gridy==0);
+if isempty(zero_valueY) 
+    [~,zero_valueY] =min(abs(gridy)); % dirty fix for case where the grid does not include (0,0)
+end
 zero_valueZ = find(gridz==0);
+if isempty(zero_valueZ) 
+    [~,zero_valueZ] =min(abs(gridz));   % dirty fix for case where the grid does not include (0,0)
+end
+
 z_vec_Shear = (gridz)+Zh; %create vector of heights
 Vhub_shear  = compU(zero_valueZ,:,zero_valueY); %Velocity u at the hub height
 
