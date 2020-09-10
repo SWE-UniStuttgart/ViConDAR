@@ -71,6 +71,6 @@ number = {January},
 pages = {1--6},
 publisher = {American Institute of Aeronautics and Astronautics},
 title = {{A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations}},
-url = {https://arc.aiaa.org/doi/10.2514/6.2020-0993},
+url = {https://doi.org/10.2514/6.2020-0993},
 year = {2020}
 }
