@@ -43,16 +43,17 @@ In order to report a bug or a feature request as well as any other comment pleas
 
 ## Dependencies - Requirements
 - The input windfields files can be created with any kind of turbulence generator as long as they are convereted to the global Vicondar format. An example of the structure of such a file is included in the test files folder (TEST_Sh25_SD01_V15_TI05.mat). Currently Turbsim by NREL (https://github.com/OpenFAST/openfast/tree/master/modules/turbsim) and Mann turbulence generator by DTU (https://github.com/OpenFAST/openfast/tree/master/modules/turbsim) are directly supported with relevant functions in the functions and HelpfulStandAlone folders of this repository. The python script for converting the Mann format to the Vicondar format is written by Davide Conti from DTU Wind Energy.
-- Currently the constrained turbulence generators connected to ViConDAR are Turbsim V2.00 Alpha (https://github.com/OpenFAST/openfast/tree/master/modules/turbsim) and PyConTurb (https://gitlab.windenergy.dtu.dk/pyconturb/pyconturb). The turbsim executable is also included in the present repository compiled by SWE (Matthias Kretschmer) including some relevant bug fixes from NREL as well as some additional input options.
+- Currently the constrained turbulence generators connected to ViConDAR are Turbsim V2.00 Alpha from NREL (https://github.com/OpenFAST/openfast/tree/master/modules/turbsim), PyConTurb from DTU (https://gitlab.windenergy.dtu.dk/pyconturb/pyconturb) and Nikolay Dimitrov's method from DTU. The turbsim executable is included in the present repository compiled by SWE (Matthias Kretschmer) including some relevant bug fixes from NREL as well as some additional input options. A version of PyConTurb is also included although the user is encouraged to update to the latest version from the repository. Dimitrov's method is implemented in python by Davide Conti from DTU who developed the scripts included here.
 - Some functions regarding reading and writing .wnd files are created and distributed as open source by NREL. We have slightly modified some of them for our purposes and added them in this repository. Exact details can be found in the headers of the source code. 
 - Python(>=v3.5) has to be installed in the system. The path to the correct python.exe corresponding to the python environment including PyConTurb and its dependencies has to be explicitly stated in the InputParameters file.  
 - The framework is developed and tested with Matlab 2015b 64bit. We have done some tests with Matlab 2018b 64bit but not all functionalities are guaranteed to work properly.
 
 ## Resources
-1. Pettas V, Costa García F, Kretschmer M, Rinker JM, Clifton A, Cheng PW. A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations. In: AIAA Scitech 2020 Forum. American Institute of Aeronautics and Astronautics; 2020:1-6. doi:10.2514/6.2020-0993
-2. Rinker, J. M., “PyConTurb: an open-source constrained turbulence generator,” Journal of Physics: Conference Series, Vol.
+1. Pettas V., Costa García F., Kretschmer M., Rinker J.M., Clifton A., Cheng P.W., “A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations”. In: AIAA Scitech 2020 Forum. American Institute of Aeronautics and Astronautics; 2020:1-6. doi:10.2514/6.2020-0993
+2. Rinker, J. M., “PyConTurb: an open-source constrained turbulence generator”, Journal of Physics: Conference Series, Vol.
 1037, 2018, p. 062032. URL http://stacks.iop.org/1742-6596/1037/i=6/a=062032?key=crossref.e906e6eebbe4b3f8b1b8ad8e740718b1.
 3. NWTC Information Portal (Alpha Versions).  https://nwtc.nrel.gov/Alphas. Last modified 14-June-2016 ;
+4. Dimitrov N., Natarajan A., “Application of simulated lidar scanning patterns to constrained Gaussian turbulence fields for load validation”, 2017, Wind Energ., 20: 79– 95. https://doi.org/10.1002/we.1992 .
 
 ## Citing
 If you use ViConDAR for a publication, use the following citation:
