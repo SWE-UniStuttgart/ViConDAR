@@ -4,6 +4,7 @@
 *.sum
 *.csv
 *.mat
+*.bin
 !TestFiles/TEST_Sh25_SD01_V15_TI05.mat #keep only the test file
 
 # Ignore the folders with data
