@@ -78,3 +78,8 @@ title = {{A numerical framework for constraining synthetic wind fields with lida
 url = {https://doi.org/10.2514/6.2020-0993 },
 year = {2020}
 }
+
+## Code development and maintenance
+Vasilis Pettas, Unisversity of Suttgart, Stuttgart Wind Energy (SWE) ORCID: 0000-0001-9985-9031
+
+Francisco Costa, Unisversity of Suttgart, Stuttgart Wind Energy (SWE) ORCID: 0000-0001-7822-3317
