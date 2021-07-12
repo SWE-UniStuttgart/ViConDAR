@@ -92,7 +92,8 @@ else %if you don't interpolate get the closest point
             
         end
         if length(LOS_points.slicesAv) ~= 1            
-            VFinalTotal_Time{i1} = mean(VFinalTotal_TimeInt2,'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in th LOS            
+            VFinalTotal_Time{i1} = mean(VFinalTotal_TimeInt2,'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in th LOS
+            
         else
             VFinalTotal_Time{i1} = VFinalTotal_TimeInt2;
         end
