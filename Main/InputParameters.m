@@ -45,9 +45,9 @@ input.AllFixed = {'Pat';'Ns';'Tp';'Tm';'Pos';'Fd' ;'DAv';'SlAv'};
 %Wrapper global flags to choose the functionality
 input.flag_getLidarOutput     = 1; % Obtain data for comparison between original and lidar measured WF
 input.flag_getTurbsimInput    = 1; % Obtain inputs to create constrained windfield with turbsim
-input.flag_getPyconturbInput  = 1; % Obtain inputs to create constrained windfield with pyconturb
+input.flag_getPyconturbInput  = 0; % Obtain inputs to create constrained windfield with pyconturb
 input.flag_obtain_Con_Turbsim = 1; % Run turbsim and obtain constrained wind field
-input.flag_obtain_Con_Pyconturb_Matlab   = 1; % Run pyconturb and obtain constrained wind field through matlab
+input.flag_obtain_Con_Pyconturb_Matlab   = 0; % Run pyconturb and obtain constrained wind field through matlab
 input.flag_obtain_Con_Pyconturb_python   = 0; % Run pyconturb and obtain constrained wind field through the Python wrapper
 input.flag_obtain_Con_Pyconturb_ConverToMat = 0; % After simulation is done with python run this to obtain the windfiels in matlab for further processing with ViConDAR. This flag has to be used together with flag_obtain_Con_Pyconturb_python
 input.flag_calculate_fullWF_statistics = 1; % Calculate statistics from full wind fields (constrained and/or original). Code looks in all folders using the names provided as input
@@ -163,9 +163,9 @@ input.interp_data = 'Take_list'; % Could be 'all','none' or 'Take_list'. If 'Tak
 %% Plotting options
 
 input.points_plot_WF_timeseries = [-54 70 0 45; 54 70 0 -63]; % point in meters on the grid to plot -->[Y;Z] y=-Ymax:dy:Ymax, z=-Zmax:dz:Zmax. The code will find the closest grid point and plot it
-input.plot_WF_timeseries_Pyconturb = 1 ; % use constrained windfields with pyconturb for timeseries
+input.plot_WF_timeseries_Pyconturb = 0 ; % use constrained windfields with pyconturb for timeseries
 input.plot_WF_timeseries_Turbsim = 1 ; % use constrained windfields with turbsim for timeseries
 
 input.time_fullWF_Slices = [52 100]; % slices in time [s]
-input.plot_WF_slices_Pyconturb = 1; % use constrained windfields with pyconturb for plotting slices
+input.plot_WF_slices_Pyconturb = 0; % use constrained windfields with pyconturb for plotting slices
 input.plot_WF_slices_Turbsim = 1;   % use constrained windfields with turbsim for plotting slices
