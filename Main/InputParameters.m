@@ -57,7 +57,7 @@ input.flag_apply_noise      = 1; % Apply noise to measured points
 input.flag_apply_LOS        = 1; % Apply Line of sight of LiDAR
 input.flag_apply_weightREWS = 1; % Weight for the length of the blade for REWS caclulation
 input.flag_resampling       = 0; % Apply resampling to the lidar measurments. Currently based on frequency domain zero padding
-
+input.flag_probe_weighting  = "mean"; % "mean" for simple averaging, "gaussian" Gaussian weighting mean 
 % Flags for plotting options
 input.flag_plot_lidar          = 1; % plot lidar measurements vs original windfield
 input.flag_plot_WF_timeseries  = 1; % plot points from the grids of windfields the code will look for all constrained and original windfields with the same name and plot if they exist
@@ -77,7 +77,7 @@ input.timeStep_Measurements = {[0 1] [0]}; %Time step between each single measur
 input.ref_plane_dist = [250]; % Reference Plane for LOS (distance[m])
 input.Pos_LiDAR      = [0,0]; % LiDAR position offset from hub center(meters)==> [Y,Z]. It cannot be used to loop over it. It has to be fixed for now
 input.distance_av_space = [30]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and afer the range gate center point
-input.points_av_slice   = [5]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
+input.points_av_slice   = [10]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
 input.noise_U = [20]; % magnitude of noise to be applied in U time series (see help of awgn function)
 
 input.noise_V = input.noise_U; % magnitude of noise to be applied in V time series (see help of awgn function)

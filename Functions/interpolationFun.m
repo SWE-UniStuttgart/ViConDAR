@@ -79,7 +79,7 @@ else %if you don't interpolate get the closest point
             indLoopT2 = indLoopT;
             indNEg = find(indLoopT<=0); % find negative, zeros or Nans
             indNEg =  [indNEg find(isnan(indLoopT))]; % find negative or Nans
-            indNEg = [indNEg find(indLoopT>size(component,2))]; % findd points outside of the grid
+            indNEg = [indNEg find(indLoopT>size(component,2))]; % find points outside of the grid
             indLoopT2(indNEg) = [];
             VFinalTotal_TimeInt{iTSlice} = squeeze(component(PoinInd{i1}(2,iTSlice), indLoopT2 ,PoinInd{i1}(1,iTSlice)));    %
             
@@ -91,6 +91,7 @@ else %if you don't interpolate get the closest point
             VFinalTotal_TimeInt2(iTSlice,:) = [nan(1,NansStart) VFinalTotal_TimeInt{iTSlice} nan(1,NansEnd) ];
             
         end
+        
         if length(LOS_points.slicesAv) ~= 1            
             % VFinalTotal_Time{i1} = mean(VFinalTotal_TimeInt2,'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in the LOS
             % Introducing Gaussina weights in the performance of probe volume:
@@ -99,6 +100,7 @@ else %if you don't interpolate get the closest point
                     VFinalTotal_TimeInt3=VFinalTotal_TimeInt2(:,i);
                     VFinalTotal_TimeInt_noNAN=VFinalTotal_TimeInt3(~isnan(VFinalTotal_TimeInt3)); % remove nans
                     weights = linspace (-length(VFinalTotal_TimeInt_noNAN),length(VFinalTotal_TimeInt_noNAN),size(VFinalTotal_TimeInt_noNAN,1));
+                    
                     pdf = fitdist(VFinalTotal_TimeInt_noNAN,'Normal'); %fiting to a normal distribution
 
                     weights_gauss = normpdf(weights,0,pdf.sigma);

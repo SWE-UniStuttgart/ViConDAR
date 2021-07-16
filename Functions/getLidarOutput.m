@@ -169,6 +169,7 @@ end
 if distance_av_slice ~= 0
     SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
     focus_distances = SliceVecInt+ref_plane_dist;
+    
 else
     focus_distances = ref_plane_dist;  % no slices to be averaged, single point measurement
 end
