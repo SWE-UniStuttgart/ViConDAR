@@ -80,6 +80,6 @@ year = {2020}
 }
 
 ## Code development and maintenance
-Vasilis Pettas, Unisversity of Suttgart, Stuttgart Wind Energy (SWE) ORCID: 0000-0001-9985-9031
+Vasilis Pettas, Unisversity of Stuttgart, Stuttgart Wind Energy (SWE) ORCID: 0000-0001-9985-9031
 
-Francisco Costa, Unisversity of Suttgart, Stuttgart Wind Energy (SWE) ORCID: 0000-0001-7822-3317
+Francisco Costa, University of Stuttgart, Stuttgart Wind Energy (SWE) ORCID: 0000-0001-7822-3317
