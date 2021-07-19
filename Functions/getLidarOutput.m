@@ -15,43 +15,6 @@
 %--------------------------------------------------------------------------
 
 function Output = getLidarOutput(input,curFileInfo)
-
-
-%% IO/parameter definition
- 
-% Turbine parameters
-rotor_radius = input.rotor_radius; % Radio of the Rotor [m]
-Zh           = input.Zh;           % HubHeight [m]
-Pos_LiDAR    = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pos')))); %#ok<*FNDSB> % LiDAR position offsetfrom hub center(meters)==> [Y,Z] WE NEED TO FIX THE APPLICATION OF OFFSET IN LOS ONLY!!!!
-% Pos_LiDAR  = Pos_LiDARCell{1,1};
-% Lidar parameters
-ref_plane_dist = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Fd'))));       % Reference Plane for LOS (distance[m])
-distance_av_space = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'DAv'))));   % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds from pulses meters ahead and afer the point
-points_av_slice   = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SlAv'))));  % how many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
-Y = input.PatternY{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates lateral (m)
-Z = input.PatternZ{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates vertical (m)
-timeStep_Measurements = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Tm'))));% [s] Time required for a single point measurement
-timestep_pat_vec = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Tp'))));     % [s] Time required for a full scan 
-
-if timestep_pat_vec < timeStep_Measurements*length(Y) % throw error if timesteps dont match
-    error ('Time step of pattern is smaller than the timestep of measures x number of points. Cannot continue')
-end
-
-%Processing REWS:
-dist_REWS_nd = input.dist_REWS_nd; % Non dimentional span position for rotor effective wind speed calculation [define from 0 to 1 inclusive]
-Wi           = input.Wi;  %Weight to be applied for rotor effective wind speed calculation
-%Resampling lidar measurements, currently in Frequency domain
-resampling_factor = input.resampling_factor; % Amount of desired resampling for outputs in Turbsim and PyConTurb used with input.flag_resampling
-% Wind velocity vector components to be used
-nComp             = input.nComp;        %#ok<NASGU> %1:u, 2:v+u 3:u+v+w % Number of components to process (U,V,W):
-% Interpolation for time and space
-type_interpolation     = input.type_interpolation; %#ok<NASGU> % (interp1) interpolation between slices [Time] line460 (check other options of interpm)
-type_interpolation_2   = input.type_interpolation_2; % (interp2)  interpolation in grid points for values on the pattern points[Space]
-%Noise magnitude to imitate uncertainty and noise in real measurements (in dB)
-noise_U  = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Ns'))));% magnitude of noise to be applied in U time series (see help of awgn function)
-noise_V  = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Ns')))); % magnitude of noise to be applied in V time series (see help of awgn function)
-noise_W  = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Ns')))); % magnitude of noise to be applied in W time series (see help of awgn function)
-
 %% Load windfield file
 filenameOrWF = [input.OriginalWF_dir curFileInfo.originalWF{1} '.mat'];
 load (filenameOrWF); % winfield variable loaded
@@ -84,6 +47,49 @@ for i=1:gridtime
     SqueezeCompW{i}=squeeze(compW(:,i,:));
     compW(:,i,:)=flipud(SqueezeCompW{i}');
 end
+
+%% IO/parameter definition
+ 
+% Turbine parameters
+rotor_radius = input.rotor_radius; % Radio of the Rotor [m]
+Zh           = input.Zh;           % HubHeight [m]
+Pos_LiDAR    = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pos')))); %#ok<*FNDSB> % LiDAR position offsetfrom hub center(meters)==> [Y,Z] WE NEED TO FIX THE APPLICATION OF OFFSET IN LOS ONLY!!!!
+% Pos_LiDAR  = Pos_LiDARCell{1,1};
+% Lidar parameters
+ref_plane_dist = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Fd'))));       % Reference Plane for LOS (distance[m])
+distance_av_space = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'DAv'))));   % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds from pulses meters ahead and afer the point
+
+
+if  strcmpi(input.flag_probe_weighting,"gaussian")
+    points_av_slice = round(input.distance_av_space/distanceSlices); %#ok<NODEF>
+else
+    points_av_slice = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SlAv'))));  % how many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
+end
+
+Y = input.PatternY{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates lateral (m)
+Z = input.PatternZ{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates vertical (m)
+timeStep_Measurements = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Tm'))));% [s] Time required for a single point measurement
+timestep_pat_vec = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Tp'))));     % [s] Time required for a full scan 
+
+if timestep_pat_vec < timeStep_Measurements*length(Y) % throw error if timesteps dont match
+    error ('Time step of pattern is smaller than the timestep of measures x number of points. Cannot continue')
+end
+
+%Processing REWS:
+dist_REWS_nd = input.dist_REWS_nd; % Non dimentional span position for rotor effective wind speed calculation [define from 0 to 1 inclusive]
+Wi           = input.Wi;  %Weight to be applied for rotor effective wind speed calculation
+%Resampling lidar measurements, currently in Frequency domain
+resampling_factor = input.resampling_factor; % Amount of desired resampling for outputs in Turbsim and PyConTurb used with input.flag_resampling
+% Wind velocity vector components to be used
+nComp             = input.nComp;        %#ok<NASGU> %1:u, 2:v+u 3:u+v+w % Number of components to process (U,V,W):
+% Interpolation for time and space
+type_interpolation     = input.type_interpolation; %#ok<NASGU> % (interp1) interpolation between slices [Time] line460 (check other options of interpm)
+type_interpolation_2   = input.type_interpolation_2; % (interp2)  interpolation in grid points for values on the pattern points[Space]
+%Noise magnitude to imitate uncertainty and noise in real measurements (in dB)
+noise_U  = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Ns'))));% magnitude of noise to be applied in U time series (see help of awgn function)
+noise_V  = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Ns')))); % magnitude of noise to be applied in V time series (see help of awgn function)
+noise_W  = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Ns')))); % magnitude of noise to be applied in W time series (see help of awgn function)
+
 
 %% Discretization 
 
@@ -168,15 +174,15 @@ end
 
 if distance_av_slice ~= 0
     SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
-    focus_distances = SliceVecInt+ref_plane_dist;
-    
+    input.focus_distances = SliceVecInt+ref_plane_dist;
+
 else
-    focus_distances = ref_plane_dist;  % no slices to be averaged, single point measurement
+    input.focus_distances = ref_plane_dist;  % no slices to be averaged, single point measurement
 end
 
 %loop over planes to get points
-for ifDist = 1:length(focus_distances)
-    iplane = focus_distances(ifDist); % requested planes are all the planes along the distance (slicesDistance)
+for ifDist = 1:length(input.focus_distances)
+    iplane = input.focus_distances(ifDist); % requested planes are all the planes along the distance (slicesDistance)
     for iTraj = 1:size(trajectory,2)
         if input.flag_apply_LOS ==1
             plane_traj{ifDist}(1,iTraj) = iplane*tand(angley(iTraj));
@@ -208,9 +214,9 @@ end
 % Here is calculated the mean velocity of all the points in the pattern every time LiDAR completes one
 % pattern (frequency of the pattern) taking into account timstep_meas.
 
-[VFinalTotal_U,VFinalTotal_Time_U,~,~] = interpolationFun(compU,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
-[VFinalTotal_V,VFinalTotal_Time_V,~,~] = interpolationFun(compV,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
-[VFinalTotal_W,VFinalTotal_Time_W,~,~] = interpolationFun(compW,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
+[VFinalTotal_U,VFinalTotal_Time_U,~,~] = interpolationFun(input,compU,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
+[VFinalTotal_V,VFinalTotal_Time_V,~,~] = interpolationFun(input,compV,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
+[VFinalTotal_W,VFinalTotal_Time_W,~,~] = interpolationFun(input,compW,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
 
 %% LOS transformations. From cartesian to ray coordinates and back with the cyclops dilema (or something else.. )
 

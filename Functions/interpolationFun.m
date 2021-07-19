@@ -7,7 +7,7 @@
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 
-function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(component,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2)
+function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(input,component,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2)
 
 if 2==1  %obsolete it shouldn't be used... Fix it later???? Currently we use the closest grid point and the nearest time slice
     for slice = 1:1:fullTime/dt+1
@@ -79,7 +79,7 @@ else %if you don't interpolate get the closest point
             indLoopT2 = indLoopT;
             indNEg = find(indLoopT<=0); % find negative, zeros or Nans
             indNEg =  [indNEg find(isnan(indLoopT))]; % find negative or Nans
-            indNEg = [indNEg find(indLoopT>size(component,2))]; % find points outside of the grid
+            indNEg = [indNEg find(indLoopT>size(component,2))]; % findd points outside of the grid
             indLoopT2(indNEg) = [];
             VFinalTotal_TimeInt{iTSlice} = squeeze(component(PoinInd{i1}(2,iTSlice), indLoopT2 ,PoinInd{i1}(1,iTSlice)));    %
             
@@ -91,27 +91,25 @@ else %if you don't interpolate get the closest point
             VFinalTotal_TimeInt2(iTSlice,:) = [nan(1,NansStart) VFinalTotal_TimeInt{iTSlice} nan(1,NansEnd) ];
             
         end
-        
-        if length(LOS_points.slicesAv) ~= 1            
-            % VFinalTotal_Time{i1} = mean(VFinalTotal_TimeInt2,'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in the LOS
+%         if length(LOS_points.slicesAv) ~= 1            
+%             VFinalTotal_Time{i1} = mean(VFinalTotal_TimeInt2,'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in the LOS
             % Introducing Gaussina weights in the performance of probe volume:
             % First we create the weights:
-            for i=1:size(VFinalTotal_TimeInt2,2)
-                    VFinalTotal_TimeInt3=VFinalTotal_TimeInt2(:,i);
-                    VFinalTotal_TimeInt_noNAN=VFinalTotal_TimeInt3(~isnan(VFinalTotal_TimeInt3)); % remove nans
-                    weights = linspace (-length(VFinalTotal_TimeInt_noNAN),length(VFinalTotal_TimeInt_noNAN),size(VFinalTotal_TimeInt_noNAN,1));
-                    
-                    pdf = fitdist(VFinalTotal_TimeInt_noNAN,'Normal'); %fiting to a normal distribution
-
-                    weights_gauss = normpdf(weights,0,pdf.sigma);
-                    
-                    % performing weighted mean
-                    VFinalTotal_Time{i1}(:,i) = sum(weights_gauss'.*VFinalTotal_TimeInt_noNAN)/sum(weights_gauss');
-
+%             for i=1:size(VFinalTotal_TimeInt2,2)
+%                     VFinalTotal_TimeInt3=VFinalTotal_TimeInt2(:,i);
+%                     VFinalTotal_TimeInt_noNAN=VFinalTotal_TimeInt3(~isnan(VFinalTotal_TimeInt3)); % remove nans
+%                     weights = linspace (-length(VFinalTotal_TimeInt_noNAN),length(VFinalTotal_TimeInt_noNAN),size(VFinalTotal_TimeInt_noNAN,1));
+%                     pdf = fitdist(VFinalTotal_TimeInt_noNAN,'Normal'); %fiting to a normal distribution
+% 
+%                     weights_gauss = normpdf(weights,0,pdf.sigma);
+%                     
+%                     % performing weighted mean
+%                     VFinalTotal_Time{i1}(:,i) = sum(weights_gauss'.*VFinalTotal_TimeInt_noNAN)/sum(weights_gauss');
+        VFinalTotal_Time{i1}=weighting_fun(input,LOS_points,VFinalTotal_TimeInt2);
                 
-            end
-        else
-            VFinalTotal_Time{i1} = VFinalTotal_TimeInt2;
+%             end
+%         else
+%             VFinalTotal_Time{i1} = VFinalTotal_TimeInt2;
         end
         clear VFinalTotal_TimeInt
     end
