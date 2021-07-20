@@ -57,7 +57,7 @@ input.flag_apply_noise      = 1; % Apply noise to measured points
 input.flag_apply_LOS        = 1; % Apply Line of sight of LiDAR
 input.flag_apply_weightREWS = 1; % Weight for the length of the blade for REWS caclulation
 input.flag_resampling       = 0; % Apply resampling to the lidar measurments. Currently based on frequency domain zero padding
-input.flag_probe_weighting  = "mean"; % "mean" for simple averaging, "gaussian" Gaussian weighting mean 
+input.flag_probe_weighting  = "gaussian"; % "mean" for simple averaging, "gaussian" Gaussian weighting mean 
 % Flags for plotting options
 input.flag_plot_lidar          = 1; % plot lidar measurements vs original windfield
 input.flag_plot_WF_timeseries  = 1; % plot points from the grids of windfields the code will look for all constrained and original windfields with the same name and plot if they exist
