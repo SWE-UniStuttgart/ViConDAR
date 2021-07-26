@@ -93,18 +93,7 @@ else %if you don't interpolate get the closest point
         end
 %         if length(LOS_points.slicesAv) ~= 1            
 %             VFinalTotal_Time{i1} = mean(VFinalTotal_TimeInt2,'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in the LOS
-            % Introducing Gaussina weights in the performance of probe volume:
-            % First we create the weights:
-%             for i=1:size(VFinalTotal_TimeInt2,2)
-%                     VFinalTotal_TimeInt3=VFinalTotal_TimeInt2(:,i);
-%                     VFinalTotal_TimeInt_noNAN=VFinalTotal_TimeInt3(~isnan(VFinalTotal_TimeInt3)); % remove nans
-%                     weights = linspace (-length(VFinalTotal_TimeInt_noNAN),length(VFinalTotal_TimeInt_noNAN),size(VFinalTotal_TimeInt_noNAN,1));
-%                     pdf = fitdist(VFinalTotal_TimeInt_noNAN,'Normal'); %fiting to a normal distribution
-% 
-%                     weights_gauss = normpdf(weights,0,pdf.sigma);
-%                     
-%                     % performing weighted mean
-%                     VFinalTotal_Time{i1}(:,i) = sum(weights_gauss'.*VFinalTotal_TimeInt_noNAN)/sum(weights_gauss');
+          
         VFinalTotal_Time{i1}=weighting_fun(input,LOS_points,VFinalTotal_TimeInt2);
                 
 %             end

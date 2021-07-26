@@ -8,6 +8,33 @@
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 function input = InputParameters()
+%% Directory/path definition
+
+% All directories are strings to be concatenated and they should always finish
+% with \. If you run on Mac/Linux definitions should be changed accordingly
+input.OriginalWF_dir    = '..\OriginalWF\';      % Direcotry where original windfileds in .mat format are saved
+input.LidarOutput_dir   = '..\LidarOutput\';     % Directory to save the lidar measurement outputs
+input.ConstrainedWF_dir = '..\ConstrainedWF\'; % Directory to save all constrained windfileds
+
+input.TurbSimInput_dir   = '..\InputsForConstrainedTurb\TurbsimInput\';   %Directory to save inputs to use with turbsim constraining functionality
+input.PyconturbInput_dir = '..\InputsForConstrainedTurb\PyconturbInput\'; % Directory to save the required inputs to run Pyconturb for constraining a windfield
+
+input.PyconturbOut_dir = '..\ConstrainedWF\PyConTurb\'; % Sub directory to save Pyconturb outputs (.mat, .csv)
+input.TurbSimOut_dir   = '..\ConstrainedWF\Turbsim\';  % Sub directory to save Turbsim outputs (.mat,.wnd etc.)
+
+input.fullWF_statistics_dir = [input.ConstrainedWF_dir 'Statistics\']; % Directory to store the statistics from full windfields invcluding both original and constrained
+
+input.TurbSimExe_path = '..\ConstrainedWF\Turbsim\TurbSim_x64.exe'; %Full path to the executable of Turbsim. If other platform than windows is used the correct executable is neeeded
+
+input.pathToTurbSim      = '..\ConstrainedWF\Turbsim\';  %
+input.TurbSimInpTemplate = '..\ConstrainedWF\Turbsim\Template_Turbsim.inp'; % Full path to Turbsim tempalte .inp. It is required to build upon it the case specific input.
+input.PythonExe_path     = 'python';         % Path to run python. If python is set as environmental variable writing python is enough. If not, the full path to the correct python environment and executable is required
+
+input.Rayleigh_distance  ='..\..\GIT_Qlunc\metadata\'; % fed from Qlunc
+
+input.AddUserDir = {input.LidarOutput_dir input.ConstrainedWF_dir input.TurbSimInput_dir input.PyconturbInput_dir input.PyconturbOut_dir input.TurbSimOut_dir input.fullWF_statistics_dir};
+
+%-------------------------------------------------------------------------%
 
 %% Input variables for naming and indexing and WF properties
 
@@ -76,8 +103,10 @@ input.timeStep_Measurements = {[0 1] [0]}; %Time step between each single measur
 
 input.ref_plane_dist = [250]; % Reference Plane for LOS (distance[m])
 input.Pos_LiDAR      = [0,0]; % LiDAR position offset from hub center(meters)==> [Y,Z]. It cannot be used to loop over it. It has to be fixed for now
-input.distance_av_space = [30]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and after the range gate center point (Rayleigh Distance: parameter fed from Qlunc)
-input.points_av_slice   = [17]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
+
+input.distance_av_space = [str2num(fileread([input.Rayleigh_distance,'rayleigh_distance.txt']))]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and after the range gate center point (Rayleigh Distance: parameter fed from Qlunc)
+% input.distance_av_space = [30]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and after the range gate center point
+input.points_av_slice   = [0]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
 input.noise_U = [20]; % magnitude of noise to be applied in U time series (see help of awgn function)
 
 input.noise_V = input.noise_U; % magnitude of noise to be applied in V time series (see help of awgn function)
@@ -102,31 +131,6 @@ input.nComp                = 1;        %1:u, 2:v+u 3:u+v+w. Number of components
 input.type_interpolation   = 'linear'; % (interp1) interpolation between slices line460 (check other options of interpm)
 input.type_interpolation_2 = 'linear'; % (interp2)  interpolation in selected slice for values on the pattern points
 
-%% Directory/path definition
-
-% All directories are strings to be concatenated and they should always finish
-% with \. If you run on Mac/Linux definitions should be changed accordingly
-input.OriginalWF_dir  = '..\OriginalWF\';      % Direcotry where original windfileds in .mat format are saved
-input.LidarOutput_dir = '..\LidarOutput\';     % Directory to save the lidar measurement outputs
-input.ConstrainedWF_dir = '..\ConstrainedWF\'; % Directory to save all constrained windfileds
-
-input.TurbSimInput_dir   = '..\InputsForConstrainedTurb\TurbsimInput\';   %Directory to save inputs to use with turbsim constraining functionality
-input.PyconturbInput_dir = '..\InputsForConstrainedTurb\PyconturbInput\'; % Directory to save the required inputs to run Pyconturb for constraining a windfield
-
-input.PyconturbOut_dir = '..\ConstrainedWF\PyConTurb\'; % Sub directory to save Pyconturb outputs (.mat, .csv)
-input.TurbSimOut_dir   = '..\ConstrainedWF\Turbsim\';  % Sub directory to save Turbsim outputs (.mat,.wnd etc.)
-
-input.fullWF_statistics_dir = [input.ConstrainedWF_dir 'Statistics\']; % Directory to store the statistics from full windfields invcluding both original and constrained
-
-input.TurbSimExe_path = '..\ConstrainedWF\Turbsim\TurbSim_x64.exe'; %Full path to the executable of Turbsim. If other platform than windows is used the correct executable is neeeded
-
-input.pathToTurbSim = '..\ConstrainedWF\Turbsim\';  %
-input.TurbSimInpTemplate = '..\ConstrainedWF\Turbsim\Template_Turbsim.inp'; % Full path to Turbsim tempalte .inp. It is required to build upon it the case specific input.
-input.PythonExe_path     = 'python';         % Path to run python. If python is set as environmental variable writing python is enough. If not, the full path to the correct python environment and executable is required
-
-input.AddUserDir = {input.LidarOutput_dir input.ConstrainedWF_dir input.TurbSimInput_dir input.PyconturbInput_dir input.PyconturbOut_dir input.TurbSimOut_dir input.fullWF_statistics_dir};
-
-%-------------------------------------------------------------------------%
 
 %% Wind turbine parameters
 
