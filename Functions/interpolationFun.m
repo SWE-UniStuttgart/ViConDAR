@@ -7,9 +7,9 @@
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 
-function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(component,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2)
+function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(input,component,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2)
 
-if 2==1  %obsolete it shouldn't be used... Fix it later???? Currently we use the closest grid point and the nearest time slice
+if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later???? Currently we use the closest grid point and the nearest time slice
     for slice = 1:1:fullTime/dt+1
         for i1 = 1:size(LOS_points.slices,1)
             

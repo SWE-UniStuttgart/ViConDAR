@@ -67,13 +67,13 @@ input.plot_fullWF_Slices       = 1; % plot slices in time from the grids of wind
 
 %% Lidar parameters
 
-input.PatternY = {[ 54  54 0 -54 -54];[0 -76.5 76.5 -45 45 -45 45]}; % Pattern points Y axis (in meters). Each line is a pattern
-input.PatternZ = {[-54  54 0 -54  54];[0 0 0 63 63 -63 -63]}; % Pattern points Z axis (in meters). Each line is a pattern
+input.PatternY = {[ 54  54 0 -54 -54]}; % Pattern points Y axis (in meters). Each line is a pattern
+input.PatternZ = {[-54  54 0 -54  54]}; % Pattern points Z axis (in meters). Each line is a pattern
 
-input.PatternNames = {'5P_Rectangular' '7P_Circular' }; % names of the patterns. Important: number of names should equal number of Y,Z coordinates
+input.PatternNames = {'5P_Rectangular'}; % names of the patterns. Important: number of names should equal number of Y,Z coordinates
 
-input.timestep_pat_vec      = {[5] [2 4] }; %Time step of the total pattern. Sampling rate of total pattern should be that npoins*timestep_meas<=timestep_pat(s). Add one value for each pattern
-input.timeStep_Measurements = {[0 1] [0]}; %Time step between each single measured point. Add one value for each pattern [s]
+input.timestep_pat_vec      = {[5]}; %Time step of the total pattern. Sampling rate of total pattern should be that npoins*timestep_meas<=timestep_pat(s). Add one value for each pattern
+input.timeStep_Measurements = {[.2]}; %Time step between each single measured point. Add one value for each pattern [s]
 
 input.ref_plane_dist = [250]; % Reference Plane for LOS (distance[m])
 input.Pos_LiDAR      = [0,0]; % LiDAR position offset from hub center(meters)==> [Y,Z]. It cannot be used to loop over it. It has to be fixed for now
@@ -103,7 +103,7 @@ input.resampling_factor = 1; % Amount of desired resampling for outputs in Turbs
 input.nComp                = 1;        %1:u, 2:v+u 3:u+v+w. Number of components to process (U,V,W):
 input.type_interpolation   = 'linear'; % (interp1) interpolation between slices line460 (check other options of interpm)
 input.type_interpolation_2 = 'linear'; % (interp2)  interpolation in selected slice for values on the pattern points
-
+input.interpolation_slices = 0; % choose interpolattion between slices
 %% Directory/path definition
 
 % All directories are strings to be concatenated and they should always finish

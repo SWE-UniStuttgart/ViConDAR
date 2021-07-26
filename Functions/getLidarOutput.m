@@ -61,19 +61,20 @@ load (filenameOrWF); % winfield variable loaded
 %% Obtain and create data
 %extract components from the windfield variable
 
-compU               =  windfield.u;
-compV               =  windfield.v;
-compW               =  windfield.w;
-dt                  =  windfield.dt; %time step
-gridtime            =  windfield.grid.nt;
-gridny              =  windfield.grid.ny;
-gridnz              =  windfield.grid.nz;
-gridz               =  -windfield.grid.z;
-gridy               =  windfield.grid.y;
-Uref                =  windfield.URef; % Mean velocity of the windfied (m/s)
-dz                  =  windfield.grid.dz;
-dy                  =  windfield.grid.dy;
-distanceSlices      =  Uref*dt; % Distance step  between consecutive slices(m)
+compU                =  windfield.u;
+compV                =  windfield.v;
+compW                =  windfield.w;
+dt                   =  windfield.dt; %time step
+gridtime             =  windfield.grid.nt;
+gridny               =  windfield.grid.ny;
+gridnz               =  windfield.grid.nz;
+gridz                =  -windfield.grid.z;
+gridy                =  windfield.grid.y;
+Uref                 =  windfield.URef; % Mean velocity of the windfied (m/s)
+dz                   =  windfield.grid.dz;
+dy                   =  windfield.grid.dy;
+distanceSlices       =  Uref*dt; % Distance step  between consecutive slices(m)
+distance_sample_rate = (input.timeStep_Measurements{1}(1)/dt)*distanceSlices; %[m] Meters between  sample steps
 
 % Manipulation of data before calculations:
 for i=1:gridtime
@@ -209,9 +210,9 @@ end
 % Here is calculated the mean velocity of all the points in the pattern every time LiDAR completes one
 % pattern (frequency of the pattern) taking into account timstep_meas.
 
-[VFinalTotal_U,VFinalTotal_Time_U,~,~] = interpolationFun(compU,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
-[VFinalTotal_V,VFinalTotal_Time_V,~,~] = interpolationFun(compV,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
-[VFinalTotal_W,VFinalTotal_Time_W,~,~] = interpolationFun(compW,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
+[VFinalTotal_U,VFinalTotal_Time_U,~,~] = interpolationFun(input,compU,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
+[VFinalTotal_V,VFinalTotal_Time_V,~,~] = interpolationFun(input,compV,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
+[VFinalTotal_W,VFinalTotal_Time_W,~,~] = interpolationFun(input,compW,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
 
 %% LOS transformations. From cartesian to ray coordinates and back with the cyclops dilema (or something else.. )
 
