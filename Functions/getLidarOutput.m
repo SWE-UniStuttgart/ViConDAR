@@ -28,6 +28,8 @@ Pos_LiDAR    = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1
 ref_plane_dist = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Fd'))));       % Reference Plane for LOS (distance[m])
 distance_av_space = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'DAv'))));   % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds from pulses meters ahead and afer the point
 points_av_slice   = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SlAv'))));  % how many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
+sample_rate   = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SmpR'))));  % Sample rate [Hz]
+
 Y = input.PatternY{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates lateral (m)
 Z = input.PatternZ{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates vertical (m)
 timeStep_Measurements = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Tm'))));% [s] Time required for a single point measurement

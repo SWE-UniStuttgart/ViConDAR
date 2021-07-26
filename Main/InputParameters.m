@@ -34,10 +34,11 @@ input.fixedInp ={
     %                 'Fd'   ;  %input.ref_plane_dist
     %                 'DAv'  ;  %input.distance_av_space
     %                 'SlAv'  ; %points_av_slice
+    %                 'SmpR'  ; %Sample rate 
     };
 
 % This should not be changed. Only when a new lidar feature is added. This is a list of all the parameters requires to run lidar simulator
-input.AllFixed = {'Pat';'Ns';'Tp';'Tm';'Pos';'Fd' ;'DAv';'SlAv'};
+input.AllFixed = {'Pat';'Ns';'Tp';'Tm';'Pos';'Fd' ;'DAv';'SmpR';'SlAv'};
 %-------------------------------------------------------------------------%
 
 %% Flags for the different functionalities of the framework.
@@ -78,6 +79,7 @@ input.ref_plane_dist = [250]; % Reference Plane for LOS (distance[m])
 input.Pos_LiDAR      = [0,0]; % LiDAR position offset from hub center(meters)==> [Y,Z]. It cannot be used to loop over it. It has to be fixed for now
 input.distance_av_space = [30]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and afer the range gate center point
 input.points_av_slice   = [5]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
+input.sample_rate   = [1]; % [Hz] Lidar measurements sample rete
 input.noise_U = [20]; % magnitude of noise to be applied in U time series (see help of awgn function)
 
 input.noise_V = input.noise_U; % magnitude of noise to be applied in V time series (see help of awgn function)
