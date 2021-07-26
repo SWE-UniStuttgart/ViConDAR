@@ -106,7 +106,7 @@ input.Pos_LiDAR      = [0,0]; % LiDAR position offset from hub center(meters)==>
 
 input.distance_av_space = [str2num(fileread([input.Rayleigh_distance,'rayleigh_distance.txt']))]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and after the range gate center point (Rayleigh Distance: parameter fed from Qlunc)
 % input.distance_av_space = [30]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and after the range gate center point
-input.points_av_slice   = [17]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
+input.points_av_slice   = [0]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
 input.noise_U = [20]; % magnitude of noise to be applied in U time series (see help of awgn function)
 
 input.noise_V = input.noise_U; % magnitude of noise to be applied in V time series (see help of awgn function)

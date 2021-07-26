@@ -17,7 +17,7 @@
 function Output = getLidarOutput(input,curFileInfo)
 %% Load windfield file
 filenameOrWF = [input.OriginalWF_dir curFileInfo.originalWF{1} '.mat'];
-load (filenameOrWF); % winfield variable loaded
+load (filenameOrWF); %#ok<*LOAD> % winfield variable loaded
 
 %% Obtain and create data
 %extract components from the windfield variable
@@ -59,13 +59,15 @@ Pos_LiDAR    = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1
 ref_plane_dist = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Fd'))));       % Reference Plane for LOS (distance[m])
 distance_av_space = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'DAv'))));   % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds from pulses meters ahead and afer the point
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NEW: when gaussian for weighting function take all the slices in the
+% probe volume
 if  strcmpi(input.flag_probe_weighting,"gaussian")
     points_av_slice = round(input.distance_av_space/distanceSlices); %#ok<NODEF>
 else
     points_av_slice = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SlAv'))));  % how many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
 end
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Y = input.PatternY{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates lateral (m)
 Z = input.PatternZ{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates vertical (m)
 timeStep_Measurements = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Tm'))));% [s] Time required for a single point measurement
@@ -133,7 +135,7 @@ if ~isempty(SlicestoCut)
     slicesTime = slicesTime(:,1:end-MaxColumn);
 end
 
-distance_av_slice = distance_av_space/(distanceSlices); %transforming the distance in space to slices count
+distance_av_slice_num = distance_av_space/(distanceSlices); %transforming the distance in space to slices count
 
 %% Rotate wind field for adding yaw and tilt inflow offsets
 
@@ -172,14 +174,17 @@ for iTra= 1:length(Y)
     LOS_2_In_matrix{iTra} =  In_2_LOS_matrix{iTra}^-1; % Inverse transformation: LOS_CS to Inertial_CS
 end
 
-if distance_av_slice ~= 0
-    SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
+if distance_av_slice_num ~= 0
+    SliceVecInt = round((-distance_av_slice_num:distance_av_slice_num/points_av_slice:distance_av_slice_num))*distanceSlices;
     input.focus_distances = SliceVecInt+ref_plane_dist;
 
 else
     input.focus_distances = ref_plane_dist;  % no slices to be averaged, single point measurement
 end
-
+%%%%%%%%%%%%%%%%%%%%%
+%Implementa a function interpolate between slices to get the wind speed
+%instead of taking the nearest slide
+%%%%%%%%%%%%%%%%%%%%%
 %loop over planes to get points
 for ifDist = 1:length(input.focus_distances)
     iplane = input.focus_distances(ifDist); % requested planes are all the planes along the distance (slicesDistance)
@@ -189,15 +194,15 @@ for ifDist = 1:length(input.focus_distances)
             plane_traj{ifDist}(2,iTraj) = iplane*tand(anglez(iTraj));
         else   %dont move the trajectory projection if you dont have LOS
             plane_traj{ifDist}(1,iTraj) = Y(iTraj);
-            plane_traj{ifDist}(2,iTraj) = Z(iTraj); % this variable saves Y aand z points according to the plane
+            plane_traj{ifDist}(2,iTraj) = Z(iTraj); % this variable saves Y and z points according to the plane
         end
     end
 end
 
-LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
+LOS_points.slicesAv = round(-distance_av_slice_num:distance_av_slice_num/points_av_slice:distance_av_slice_num);
 
 %Check for the case when we request only 1 slice to be averaged
-if [isempty(LOS_points.slicesAv) || any(isnan(LOS_points.slicesAv))]  && distance_av_slice==0 %#ok<*NBRAK,BDSCA>
+if [isempty(LOS_points.slicesAv) || any(isnan(LOS_points.slicesAv))]  && distance_av_slice_num==0 %#ok<*NBRAK,BDSCA>
     LOS_points.slicesAv = 0;
 end
 
@@ -487,7 +492,7 @@ Output.Pattern.Coord    = [Y;Z];
 Output.Pattern.refplane = ref_plane_dist; %like focus distance
 Output.Pattern.timestep_pat_vec  = timestep_pat_vec; 
 Output.Pattern.timeStep_Measurements = timeStep_Measurements; 
-Output.Pattern.distance_av_slice = distance_av_slice; 
+Output.Pattern.distance_av_slice_num = distance_av_slice_num; 
 Output.Pattern.points_av_slice   = points_av_slice;
 Output.Pattern.timestep_pat_vec  = timestep_pat_vec;
 Output.Pattern.name              = input.PatternNames{curFileInfo.values{find(strcmp(curFileInfo.variables{1, 1},'Pat'))}};
