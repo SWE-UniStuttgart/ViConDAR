@@ -74,7 +74,7 @@ Uref                 =  windfield.URef; % Mean velocity of the windfied (m/s)
 dz                   =  windfield.grid.dz;
 dy                   =  windfield.grid.dy;
 distanceSlices       =  Uref*dt; % Distance step  between consecutive slices(m)
-distance_sample_rate = (input.timeStep_Measurements{1}(1)/dt)*distanceSlices; %[m] Meters between  sample steps
+distance_sample_rate = (input.sample_rate/dt)*distanceSlices; %[m] Meters between  sample steps
 
 % Manipulation of data before calculations:
 for i=1:gridtime
@@ -170,8 +170,13 @@ for iTra= 1:length(Y)
 end
 
 if distance_av_slice ~= 0
-    SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
-    focus_distances = SliceVecInt+ref_plane_dist;
+%     SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
+%     focus_distances = SliceVecInt+ref_plane_dist;
+% Recalculate the slices before and after the focus distance that want to
+% average:
+    post=nonzeros(0:distance_sample_rate:distance_av_space)';
+    prev=sort(-post);
+    focus_distances = [ref_plane_dist+prev,ref_plane_dist,ref_plane_dist+post];
 else
     focus_distances = ref_plane_dist;  % no slices to be averaged, single point measurement
 end
@@ -190,7 +195,8 @@ for ifDist = 1:length(focus_distances)
     end
 end
 
-LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
+% LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
+LOS_points.slicesAv = -distance_av_slice:distance_sample_rate/distanceSlices:distance_av_slice;
 
 %Check for the case when we request only 1 slice to be averaged
 if [isempty(LOS_points.slicesAv) || any(isnan(LOS_points.slicesAv))]  && distance_av_slice==0 %#ok<*NBRAK,BDSCA>
