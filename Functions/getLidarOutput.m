@@ -186,8 +186,10 @@ if distance_av_slice ~= 0
             [~,ind_min]=mink(diff_slices,2,2);
             ind_min=sort(ind_min);
             focus_distances2{ind_foc}=[ind_min];
+            focus_distances_new{ind_foc} = [slicesDistance(ind_min(1)) slicesDistance(ind_min(2))];
         else 
-            focus_distances2{ind_foc}=find(slicesDistance==focus_distances(ind_foc));
+            focus_distances2{ind_foc}    = find(slicesDistance==focus_distances(ind_foc));
+            focus_distances_new{ind_foc} = slicesDistance(focus_distances2{ind_foc});
         end      
     end
 %     focus_distances = focus_distances2;
@@ -196,15 +198,17 @@ else
 end
 
 %loop over planes to get points
-for ifDist = 1:length(focus_distances)
-    iplane = focus_distances(ifDist); % requested planes are all the planes along the distance (slicesDistance)
-    for iTraj = 1:size(trajectory,2)
-        if input.flag_apply_LOS ==1
-            plane_traj{ifDist}(1,iTraj) = iplane*tand(angley(iTraj));
-            plane_traj{ifDist}(2,iTraj) = iplane*tand(anglez(iTraj));
-        else   %dont move the trajectory projection if you dont have LOS
-            plane_traj{ifDist}(1,iTraj) = Y(iTraj);
-            plane_traj{ifDist}(2,iTraj) = Z(iTraj); % this variable saves Y and z points according to the plane
+for ifDist = 1:length(focus_distances_new)
+    iplane = focus_distances_new{ifDist}; % requested planes are all the planes along the distance (slicesDistance)
+    for ind_num_planes=1:size(focus_distances_new{ifDist},2)
+        for iTraj = 1:size(trajectory,2)
+            if input.flag_apply_LOS ==1
+                plane_traj{ifDist}(1,iTraj) = iplane(ind_num_planes)*tand(angley(iTraj));
+                plane_traj{ifDist}(2,iTraj) = iplane(ind_num_planes)*tand(anglez(iTraj));
+            else   %dont move the trajectory projection if you dont have LOS
+                plane_traj{ifDist}(1,iTraj) = Y(iTraj);
+                plane_traj{ifDist}(2,iTraj) = Z(iTraj); % this variable saves Y and z points according to the plane
+            end
         end
     end
 end
