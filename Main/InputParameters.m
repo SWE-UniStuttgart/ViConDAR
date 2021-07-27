@@ -73,13 +73,13 @@ input.PatternZ = {[-54  54 0 -54  54]}; % Pattern points Z axis (in meters). Eac
 input.PatternNames = {'5P_Rectangular'}; % names of the patterns. Important: number of names should equal number of Y,Z coordinates
 
 input.timestep_pat_vec      = {[5]}; %Time step of the total pattern. Sampling rate of total pattern should be that npoins*timestep_meas<=timestep_pat(s). Add one value for each pattern
-input.timeStep_Measurements = {[.125]}; %Time step between each single measured point. Add one value for each pattern [s]
+input.timeStep_Measurements = {[1]}; %Time step between each single measured point. Add one value for each pattern [s]
 
-input.ref_plane_dist = [250]; % Reference Plane for LOS (distance[m])
+input.ref_plane_dist = [195]; % Reference Plane for LOS (distance[m])
 input.Pos_LiDAR      = [0,0]; % LiDAR position offset from hub center(meters)==> [Y,Z]. It cannot be used to loop over it. It has to be fixed for now
 input.distance_av_space = [30]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and afer the range gate center point
 input.points_av_slice   = [3]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
-input.sample_rate   = .50; % [Hz] Lidar measurements sample rete
+input.sample_rate   =.255; % [Hz] Lidar measurements sample rate (along with the probe length)
 input.noise_U = [20]; % magnitude of noise to be applied in U time series (see help of awgn function)
 
 input.noise_V = input.noise_U; % magnitude of noise to be applied in V time series (see help of awgn function)

@@ -74,7 +74,7 @@ Uref                 =  windfield.URef; % Mean velocity of the windfied (m/s)
 dz                   =  windfield.grid.dz;
 dy                   =  windfield.grid.dy;
 distanceSlices       =  Uref*dt; % Distance step  between consecutive slices(m)
-distance_sample_rate = (input.sample_rate/dt)*distanceSlices; %[m] Meters between  sample steps
+distance_sample_rate = ((input.sample_rate)/dt)*distanceSlices; %[m] Meters between  sample steps along with the probe length
 
 % Manipulation of data before calculations:
 for i=1:gridtime
@@ -174,9 +174,23 @@ if distance_av_slice ~= 0
 %     focus_distances = SliceVecInt+ref_plane_dist;
 % Recalculate the slices before and after the focus distance that want to
 % average:
+    
     post=nonzeros(0:distance_sample_rate:distance_av_space)';
     prev=sort(-post);
     focus_distances = [ref_plane_dist+prev,ref_plane_dist,ref_plane_dist+post];
+   
+    for ind_foc=1:size(focus_distances,2)
+        focus_distances2{ind_foc}=focus_distances(ind_foc);
+        if ~ismember(focus_distances2{ind_foc},slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones
+            diff_slices=(abs(focus_distances2{ind_foc}-slicesDistance));
+            [~,ind_min]=mink(diff_slices,2,2);
+            ind_min=sort(ind_min);
+            focus_distances2{ind_foc}=[ind_min];
+        else 
+            focus_distances2{ind_foc}=find(slicesDistance==focus_distances(ind_foc));
+        end      
+    end
+%     focus_distances = focus_distances2;
 else
     focus_distances = ref_plane_dist;  % no slices to be averaged, single point measurement
 end
@@ -190,7 +204,7 @@ for ifDist = 1:length(focus_distances)
             plane_traj{ifDist}(2,iTraj) = iplane*tand(anglez(iTraj));
         else   %dont move the trajectory projection if you dont have LOS
             plane_traj{ifDist}(1,iTraj) = Y(iTraj);
-            plane_traj{ifDist}(2,iTraj) = Z(iTraj); % this variable saves Y aand z points according to the plane
+            plane_traj{ifDist}(2,iTraj) = Z(iTraj); % this variable saves Y and z points according to the plane
         end
     end
 end
