@@ -29,7 +29,7 @@ for iTimeSlice = 1:length(input.time_fullWF_Slices) % loop over requested slices
         load([input.OriginalWF_dir curNamOr]); % variable windfield loaded
         % find the closest timestep in the grid as requeted by the user
         TSlice = find(abs(curTime-windfield.grid.t)==min(abs(curTime-windfield.grid.t)),1); %Y point as index
-        contour (windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,TSlice,:)))','Fill','on')
+        contour (windfield.grid.y,windfield.grid.z,(squeeze(windfield.u(:,1,:)))','Fill','on')
         colorbar('peer',gca);
         CLimits = [floor(min(min(squeeze(windfield.u(:,TSlice,:))))) ceil(max(max(squeeze(windfield.u(:,TSlice,:)))))];
         set(gca,'BoxStyle','full','CLim',CLimits,'Layer','top');

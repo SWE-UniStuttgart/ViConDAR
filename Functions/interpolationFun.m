@@ -10,27 +10,71 @@
 function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(input,component,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2)
 
 if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later???? Currently we use the closest grid point and the nearest time slice
-    for slice = 1:1:fullTime/dt+1
-        for i1 = 1:size(LOS_points.slices,1)
-            
-            % Values with LOS of LiDAR:
-            Y1 = LOS_points.Coor{i1}(1,:);
-            Z1 = LOS_points.Coor{i1}(2,:);
-            Y1 = round(Y1,5); % Round because if not, the interpolation gives NaN's or incorrect results
-            Z1 = round(Z1,5);
-            
-            if max(Y1)>max(gridy) || max(Z1)>max(gridz) || min(Y1)<min(gridy) || min(Z1)<min(gridz) % check if point are inside the grid
-                % Do nothing
-            else
-                if slice<=(fullTime/dt) % Delete the last slice to avoid errors in the process
-                    %% Space Interpolation.
-                    component1=squeeze(component(:,slice,:)); % Remove dimension=1                    
-                    VFinalTotal{i1}(:,slice)=interp2(gridy,gridz,component1,Y1,Z1,type_interpolation_2); %#ok<*AGROW>
-                    VFinalTotal{i1}(:,slice)=round(VFinalTotal{i1}(:,slice),2);
+    for dim2=1:size (LOS_points.Coor,2)  
+        for dim1=1:size (LOS_points.Coor,1)
+            Y1{dim1,dim2} = LOS_points.Coor{dim1,dim2}(1,:);
+            Z1{dim1,dim2} = LOS_points.Coor{dim1,dim2}(2,:);
+            for ind_p=1:size(Y1{dim1,dim2},2)
+                busquedaY = find(ismember(gridy,Y1{dim1,dim2}(1,ind_p)) ); % look for coincidences in Y component
+                busquedaZ = find(ismember(gridz,Z1{dim1,dim2}(1,ind_p))); %#ok<*EFIND> % look for coincidences in  Z component
+                if isempty(busquedaY)|| length(busquedaY) <(length(LOS_points.slicesAv))
+                    DifY = gridy-Y1{dim1,dim2}(1,ind_p); 
+                    [~,ind_miny] = mink(abs(DifY),2,2);
+                    ind_miny=sort(ind_miny);
+                    PointFm{dim1,dim2}(1,:) = [gridy(ind_miny(1)) gridy(ind_miny(2))];
+                    
+                else
+                    PointFm{dim1,dim2}(1,:) = gridy(busquedaY);
                 end
+                if isempty(busquedaZ)|| length(busquedaZ) <(length(LOS_points.slicesAv))
+                    DifZ = gridz-Z1{dim1,dim2}(1,ind_p); 
+                    [~,ind_minz] = mink(abs(DifZ),2,2); % we get the two closest points (previous and following ones)
+                    ind_minz=sort(ind_minz);
+                    PointFm{dim1,dim2}(2,:) = [gridz(ind_minz(1)) gridz(ind_minz(2))];
+                else
+                    PointFm{dim1,dim2}(2,:) = gridz(busquedaZ);
+                end
+                
+                % Combine points to interpolate them.
+                n=1;
+%                 for indfocus=1:size(input.focus_distances_new,2)
+                    for ix=1:length(input.focus_distances_new{1})
+                        for iy = 1:size(PointFm{dim1,dim2}(1,:),2) 
+                            for iz=1:size(PointFm{dim1,dim2}(1,:),2) 
+                                Point_to_interp{ind_p,n}=[vertcat(input.focus_distances_new{ind_p}(1,ix),PointFm{1,dim2}(1,iy),PointFm{1,dim2}(2,iz))];
+                                n=n+1;
+                            end
+                        end
+                    
+                    end
             end
         end
     end
+    
+    
+    
+    
+    
+    %     for slice = 1:1:fullTime/dt+1
+%         for i1 = 1:size(LOS_points.slices,1)
+            
+%             % Values with LOS of LiDAR:
+%             Y1 = LOS_points.Coor{i1}(1,:);
+%             Z1 = LOS_points.Coor{i1}(2,:);
+%             Y1 = round(Y1,5); % Round because if not, the interpolation gives NaN's or incorrect results
+%             Z1 = round(Z1,5);
+%             if max(Y1)>max(gridy) || max(Z1)>max(gridz) || min(Y1)<min(gridy) || min(Z1)<min(gridz) % check if point are inside the grid
+%                 % Do nothing
+%             else
+%                 if slice<=(fullTime/dt) % Delete the last slice to avoid errors in the process
+%                     %% Space Interpolation.
+%                     component1=squeeze(component(:,slice,:)); % Remove dimension=1                    
+%                     VFinalTotal{i1}(:,slice)=interp2(gridy,gridz,component1,Y1,Z1,type_interpolation_2); %#ok<*AGROW>
+%                     VFinalTotal{i1}(:,slice)=round(VFinalTotal{i1}(:,slice),2);
+%                 end
+%             end
+%         end
+%     end
     
 else %if you don't interpolate get the closest point
     for i1 = 1:size(LOS_points.slices,1) % loop over the points of pattern

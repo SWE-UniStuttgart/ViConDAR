@@ -11,7 +11,7 @@ function input = InputParameters()
 
 %% Input variables for naming and indexing and WF properties
 
-input.nameBase = 'TEST'; %This is the first part of the name to be used for the concatenation
+input.nameBase = 'Test'; %This is the first part of the name to be used for the concatenation
 % free naming conventions by the user. They should appear in the name of the
 % original windfield (at least one). Commenting out will make them not appear
 % in the name concatenation.
@@ -75,11 +75,11 @@ input.PatternNames = {'5P_Rectangular'}; % names of the patterns. Important: num
 input.timestep_pat_vec      = {[5]}; %Time step of the total pattern. Sampling rate of total pattern should be that npoins*timestep_meas<=timestep_pat(s). Add one value for each pattern
 input.timeStep_Measurements = {[1]}; %Time step between each single measured point. Add one value for each pattern [s]
 
-input.ref_plane_dist = [195]; % Reference Plane for LOS (distance[m])
+input.ref_plane_dist = [250]; % Reference Plane for LOS (distance[m])
 input.Pos_LiDAR      = [0,0]; % LiDAR position offset from hub center(meters)==> [Y,Z]. It cannot be used to loop over it. It has to be fixed for now
-input.distance_av_space = [30]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and afer the range gate center point
+input.distance_av_space = [40]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and afer the range gate center point
 input.points_av_slice   = [3]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
-input.sample_rate   =.32; % [Hz] Lidar measurements sample rate (along with the probe length)
+input.sample_rate   = [.25]; % [Hz] Lidar measurements sample rate (along with the probe length)
 input.noise_U = [20]; % magnitude of noise to be applied in U time series (see help of awgn function)
 
 input.noise_V = input.noise_U; % magnitude of noise to be applied in V time series (see help of awgn function)
@@ -103,7 +103,7 @@ input.resampling_factor = 1; % Amount of desired resampling for outputs in Turbs
 input.nComp                = 1;        %1:u, 2:v+u 3:u+v+w. Number of components to process (U,V,W):
 input.type_interpolation   = 'linear'; % (interp1) interpolation between slices line460 (check other options of interpm)
 input.type_interpolation_2 = 'linear'; % (interp2)  interpolation in selected slice for values on the pattern points
-input.interpolation_slices = 0; % choose interpolattion between slices
+input.interpolation_slices = 1; % choose interpolattion between slices
 %% Directory/path definition
 
 % All directories are strings to be concatenated and they should always finish

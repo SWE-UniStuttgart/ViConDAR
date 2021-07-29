@@ -172,25 +172,56 @@ end
 if distance_av_slice ~= 0
 %     SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
 %     focus_distances = SliceVecInt+ref_plane_dist;
+
 % Recalculate the slices before and after the focus distance that want to
-% average:
+% average. If the slice does not exist we take the previous and the
+% following. Later on we will use them to interpolate and get the velocity
+% values
     
     post=nonzeros(0:distance_sample_rate:distance_av_space)';
     prev=sort(-post);
-    focus_distances = [ref_plane_dist+prev,ref_plane_dist,ref_plane_dist+post];
+    input.focus_distances = [ref_plane_dist+prev,ref_plane_dist,ref_plane_dist+post];
+%     focus_distances2int = focus_distances.*cosd(angley).*cosd(anglez);
    
-    for ind_foc=1:size(focus_distances,2)
-        focus_distances2{ind_foc}=focus_distances(ind_foc);
-        if ~ismember(focus_distances2{ind_foc},slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones
-            diff_slices=(abs(focus_distances2{ind_foc}-slicesDistance));
-            [~,ind_min]=mink(diff_slices,2,2);
-            ind_min=sort(ind_min);
-            focus_distances2{ind_foc}=[ind_min];
-            focus_distances_new{ind_foc} = [slicesDistance(ind_min(1)) slicesDistance(ind_min(2))];
-        else 
-            focus_distances2{ind_foc}    = find(slicesDistance==focus_distances(ind_foc));
-            focus_distances_new{ind_foc} = slicesDistance(focus_distances2{ind_foc});
-        end      
+    for ind_foc=1:size(input.focus_distances,2)
+        input.focus_distances2{ind_foc}=input.focus_distances(ind_foc);
+        
+        if ~ismember(input.focus_distances2{ind_foc},slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones (the previous and the following)
+            diff_slices                  = (abs(input.focus_distances2{ind_foc}-slicesDistance));
+            [~,ind_min]                  = mink(diff_slices,2,2); 
+            ind_min                      = sort(ind_min);
+            input.focus_distances2{ind_foc}    =[ind_min];
+            input.focus_distances_new{ind_foc} = [slicesDistance(ind_min(1)) slicesDistance(ind_min(2))]; % new vector with the slices (the previous and the following)
+        else
+            input.focus_distances2{ind_foc}    = find(slicesDistance==input.focus_distances(ind_foc));
+            input.focus_distances_new{ind_foc} = slicesDistance(input.focus_distances2{ind_foc});
+            
+        end 
+%      for ind_foc2=1:size(focus_distances2int,2)
+%         focus_distances2int2 {ind_foc2}= focus_distances2int(ind_foc2);
+%         if ~ismember(focus_distances2int2{ind_foc2},slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones (the previous and the following)
+%             diff_slices                  = (abs(focus_distances2int2{ind_foc2}-slicesDistance));
+%             [~,ind_min]                  = mink(diff_slices,2,2); 
+%             ind_min                      = sort(ind_min);
+%             focus_distances2int2{ind_foc2}    =[ind_min];
+%             focus_distances2int2_new{ind_foc2} = [slicesDistance(ind_min(1)) slicesDistance(ind_min(2))]; % new vector with the slices (the previous and the following)
+%         else 
+%             focus_distances2int2{ind_foc2}    = find(slicesDistance==focus_distances2int(ind_foc2));
+%             focus_distances2int2_new{ind_foc2} = slicesDistance(focus_distances2int2{ind_foc2});
+%             
+%         end
+%      end
+        % If, in the previous "if", the slice exists, the focus distance
+        % vector contains only one value. The following "if" fills these
+        % values to make the focus distances vector consistent
+        if size(input.focus_distances_new{ind_foc},2)==1
+            input.focus_distances_new{ind_foc}(1,2) = input.focus_distances_new{ind_foc}(1,1);
+            input.focus_distances2{ind_foc}(1,2)    = input.focus_distances2{ind_foc}(1,1);
+        end
+%         if size(focus_distances2int2_new{ind_foc2},2)==1
+%             focus_distances2int2_new{ind_foc}(1,2) = focus_distances2int2_new{ind_foc}(1,1);
+%             focus_distances2int2{ind_foc}(1,2)    = focus_distances2int2{ind_foc}(1,1);
+%         end
     end
 %     focus_distances = focus_distances2;
 else
@@ -198,13 +229,13 @@ else
 end
 
 %loop over planes to get points
-for ifDist = 1:length(focus_distances_new)
-    iplane = focus_distances_new{ifDist}; % requested planes are all the planes along the distance (slicesDistance)
-    for ind_num_planes=1:size(focus_distances_new{ifDist},2)
+for ifDist = 1:length(input.focus_distances_new)
+    iplane = input.focus_distances_new{ifDist}; % requested planes are all the planes along the distance (slicesDistance)
+    for ind_num_planes = 1:size(input.focus_distances_new{ifDist},2)
         for iTraj = 1:size(trajectory,2)
             if input.flag_apply_LOS ==1
-                plane_traj{ifDist}(1,iTraj) = iplane(ind_num_planes)*tand(angley(iTraj));
-                plane_traj{ifDist}(2,iTraj) = iplane(ind_num_planes)*tand(anglez(iTraj));
+                plane_traj{ifDist}(1,iTraj,ind_num_planes) = iplane(ind_num_planes)*tand(angley(iTraj));
+                plane_traj{ifDist}(2,iTraj,ind_num_planes) = iplane(ind_num_planes)*tand(anglez(iTraj));
             else   %dont move the trajectory projection if you dont have LOS
                 plane_traj{ifDist}(1,iTraj) = Y(iTraj);
                 plane_traj{ifDist}(2,iTraj) = Z(iTraj); % this variable saves Y and z points according to the plane
@@ -214,6 +245,8 @@ for ifDist = 1:length(focus_distances_new)
 end
 
 % LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
+% mpoint=(ceil(end/2));
+
 LOS_points.slicesAv = -distance_av_slice:distance_sample_rate/distanceSlices:distance_av_slice;
 
 %Check for the case when we request only 1 slice to be averaged
@@ -222,15 +255,30 @@ if [isempty(LOS_points.slicesAv) || any(isnan(LOS_points.slicesAv))]  && distanc
 end
 
 for num_tr3 = 1:length (Y)
-    LOS_points.slices(num_tr3,:)     = slices(num_tr3,:);
-    LOS_points.slicesTime(num_tr3,:) = slicesTime(num_tr3,:);
-    for iTraj2 = 1:size(plane_traj,2)
-        LOS_points.Coor{num_tr3}(:,iTraj2) = plane_traj{1,iTraj2}(:,num_tr3); %this variable saves coordinates according to trajectory points
+        LOS_points.slices(num_tr3,:)     = slices(num_tr3,:);
+        LOS_points.slicesTime(num_tr3,:) = slicesTime(num_tr3,:);
+end
+%  
+% %find dimensions of the planes. Different cases if there are two or three
+% %slices to calculate the points
+% 
+% for i_dim=1:length(plane_traj)
+%    dmn{i_dim}=size(plane_traj{i_dim}) ;
+% end
+
+% Storing coordinates in a proper way
+for i0=1:size(plane_traj{1},3)
+    for i1=1:size(plane_traj{1},2)
+        for i2=1:size(plane_traj,2)
+            LOS_points.Coor{i0,i1}(:,i2)=plane_traj{i2}(:,i1,i0);
+        end 
     end
 end
 
+
+
 % extract the measured slices as well as the full time series. Here is also
-% the averaging (or any other mnanipulation) for the multiple slices. NO LOS here
+% the averaging (or any other manipulation) for the multiple slices. NO LOS here
 % Here is calculated the mean velocity of all the points in the pattern every time LiDAR completes one
 % pattern (frequency of the pattern) taking into account timstep_meas.
 
