@@ -33,15 +33,14 @@ point=1;
                     [~,ind_minz] = mink(abs(DifZ),2,2); % we get the two closest points (previous and following ones)
                     ind_minz=sort(ind_minz);
                     PointFm(2,:) = [gridz(ind_minz(1)) gridz(ind_minz(2))];
-%                     PointFm2{point}(2,:)=PointFm{dim1,dim2}(1,:);
                 else
                     PointFm(2,:) = gridz(busquedaZ);
                 end
-                PointFm2{point}(:,:)=PointFm;
+%                 PointFm2{point}(:,:)=PointFm;
                 PointFm(3,:)=input.focus_distances_new{ind_p};
                 
-                point_to_interp = fliplr(combvec(PointFm(1,:),PointFm(2,:),PointFm(3,:))');
-                point_to_interpolate{ind_p}=point_to_interp;
+                point_to_interpolate{ind_p} = fliplr(combvec(PointFm(1,:),PointFm(2,:),PointFm(3,:))');
+%                 point_to_interpolate{ind_p}=point_to_interp;
                 point=point+1;                
 
             end
