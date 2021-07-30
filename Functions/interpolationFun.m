@@ -7,7 +7,7 @@
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 
-function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(input,component,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2)
+function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(input,component,LOS_points,gridy,gridz,fullTime,windfield,dt,type_interpolation_2)
 
 if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later???? Currently we use the closest grid point and the nearest time slice
 point=1;
@@ -23,23 +23,26 @@ point=1;
                     DifY = gridy-Y1{dim1,dim2}(1,ind_p); 
                     [~,ind_miny] = mink(abs(DifY),2,2);
                     ind_miny=sort(ind_miny);
-                    PointFm(1,:) = [gridy(ind_miny(1)) gridy(ind_miny(2))];
+                    PointFm(1,:) = [(ind_miny(1)) (ind_miny(2))];
 %                     PointFm2{point}(:,:)=PointFm{dim1,dim2}(:,:);
                 else
-                    PointFm(1,:) = gridy(busquedaY);
+                    PointFm(1,:) = (busquedaY);
                 end
                 if isempty(busquedaZ)%|| %length(busquedaZ) <(length(LOS_points.slicesAv))
                     DifZ = gridz-Z1{dim1,dim2}(1,ind_p); 
                     [~,ind_minz] = mink(abs(DifZ),2,2); % we get the two closest points (previous and following ones)
                     ind_minz=sort(ind_minz);
-                    PointFm(2,:) = [gridz(ind_minz(1)) gridz(ind_minz(2))];
+                    PointFm(2,:) = [(ind_minz(1)) (ind_minz(2))];
                 else
-                    PointFm(2,:) = gridz(busquedaZ);
+                    PointFm(2,:) = (busquedaZ);
                 end
 %                 PointFm2{point}(:,:)=PointFm;
-                PointFm(3,:)=input.focus_distances_new{ind_p};
+                PointFm(3,:)=input.focus_distances2{ind_p};
                 
-                point_to_interpolate{ind_p} = fliplr(combvec(PointFm(1,:),PointFm(2,:),PointFm(3,:))');
+                point_to_interpolate{ind_p} = fliplr(combvec(PointFm(1,:),PointFm(3,:),PointFm(2,:))');
+                for ind_velo_vec=1:size(point_to_interpolate{ind_p},1)
+                    point_to_interpolate{ind_p}(ind_velo_vec,4)= windfield.u(point_to_interpolate{ind_p}(ind_velo_vec,1),point_to_interpolate{ind_p}(ind_velo_vec,2),point_to_interpolate{ind_p}(ind_velo_vec,3));
+                end
 %                 point_to_interpolate{ind_p}=point_to_interp;
                 point=point+1;                
 

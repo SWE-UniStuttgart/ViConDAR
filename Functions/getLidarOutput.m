@@ -282,9 +282,9 @@ end
 % Here is calculated the mean velocity of all the points in the pattern every time LiDAR completes one
 % pattern (frequency of the pattern) taking into account timstep_meas.
 
-[VFinalTotal_U,VFinalTotal_Time_U,~,~] = interpolationFun(input,compU,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
-[VFinalTotal_V,VFinalTotal_Time_V,~,~] = interpolationFun(input,compV,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
-[VFinalTotal_W,VFinalTotal_Time_W,~,~] = interpolationFun(input,compW,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2);
+[VFinalTotal_U,VFinalTotal_Time_U,~,~] = interpolationFun(input,compU,LOS_points,gridy,gridz,fullTime,windfield,dt,type_interpolation_2);
+[VFinalTotal_V,VFinalTotal_Time_V,~,~] = interpolationFun(input,compV,LOS_points,gridy,gridz,fullTime,windfield,dt,type_interpolation_2);
+[VFinalTotal_W,VFinalTotal_Time_W,~,~] = interpolationFun(input,compW,LOS_points,gridy,gridz,fullTime,windfield,dt,type_interpolation_2);
 
 %% LOS transformations. From cartesian to ray coordinates and back with the cyclops dilema (or something else.. )
 
