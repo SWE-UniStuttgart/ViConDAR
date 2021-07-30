@@ -10,49 +10,46 @@
 function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(input,component,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2)
 
 if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later???? Currently we use the closest grid point and the nearest time slice
-    for dim2=1:size (LOS_points.Coor,2)  
+point=1;
+    for dim2=1:size (LOS_points.Coor,2)  % for points in the pattern
         for dim1=1:size (LOS_points.Coor,1)
             Y1{dim1,dim2} = LOS_points.Coor{dim1,dim2}(1,:);
             Z1{dim1,dim2} = LOS_points.Coor{dim1,dim2}(2,:);
-            for ind_p=1:size(Y1{dim1,dim2},2)
+            
+            for ind_p=1:size(Y1{dim1,dim2},2)  % for points in the probe length
                 busquedaY = find(ismember(gridy,Y1{dim1,dim2}(1,ind_p)) ); % look for coincidences in Y component
                 busquedaZ = find(ismember(gridz,Z1{dim1,dim2}(1,ind_p))); %#ok<*EFIND> % look for coincidences in  Z component
-                if isempty(busquedaY)|| length(busquedaY) <(length(LOS_points.slicesAv))
+                if isempty(busquedaY)%|| length(busquedaY) <(length(LOS_points.slicesAv))
                     DifY = gridy-Y1{dim1,dim2}(1,ind_p); 
                     [~,ind_miny] = mink(abs(DifY),2,2);
                     ind_miny=sort(ind_miny);
-                    PointFm{dim1,dim2}(1,:) = [gridy(ind_miny(1)) gridy(ind_miny(2))];
-                    
+                    PointFm(1,:) = [gridy(ind_miny(1)) gridy(ind_miny(2))];
+%                     PointFm2{point}(:,:)=PointFm{dim1,dim2}(:,:);
                 else
-                    PointFm{dim1,dim2}(1,:) = gridy(busquedaY);
+                    PointFm(1,:) = gridy(busquedaY);
                 end
-                if isempty(busquedaZ)|| length(busquedaZ) <(length(LOS_points.slicesAv))
+                if isempty(busquedaZ)%|| %length(busquedaZ) <(length(LOS_points.slicesAv))
                     DifZ = gridz-Z1{dim1,dim2}(1,ind_p); 
                     [~,ind_minz] = mink(abs(DifZ),2,2); % we get the two closest points (previous and following ones)
                     ind_minz=sort(ind_minz);
-                    PointFm{dim1,dim2}(2,:) = [gridz(ind_minz(1)) gridz(ind_minz(2))];
+                    PointFm(2,:) = [gridz(ind_minz(1)) gridz(ind_minz(2))];
+%                     PointFm2{point}(2,:)=PointFm{dim1,dim2}(1,:);
                 else
-                    PointFm{dim1,dim2}(2,:) = gridz(busquedaZ);
+                    PointFm(2,:) = gridz(busquedaZ);
                 end
+                PointFm2{point}(:,:)=PointFm;
+                PointFm(3,:)=input.focus_distances_new{ind_p};
                 
-                % Combine points to interpolate them.
-                n=1;
-%                 for indfocus=1:size(input.focus_distances_new,2)
-                    for ix=1:length(input.focus_distances_new{1})
-                        for iy = 1:size(PointFm{dim1,dim2}(1,:),2) 
-                            for iz=1:size(PointFm{dim1,dim2}(1,:),2) 
-                                Point_to_interp{ind_p,n}=[vertcat(input.focus_distances_new{ind_p}(1,ix),PointFm{1,dim2}(1,iy),PointFm{1,dim2}(2,iz))];
-                                n=n+1;
-                            end
-                        end
-                    
-                    end
+                point_to_interp = fliplr(combvec(PointFm(1,:),PointFm(2,:),PointFm(3,:))');
+                point_to_interpolate{ind_p}=point_to_interp;
+                point=point+1;                
+
             end
+            point_to_interpolate2{1}=point_to_interpolate;
         end
+        point_to_interpolate32{dim2}=point_to_interpolate2;     
     end
-    
-    
-    
+
     
     
     %     for slice = 1:1:fullTime/dt+1
