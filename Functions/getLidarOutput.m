@@ -74,7 +74,7 @@ Uref                 =  windfield.URef; % Mean velocity of the windfied (m/s)
 dz                   =  windfield.grid.dz;
 dy                   =  windfield.grid.dy;
 distanceSlices       =  Uref*dt; % Distance step  between consecutive slices(m)
-distance_sample_rate = ((input.sample_rate)/dt)*distanceSlices; %[m] Meters between  sample steps along with the probe length
+distance_sample_rate = ((1/input.sample_rate)/dt)*distanceSlices; %[m] Meters between  sample steps along with the probe length
 
 % Manipulation of data before calculations:
 for i=1:gridtime
@@ -173,59 +173,41 @@ if distance_av_slice ~= 0
 %     SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
 %     focus_distances = SliceVecInt+ref_plane_dist;
 
-% Recalculate the slices before and after the focus distance that want to
-% average. If the slice does not exist we take the previous and the
-% following. Later on we will use them to interpolate and get the velocity
+% Recalculate the slices before and after the focus distance: If the slice does not exist we take the previous and the
+% following. Later on, in interpFun, we will use them to interpolate among the eight grid  points (a cube) containing the measurement coordinates  and get the velocity
 % values
     
     post=nonzeros(0:distance_sample_rate:distance_av_space)';
     prev=sort(-post);
     input.focus_distances = [ref_plane_dist+prev,ref_plane_dist,ref_plane_dist+post];
-%     focus_distances2int = focus_distances.*cosd(angley).*cosd(anglez);
    
     for ind_foc=1:size(input.focus_distances,2)
         input.focus_distances2{ind_foc}=input.focus_distances(ind_foc);
         
-        if ~ismember(input.focus_distances2{ind_foc},slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones (the previous and the following)
+        if ~ismember(input.focus_distances2{ind_foc},slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones (the previous and the following) 
             diff_slices                  = (abs(input.focus_distances2{ind_foc}-slicesDistance));
             [~,ind_min]                  = mink(diff_slices,2,2); 
             ind_min                      = sort(ind_min);
             input.focus_distances2{ind_foc}    =[ind_min];
             input.focus_distances_new{ind_foc} = [slicesDistance(ind_min(1)) slicesDistance(ind_min(2))]; % new vector with the slices (the previous and the following)
-        else
+        else % (*)
             input.focus_distances2{ind_foc}    = find(slicesDistance==input.focus_distances(ind_foc));
             input.focus_distances_new{ind_foc} = slicesDistance(input.focus_distances2{ind_foc});
             
         end 
-%      for ind_foc2=1:size(focus_distances2int,2)
-%         focus_distances2int2 {ind_foc2}= focus_distances2int(ind_foc2);
-%         if ~ismember(focus_distances2int2{ind_foc2},slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones (the previous and the following)
-%             diff_slices                  = (abs(focus_distances2int2{ind_foc2}-slicesDistance));
-%             [~,ind_min]                  = mink(diff_slices,2,2); 
-%             ind_min                      = sort(ind_min);
-%             focus_distances2int2{ind_foc2}    =[ind_min];
-%             focus_distances2int2_new{ind_foc2} = [slicesDistance(ind_min(1)) slicesDistance(ind_min(2))]; % new vector with the slices (the previous and the following)
-%         else 
-%             focus_distances2int2{ind_foc2}    = find(slicesDistance==focus_distances2int(ind_foc2));
-%             focus_distances2int2_new{ind_foc2} = slicesDistance(focus_distances2int2{ind_foc2});
-%             
-%         end
-%      end
-        % If, in the previous "if", the slice exists, the focus distance
-        % vector contains only one value. The following "if" fills these
+
+        % If, in (*), the slice is in the grid, the focus distance
+        % vector contains only one value. The following (**) fills these
         % values to make the focus distances vector consistent
-        if size(input.focus_distances_new{ind_foc},2)==1
+        
+        if size(input.focus_distances_new{ind_foc},2)==1 % (**)
             input.focus_distances_new{ind_foc}(1,2) = input.focus_distances_new{ind_foc}(1,1);
             input.focus_distances2{ind_foc}(1,2)    = input.focus_distances2{ind_foc}(1,1);
         end
-%         if size(focus_distances2int2_new{ind_foc2},2)==1
-%             focus_distances2int2_new{ind_foc}(1,2) = focus_distances2int2_new{ind_foc}(1,1);
-%             focus_distances2int2{ind_foc}(1,2)    = focus_distances2int2{ind_foc}(1,1);
-%         end
+
     end
-%     focus_distances = focus_distances2;
 else
-    focus_distances = ref_plane_dist;  % no slices to be averaged, single point measurement
+    input.focus_distances_new = ref_plane_dist;  % no slices to be averaged, single point measurement
 end
 
 %loop over planes to get points
@@ -244,7 +226,7 @@ for ifDist = 1:length(input.focus_distances_new)
     end
 end
 
-% LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
+LOS_points.slicesAv2 = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
 % mpoint=(ceil(end/2));
 
 LOS_points.slicesAv = -distance_av_slice:distance_sample_rate/distanceSlices:distance_av_slice;
