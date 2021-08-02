@@ -10,23 +10,24 @@
 function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(input,component,LOS_points,gridy,gridz,fullTime,windfield,dt,type_interpolation_2)
 
 if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later???? Currently we use the closest grid point and the nearest time slice
-    point=1;
-    for dim2=1:size (LOS_points.Coor,2)  % for points in the pattern
-        for dim1=1:size (LOS_points.Coor,1)
+    for dim1=1:size (LOS_points.Coor,1)  % for points in the pattern
+        for dim2=1:size (LOS_points.Coor,2)
             Y1{dim1,dim2} = LOS_points.Coor{dim1,dim2}(1,:);
             Z1{dim1,dim2} = LOS_points.Coor{dim1,dim2}(2,:);
             
             for ind_p=1:size(Y1{dim1,dim2},2)  % for points in the probe length
+                
                 busquedaY = find(ismember(gridy,Y1{dim1,dim2}(1,ind_p)) ); % look for coincidences in Y component
                 busquedaZ = find(ismember(gridz,Z1{dim1,dim2}(1,ind_p))); %#ok<*EFIND> % look for coincidences in  Z component
                 if isempty(busquedaY)%|| length(busquedaY) <(length(LOS_points.slicesAv))
-                    DifY = gridy-Y1{dim1,dim2}(1,ind_p);
+                    DifY = gridy - Y1{dim1,dim2}(1,ind_p);
                     [~,ind_miny] = mink(abs(DifY),2,2);
                     ind_miny=sort(ind_miny);
                     Point_ind(1,:) = [(ind_miny(1)) (ind_miny(2))];
                     Point(1,:) = [gridy(ind_miny(1)) gridy(ind_miny(2))];
                 else
-                    Point_ind(1,:) = (busquedaY);
+                    Point_ind(1,:) = [busquedaY,busquedaY];
+                    Point(1,:)= [gridy(busquedaY) gridy(busquedaY)];
                 end
                 if isempty(busquedaZ)%|| %length(busquedaZ) <(length(LOS_points.slicesAv))
                     DifZ = gridz-Z1{dim1,dim2}(1,ind_p);
@@ -37,63 +38,53 @@ if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later
                     
                 else
                     Point_ind(2,:) = (busquedaZ);
+                    Point(2,:)= [gridy(busquedaZ) gridy(busquedaZ)];
                 end
-                Point_ind(3,:)=input.focus_distances2{ind_p};
+                
+                
+                Point_ind(3,:)=input.focus_distances_index{ind_p};
                 Point(3,:) = input.focus_distances_new{ind_p};
-                
-                
                 point_to_interpolate{ind_p} = (combvec(Point_ind(1,:),Point_ind(3,:),Point_ind(2,:))');
                 point_to_interpolate_val{ind_p} = (combvec(Point(1,:),Point(3,:),Point(2,:))');
+                % Get velocity values
                 for ind_velo_vec=1:size(point_to_interpolate{ind_p},1)
-                    point_to_interpolate_val{ind_p}(ind_velo_vec,4)= windfield.u(point_to_interpolate{ind_p}(ind_velo_vec,1),point_to_interpolate{ind_p}(ind_velo_vec,2),point_to_interpolate{ind_p}(ind_velo_vec,3));
+                    point_to_interpolate_val{ind_p}(ind_velo_vec,4)= component(point_to_interpolate{ind_p}(ind_velo_vec,1),point_to_interpolate{ind_p}(ind_velo_vec,2),point_to_interpolate{ind_p}(ind_velo_vec,3));
                 end
-                mat=point_to_interpolate_val{ind_p};
-                mat=sortrows(mat,2);
-                x1 = unique(mat(:,1)); % Y component
-                x2 = flipud(unique(mat(:,3))); % Z component
-                x3 = unique(mat(:,2)); % focus distance (X component)
-                VV = mat(:,4); % velocity vector
-                V=reshape(VV,2,2,2);
+                % interpolate
+                point_to_interpolate_val{ind_p}=sortrows(point_to_interpolate_val{ind_p},2);
+                x1  = unique(point_to_interpolate_val{ind_p}(:,1)); % Y component
+                x2  = flipud(unique(point_to_interpolate_val{ind_p}(:,3))); % Z component
+                x3  = unique(point_to_interpolate_val{ind_p}(:,2)); % focus distance (X component)
+                Vel_val  = point_to_interpolate_val{ind_p}(:,4); % velocity vector
+                
                 xq1 = Y1{dim1,dim2}(1,ind_p);
                 xq2 = Z1{dim1,dim2}(1,ind_p);
-                xq3  = input.focus_distances(ind_p);
-                %                 if length(x1)<2
-                Vel_mat{1,dim2}(1,ind_p)= interpn(x1,x2,x3,V,xq1,xq2,xq3,'linear');
-                %                 elseif length(x1)<2
+                xq3 = input.focus_distances(ind_p);               
+
+
+                % cases for interpolation: In total there are 8 different
+                % cases to interpolate (have to implement the rest)
                 
-                %                 elseif length(x1)<2
+                if isempty( busquedaY)==0  && isempty( busquedaZ)==0 && length(x3)~=1 % if Y and Z exist in the grid, but not x interpolate only in the x direction (along the focus distance)
+                    Vel_mat{1,dim2}(1,ind_p) = interp1(x3, unique(Vel_val,'stable'),xq3,'linear');
                 
-                %                 end
-                point=point+1;
-            end
-            point_to_interpolate2{1}=point_to_interpolate;
+                elseif isempty(busquedaY)==1  && isempty( busquedaZ)==0 
+                    Vel_mat{1,dim2}(1,ind_p) = interp2(x1,x3, unique(Vel_val,'stable'),xq1,xq3);
+                
+                elseif isempty( busquedaY)==0  && isempty( busquedaZ)==1
+                    Vel_mat{1,dim2}(1,ind_p) = interp2(x2,x3, unique(Vel_val,'stable'),xq2,xq3);
+                
+                elseif isempty(busquedaY)==1  && isempty(busquedaZ)==1 && length(x3)==1
+                    Vel_mat{1,dim2}(1,ind_p) = interp2(x1,x2, unique(Vel_val,'stable'),xq1,xq2);                     
+                
+                elseif isempty( busquedaY)==1  && isempty( busquedaZ)==1 && length(x3)~=1
+                    V   = reshape(Vel_val,2,2,2);
+                    Vel_mat{1,dim2}(1,ind_p)= interpn(x1,x2,x3,V,xq1,xq2,xq3,'linear');
+                end                                
+            end           
         end
-        point_to_interpolate32{dim2}=point_to_interpolate2;
     end
-    
-    
-    
-    %     for slice = 1:1:fullTime/dt+1
-    %         for i1 = 1:size(LOS_points.slices,1)
-    
-    %             % Values with LOS of LiDAR:
-    %             Y1 = LOS_points.Coor{i1}(1,:);
-    %             Z1 = LOS_points.Coor{i1}(2,:);
-    %             Y1 = round(Y1,5); % Round because if not, the interpolation gives NaN's or incorrect results
-    %             Z1 = round(Z1,5);
-    %             if max(Y1)>max(gridy) || max(Z1)>max(gridz) || min(Y1)<min(gridy) || min(Z1)<min(gridz) % check if point are inside the grid
-    %                 % Do nothing
-    %             else
-    %                 if slice<=(fullTime/dt) % Delete the last slice to avoid errors in the process
-    %                     %% Space Interpolation.
-    %                     component1=squeeze(component(:,slice,:)); % Remove dimension=1
-    %                     VFinalTotal{i1}(:,slice)=interp2(gridy,gridz,component1,Y1,Z1,type_interpolation_2); %#ok<*AGROW>
-    %                     VFinalTotal{i1}(:,slice)=round(VFinalTotal{i1}(:,slice),2);
-    %                 end
-    %             end
-    %         end
-    %     end
-    
+
 else %if you don't interpolate get the closest point
     for i1 = 1:size(LOS_points.slices,1) % loop over the points of pattern
         Y1 = LOS_points.Coor{i1}(1,:);
@@ -136,8 +127,7 @@ else %if you don't interpolate get the closest point
         end
         
         for iTSlice = 1:length(LOS_points.slicesAv)% loop over the ranges of each point of the pattern and average them
-            indLoopT =  LOS_points.slices(i1,:)+LOS_points.slicesAv(iTSlice);
-            
+            indLoopT =  (LOS_points.slices(i1,:)+LOS_points.slicesAv(iTSlice));
             indLoopT2 = indLoopT;
             indNEg = find(indLoopT<=0); % find negative, zeros or Nans
             indNEg =  [indNEg find(isnan(indLoopT))]; % find negative or Nans
