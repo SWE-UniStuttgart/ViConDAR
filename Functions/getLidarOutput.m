@@ -92,7 +92,7 @@ end
 
 fullTime       = (dt*gridtime)-dt; %total time duration of the windfield
 fullslicesTime = 0:dt:fullTime;
-slicesDistance = fullslicesTime*Uref; % vector with distance between slices(m)
+input.slicesDistance = fullslicesTime*Uref; % vector with distance between slices(m)
 %Calculate the slice of each pattern point
 icunt1 = 0;
 for ipoint = 1:length(Y) % different time and slices for each point!!
@@ -169,7 +169,7 @@ for iTra= 1:length(Y)
     LOS_2_In_matrix{iTra} =  In_2_LOS_matrix{iTra}^-1; % Inverse transformation: LOS_CS to Inertial_CS
 end
 
-if distance_av_slice ~= 0
+if input.sample_rate ~= 0
 %     SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
 %     focus_distances = SliceVecInt+ref_plane_dist;
 
@@ -182,18 +182,23 @@ if distance_av_slice ~= 0
     input.focus_distances = [ref_plane_dist+prev,ref_plane_dist,ref_plane_dist+post];
    
     for ind_foc=1:size(input.focus_distances,2)
-        input.focus_distances2{ind_foc}=input.focus_distances(ind_foc);
+        input.focus_distances_index{ind_foc}=input.focus_distances(ind_foc);
         
-        if ~ismember(input.focus_distances2{ind_foc},slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones (the previous and the following) 
-            diff_slices                  = (abs(input.focus_distances2{ind_foc}-slicesDistance));
-            [~,ind_min]                  = mink(diff_slices,2,2); 
-            ind_min                      = sort(ind_min);
-            input.focus_distances2{ind_foc}    =[ind_min];
-            input.focus_distances_new{ind_foc} = [slicesDistance(ind_min(1)) slicesDistance(ind_min(2))]; % new vector with the slices (the previous and the following)
-        else % (*)
-            input.focus_distances2{ind_foc}    = find(slicesDistance==input.focus_distances(ind_foc));
-            input.focus_distances_new{ind_foc} = slicesDistance(input.focus_distances2{ind_foc});
+        if ~ismember(input.focus_distances_index{ind_foc},input.slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones (the previous and the following) 
+            diff_slices                  = (abs(input.focus_distances_index{ind_foc}-input.slicesDistance));
+            [~,ind_min]                  = mink(diff_slices,2,2);
+            ind_min3(1,ind_foc)          = ind_min(1); %index for the slices to focus the lidar.
+            ind_min2                      = sort(ind_min);
             
+            input.focus_distances_index{ind_foc}    =[ind_min2];
+            input.focus_distances_new{ind_foc} = [input.slicesDistance(ind_min2(1)) input.slicesDistance(ind_min2(2))]; % new vector with the slices (the previous and the following)
+        else % (*)
+            input.focus_distances_index{ind_foc}    = find(input.slicesDistance==input.focus_distances(ind_foc));
+            input.focus_distances_new{ind_foc} = input.slicesDistance(input.focus_distances_index{ind_foc});
+            diff_slices                  = (abs(input.focus_distances_index{ind_foc}-input.slicesDistance));
+            [~,ind_min]                  = mink(diff_slices,2,2);
+            ind_min3(1,ind_foc)          = ind_min(1); %index for the slices to focus the lidar.
+
         end 
 
         % If, in (*), the slice is in the grid, the focus distance
@@ -202,60 +207,49 @@ if distance_av_slice ~= 0
         
         if size(input.focus_distances_new{ind_foc},2)==1 % (**)
             input.focus_distances_new{ind_foc}(1,2) = input.focus_distances_new{ind_foc}(1,1);
-            input.focus_distances2{ind_foc}(1,2)    = input.focus_distances2{ind_foc}(1,1);
+            input.focus_distances_index{ind_foc}(1,2)    = input.focus_distances_index{ind_foc}(1,1);
         end
 
     end
 else
     input.focus_distances_new = ref_plane_dist;  % no slices to be averaged, single point measurement
+    input.focus_distances     = ref_plane_dist;
 end
+
 
 %loop over planes to get points
 for ifDist = 1:length(input.focus_distances_new)
-    iplane = input.focus_distances_new{ifDist}; % requested planes are all the planes along the distance (slicesDistance)
-    for ind_num_planes = 1:size(input.focus_distances_new{ifDist},2)
-        for iTraj = 1:size(trajectory,2)
-            if input.flag_apply_LOS ==1
-                plane_traj{ifDist}(1,iTraj,ind_num_planes) = iplane(ind_num_planes)*tand(angley(iTraj));
-                plane_traj{ifDist}(2,iTraj,ind_num_planes) = iplane(ind_num_planes)*tand(anglez(iTraj));
-            else   %dont move the trajectory projection if you dont have LOS
-                plane_traj{ifDist}(1,iTraj) = Y(iTraj);
-                plane_traj{ifDist}(2,iTraj) = Z(iTraj); % this variable saves Y and z points according to the plane
-            end
+    iplane = input.focus_distances(ifDist); % requested planes are all the planes along the distance (slicesDistance)
+    for iTraj = 1:size(trajectory,2)
+        if input.flag_apply_LOS ==1
+            plane_traj{ifDist}(1,iTraj) = iplane*tand(angley(iTraj));
+            plane_traj{ifDist}(2,iTraj) = iplane*tand(anglez(iTraj));
+        else   %dont move the trajectory projection if you dont have LOS
+            plane_traj{ifDist}(1,iTraj) = Y(iTraj);
+            plane_traj{ifDist}(2,iTraj) = Z(iTraj); % this variable saves Y aand z points according to the plane
         end
     end
 end
+% LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
+LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/(floor(distance_av_slice/2)+1):distance_av_slice);
 
-LOS_points.slicesAv2 = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
-% mpoint=(ceil(end/2));
-
-LOS_points.slicesAv = -distance_av_slice:distance_sample_rate/distanceSlices:distance_av_slice;
+% LOS_points.slicesAv= (ind_min3 - (ind_min3(1,ceil(size(ind_min3,2)/2)))); % measured slices (index) before and after the focus distance
 
 %Check for the case when we request only 1 slice to be averaged
 if [isempty(LOS_points.slicesAv) || any(isnan(LOS_points.slicesAv))]  && distance_av_slice==0 %#ok<*NBRAK,BDSCA>
     LOS_points.slicesAv = 0;
 end
-
-for num_tr3 = 1:length (Y)
-        LOS_points.slices(num_tr3,:)     = slices(num_tr3,:);
-        LOS_points.slicesTime(num_tr3,:) = slicesTime(num_tr3,:);
-end
-%  
-% %find dimensions of the planes. Different cases if there are two or three
-% %slices to calculate the points
-% 
-% for i_dim=1:length(plane_traj)
-%    dmn{i_dim}=size(plane_traj{i_dim}) ;
-% end
+ 
 
 % Storing coordinates in a proper way
-for i0=1:size(plane_traj{1},3)
-    for i1=1:size(plane_traj{1},2)
-        for i2=1:size(plane_traj,2)
-            LOS_points.Coor{i0,i1}(:,i2)=plane_traj{i2}(:,i1,i0);
-        end 
+for num_tr3 = 1:length (Y)
+    LOS_points.slices(num_tr3,:)     = slices(num_tr3,:);
+    LOS_points.slicesTime(num_tr3,:) = slicesTime(num_tr3,:);
+    for iTraj2 = 1:size(plane_traj,2)
+        LOS_points.Coor{num_tr3}(:,iTraj2) = plane_traj{1,iTraj2}(:,num_tr3); %this variable saves coordinates according to trajectory points
     end
 end
+
 
 
 
@@ -338,7 +332,7 @@ end
 
 %Transform Slices
 rad_values = Distances_of_Points_In_Plane<=rotor_radius;       %keep only points inside the rotor
-for ind_slicesDistance = 1:length (slicesDistance) % loop over all the slices
+for ind_slicesDistance = 1:length (input.slicesDistance) % loop over all the slices
     % Take complete slice from turbsim:
     ExSlice_U = squeeze(compU(:,ind_slicesDistance,:)); % Values of the selected slice CompU
     ExSlice_U = ExSlice_U.*rad_values; %remove points out of rotor
@@ -537,7 +531,7 @@ Output.Pattern.Coord    = [Y;Z];
 Output.Pattern.refplane = ref_plane_dist; %like focus distance
 Output.Pattern.timestep_pat_vec  = timestep_pat_vec; 
 Output.Pattern.timeStep_Measurements = timeStep_Measurements; 
-Output.Pattern.distance_av_slice = distance_av_slice; 
+% Output.Pattern.distance_av_slice = distance_av_slice; 
 Output.Pattern.points_av_slice   = points_av_slice;
 Output.Pattern.timestep_pat_vec  = timestep_pat_vec;
 Output.Pattern.name              = input.PatternNames{curFileInfo.values{find(strcmp(curFileInfo.variables{1, 1},'Pat'))}};
