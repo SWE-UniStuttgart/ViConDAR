@@ -74,7 +74,7 @@ Uref                 =  windfield.URef; % Mean velocity of the windfied (m/s)
 dz                   =  windfield.grid.dz;
 dy                   =  windfield.grid.dy;
 distanceSlices       =  Uref*dt; % Distance step  between consecutive slices(m)
-distance_sample_rate = ((1/input.sample_rate)/dt)*distanceSlices; %[m] Meters between  sample steps along with the probe length
+distance_sample_rate =  Uref*(1/input.sample_rate); %[m] Meters between  sample steps along with the probe length
 
 % Manipulation of data before calculations:
 for i=1:gridtime
@@ -169,7 +169,7 @@ for iTra= 1:length(Y)
     LOS_2_In_matrix{iTra} =  In_2_LOS_matrix{iTra}^-1; % Inverse transformation: LOS_CS to Inertial_CS
 end
 
-if input.sample_rate ~= 0
+if input.distance_av_space~= 0
 %     SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
 %     focus_distances = SliceVecInt+ref_plane_dist;
 
@@ -211,11 +211,17 @@ if input.sample_rate ~= 0
         end
 
     end
+    LOS_points.slicesAv = (ind_min3 - (ind_min3(1,ceil(size(ind_min3,2)/2)))); % measured slices (index) before and after the focus distance
+
 else
     input.focus_distances_new = ref_plane_dist;  % no slices to be averaged, single point measurement
     input.focus_distances     = ref_plane_dist;
+    LOS_points.slicesAv = 0;
 end
 
+%######################
+% Previous: LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
+%######################
 
 %loop over planes to get points
 for ifDist = 1:length(input.focus_distances_new)
@@ -230,10 +236,12 @@ for ifDist = 1:length(input.focus_distances_new)
         end
     end
 end
-% LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice);
-LOS_points.slicesAv = round(-distance_av_slice:distance_av_slice/(floor(distance_av_slice/2)+1):distance_av_slice);
 
-% LOS_points.slicesAv= (ind_min3 - (ind_min3(1,ceil(size(ind_min3,2)/2)))); % measured slices (index) before and after the focus distance
+
+
+
+
+
 
 %Check for the case when we request only 1 slice to be averaged
 if [isempty(LOS_points.slicesAv) || any(isnan(LOS_points.slicesAv))]  && distance_av_slice==0 %#ok<*NBRAK,BDSCA>
