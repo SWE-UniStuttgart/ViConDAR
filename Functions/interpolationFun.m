@@ -10,21 +10,30 @@
 function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(input,component,LOS_points,gridy,gridz,fullTime,windfield,dt,type_interpolation_2)
 
 if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later???? Currently we use the closest grid point and the nearest time slice
-
     for i1 = 1:size(LOS_points.slices,1) % loop over the points of pattern
-%         for dim1=1:size (LOS_points.Coor,1)  % for points in the pattern
-%             for dim2=1:size (LOS_points.Coor,2)
                 Y1 = LOS_points.Coor{i1}(1,:);
                 Z1 = LOS_points.Coor{i1}(2,:);
-
-                for ind_p=1:size(Y1,2)  % for points in the probe length
-
-                    xq1 = Y1(1,ind_p);
-                    xq2 = Z1(1,ind_p);
-                    xq3 = input.focus_distances(ind_p);               
-
-                    interpol{i1}(1,ind_p)=interpn(gridy,input.slicesDistance,gridz,component,xq1,xq3,xq2);
+                for iTSlice = 1:length(LOS_points.slicesAv) % For measured slices in the pattern
+                    indLoopT =  (LOS_points.slices(i1,:)-1+LOS_points.slicesAv(iTSlice))*input.distanceSlices; % Distances where the measurements are focused  along the probe length
+                    indLoopT2 = indLoopT;
+                    indNEg = find(indLoopT<=0); % find negative, zeros or Nans
+                    indNEg =  [indNEg find(isnan(indLoopT))]; % find negative or Nans
+                    indNEg = [indNEg find(indLoopT>size(component,2)*input.distanceSlices)]; % findd points outside of the grid (we assume squared grid)
+                    indLoopT2(indNEg) = [];
+                    maxLoopInd = round(length(indLoopT)/2); % find the middle of the total slices
+                    NansStart  = length(find(indNEg<maxLoopInd));
+                    NansEnd    = length(indNEg)-NansStart;
+                    indLoopT2=[nan(1,NansStart) indLoopT2 nan(1,NansEnd) ];                    
+                    for ind_p=1:size(Y1,2)  % for points in the probe length
+                            xq1 = Y1(1,ind_p);
+                            xq2 = Z1(1,ind_p);
+                            xq3 = indLoopT2;               
+                            
+                            % Interpolation
+                            VFinalTotal_Time{i1}(ind_p,:)=interpn(gridy,input.slicesDistance,gridz,component,xq1,xq3,xq2); 
+                    end
                 end
+       
         busquedaY = find(ismember(gridy,Y1) ); % look for coincidences in Y component
         busquedaZ = find(ismember(gridz,Z1)); %#ok<*EFIND> % look for coincidences in  Z component    
         if isempty (busquedaY) || length(busquedaY) <(length(LOS_points.slicesAv)) %check if all measured points are grid points
@@ -60,25 +69,6 @@ if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later
             VFinalTotal{i1} = round(VFinalTotal{i1},5);
         end
         
-%         for iTSlice = 1:length(LOS_points.slicesAv)% loop over the ranges of each point of the pattern and average them
-%             indLoopT =  LOS_points.slices(i1,:)+LOS_points.slicesAv(iTSlice);
-%             
-%             indLoopT2 = indLoopT;
-%             indNEg = find(indLoopT<=0); % find negative, zeros or Nans
-%             indNEg =  [indNEg find(isnan(indLoopT))]; % find negative or Nans
-%             indNEg = [indNEg find(indLoopT>size(component,2))]; % findd points outside of the grid
-%             indLoopT2(indNEg) = [];
-%             VFinalTotal_TimeInt{iTSlice} = squeeze(component(PoinInd{i1}(2,iTSlice), indLoopT2 ,PoinInd{i1}(1,iTSlice)));    %
-%             
-%             % find how many nan points to add in the beginning or in the
-%             % end to keep length consistent
-%             maxLoopInd = round(length(indLoopT)/2); % find the middle of the total slices
-%             NansStart  = length(find(indNEg<maxLoopInd));
-%             NansEnd    = length(indNEg)-NansStart;
-%             VFinalTotal_TimeInt2(iTSlice,:) = [nan(1,NansStart) VFinalTotal_TimeInt{iTSlice} nan(1,NansEnd) ];
-%             
-%         end
-% 
 
      % ####### Check the interpolation is working properly#####################               
 
@@ -140,9 +130,7 @@ if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later
     %                     Vel_mat{1,dim2}(1,ind_p)= interpn(x1,x2,x3,V,xq1,xq2,xq3,'linear');
     %                 end                                
     % ##########################################################################
-                           
-%             end
-%         end
+
     end
 else %if you don't interpolate get the closest point
     for i1 = 1:size(LOS_points.slices,1) % loop over the points of pattern
