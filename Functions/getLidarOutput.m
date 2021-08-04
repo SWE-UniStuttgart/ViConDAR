@@ -73,7 +73,7 @@ gridy                =  windfield.grid.y;
 Uref                 =  windfield.URef; % Mean velocity of the windfied (m/s)
 dz                   =  windfield.grid.dz;
 dy                   =  windfield.grid.dy;
-distanceSlices       =  Uref*dt; % Distance step  between consecutive slices(m)
+input.distanceSlices       =  Uref*dt; % Distance step  between consecutive slices(m)
 distance_sample_rate =  Uref*(1/input.sample_rate); %[m] Meters between  sample steps along with the probe length
 
 % Manipulation of data before calculations:
@@ -130,7 +130,7 @@ if ~isempty(SlicestoCut)
     slicesTime = slicesTime(:,1:end-MaxColumn);
 end
 
-distance_av_slice = distance_av_space/(distanceSlices); %transforming the distance in space to slices count
+distance_av_slice = distance_av_space/(input.distanceSlices  ); %transforming the distance in space to slices count
 
 %% Rotate wind field for adding yaw and tilt inflow offsets
 
@@ -170,7 +170,7 @@ for iTra= 1:length(Y)
 end
 
 if input.distance_av_space~= 0
-%     SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*distanceSlices;
+%     SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*input.distanceSlices  ;
 %     focus_distances = SliceVecInt+ref_plane_dist;
 
 % Recalculate the slices before and after the focus distance: If the slice does not exist we take the previous and the
