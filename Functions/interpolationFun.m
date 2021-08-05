@@ -13,27 +13,30 @@ if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later
     for i1 = 1:size(LOS_points.slices,1) % loop over the points of pattern
                 Y1 = LOS_points.Coor{i1}(1,:);
                 Z1 = LOS_points.Coor{i1}(2,:);
-                for iTSlice = 1:length(LOS_points.slicesAv) % For measured slices in the pattern
-                    indLoopT =  (LOS_points.slices(i1,:)-1+LOS_points.slicesAv(iTSlice))*input.distanceSlices; % Distances where the measurements are focused  along the probe length
-                    indLoopT2 = indLoopT;
-                    indNEg = find(indLoopT<=0); % find negative, zeros or Nans
-                    indNEg =  [indNEg find(isnan(indLoopT))]; % find negative or Nans
-                    indNEg = [indNEg find(indLoopT>size(component,2)*input.distanceSlices)]; % findd points outside of the grid (we assume squared grid)
-                    indLoopT2(indNEg) = [];
-                    maxLoopInd = round(length(indLoopT)/2); % find the middle of the total slices
-                    NansStart  = length(find(indNEg<maxLoopInd));
-                    NansEnd    = length(indNEg)-NansStart;
-                    indLoopT2=[nan(1,NansStart) indLoopT2 nan(1,NansEnd) ];                    
-                    for ind_p=1:size(Y1,2)  % for points in the probe length
-                            xq1 = Y1(1,ind_p);
-                            xq2 = Z1(1,ind_p);
-                            xq3 = indLoopT2;               
-                            
-                            % Interpolation
-                            VFinalTotal_Time{i1}(ind_p,:)=interpn(gridy,input.slicesDistance,gridz,component,xq1,xq3,xq2); 
+                for ind_slice=1:size(LOS_points.slices,2)
+                    for iTSlice = 1:length(LOS_points.slicesAv) % For measured slices in the pattern
+                        Y= LOS_points.Coor{i1}(1,iTSlice);
+                        Z= LOS_points.Coor{i1}(2,iTSlice); 
+                        indLoopT =  (LOS_points.slices(i1,ind_slice)+LOS_points.slicesAv(iTSlice))*1.875;% input.focus_distances(iTSlice)+1.875*(LOS_points.slices(i1,ind_slice)-1); Distances where the measurements are focused  along the probe length
+                        indLoopT2 = indLoopT;
+                        indNEg = find(indLoopT<=0); % find negative, zeros or Nans
+                        indNEg =  [indNEg find(isnan(indLoopT))]; % find negative or Nans
+                        indNEg = [indNEg find(indLoopT>size(component,2)*input.distanceSlices)]; % findd points outside of the grid (we assume squared grid)
+                        indLoopT2(indNEg) = [];
+                        maxLoopInd = round(length(indLoopT)/2); % find the middle of the total slices
+                        NansStart  = length(find(indNEg<maxLoopInd));
+                        NansEnd    = length(indNEg)-NansStart;
+                        indLoopT2=[nan(1,NansStart) indLoopT2 nan(1,NansEnd) ];                    
+                                xq1 = Y;
+                                xq2 = Z;
+                                xq3 = indLoopT2;               
+                                % Interpolation
+                                VFinalTotal_Time2{i1}(iTSlice,ind_slice)=interpn(gridz,input.slicesDistance,gridy,component,xq2,xq3,xq1); 
                     end
                 end
-       
+        VFinalTotal_Time{i1} = mean(VFinalTotal_Time2{i1},'omitnan');
+        
+        
         busquedaY = find(ismember(gridy,Y1) ); % look for coincidences in Y component
         busquedaZ = find(ismember(gridz,Z1)); %#ok<*EFIND> % look for coincidences in  Z component    
         if isempty (busquedaY) || length(busquedaY) <(length(LOS_points.slicesAv)) %check if all measured points are grid points
@@ -132,6 +135,7 @@ if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later
     % ##########################################################################
 
     end
+
 else %if you don't interpolate get the closest point
     for i1 = 1:size(LOS_points.slices,1) % loop over the points of pattern
         Y1 = LOS_points.Coor{i1}(1,:);
