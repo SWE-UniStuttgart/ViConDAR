@@ -17,7 +17,7 @@ if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later
                     for iTSlice = 1:length(LOS_points.slicesAv) % For measured slices in the pattern
                         Y= LOS_points.Coor{i1}(1,iTSlice);
                         Z= LOS_points.Coor{i1}(2,iTSlice); 
-                        indLoopT =  (LOS_points.slices(i1,ind_slice)+LOS_points.slicesAv(iTSlice))*1.875;% input.focus_distances(iTSlice)+1.875*(LOS_points.slices(i1,ind_slice)-1); Distances where the measurements are focused  along the probe length
+                        indLoopT =  (LOS_points.slices(i1,ind_slice)+LOS_points.slicesAv(iTSlice))*input.distanceSlices  ;% [m] Distances where the measurements are focused  along the probe length
                         indLoopT2 = indLoopT;
                         indNEg = find(indLoopT<=0); % find negative, zeros or Nans
                         indNEg =  [indNEg find(isnan(indLoopT))]; % find negative or Nans
