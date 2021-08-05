@@ -174,8 +174,7 @@ if input.distance_av_space~= 0
 %     focus_distances = SliceVecInt+ref_plane_dist;
 
 % Recalculate the slices before and after the focus distance: If the slice does not exist we take the previous and the
-% following. Later on, in interpFun, we will use them to interpolate among the eight grid  points (a cube) containing the measurement coordinates  and get the velocity
-% values
+% following. to calculate the trajectories
     
     post=nonzeros(0:distance_sample_rate:distance_av_space)';
     prev=sort(-post);
@@ -205,10 +204,10 @@ if input.distance_av_space~= 0
         % vector contains only one value. The following (**) fills these
         % values to make the focus distances vector consistent
         
-        if size(input.focus_distances_new{ind_foc},2)==1 % (**)
-            input.focus_distances_new{ind_foc}(1,2) = input.focus_distances_new{ind_foc}(1,1);
-            input.focus_distances_index{ind_foc}(1,2)    = input.focus_distances_index{ind_foc}(1,1);
-        end
+%         if size(input.focus_distances_new{ind_foc},2)==1 % (**)
+%             input.focus_distances_new{ind_foc}(1,2) = input.focus_distances_new{ind_foc}(1,1);
+%             input.focus_distances_index{ind_foc}(1,2)    = input.focus_distances_index{ind_foc}(1,1);
+%         end
 
     end
     LOS_points.slicesAv = (ind_min3 - (ind_min3(1,ceil(size(ind_min3,2)/2)))); % measured slices (index) before and after the focus distance
@@ -237,12 +236,6 @@ for ifDist = 1:length(input.focus_distances_new)
     end
 end
 
-
-
-
-
-
-
 %Check for the case when we request only 1 slice to be averaged
 if [isempty(LOS_points.slicesAv) || any(isnan(LOS_points.slicesAv))]  && distance_av_slice==0 %#ok<*NBRAK,BDSCA>
     LOS_points.slicesAv = 0;
@@ -257,9 +250,6 @@ for num_tr3 = 1:length (Y)
         LOS_points.Coor{num_tr3}(:,iTraj2) = plane_traj{1,iTraj2}(:,num_tr3); %this variable saves coordinates according to trajectory points
     end
 end
-
-
-
 
 % extract the measured slices as well as the full time series. Here is also
 % the averaging (or any other manipulation) for the multiple slices. NO LOS here
