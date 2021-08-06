@@ -1,8 +1,9 @@
 function VFinalTotal_Time=weighting_fun(input,LOS_points,VFinalTotal_TimeInt2)
 if length(LOS_points.slicesAv) ~= 1
     if strcmpi(input.flag_probe_weighting,"mean")
-     VFinalTotal_Time = mean(VFinalTotal_TimeInt2,'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in the LOS
-    
+        for ind_mean=1:size(VFinalTotal_TimeInt2,2)
+            VFinalTotal_Time{ind_mean} = mean(VFinalTotal_TimeInt2{ind_mean},'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in the LOS
+        end
     
     elseif strcmpi(input.flag_probe_weighting,"gaussian")
         % Introducing Gaussina weights in the performance of probe volume:
@@ -16,7 +17,8 @@ if length(LOS_points.slicesAv) ~= 1
             % For a given fwhm (fwhm = 2*Rayleigh length) we calculate the normal distribution:
             fwhm           = 2*input.distance_av_space;
             focus_distance = input.ref_plane_dist;
-            distan         = linspace(-500+focus_distance-input.distance_av_space,500+focus_distance+input.distance_av_space,1e5);
+            offset = 100;
+            distan = linspace(focus-offset,focus+offset,1e4);
             
             %Sigma and fwhm are simply related as follows:
             sigma          = fwhm/2.355;
