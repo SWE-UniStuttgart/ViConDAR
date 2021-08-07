@@ -18,7 +18,7 @@ if length(LOS_points.slicesAv) ~= 1
             fwhm           = 2*input.distance_av_space;
             focus_distance = input.ref_plane_dist;
             offset = 100;
-            distan = linspace(focus-offset,focus+offset,1e4);
+            distan = linspace(focus_distance-offset,focus_distance+offset,1e4);
             
             %Sigma and fwhm are simply related as follows:
             sigma          = fwhm/2.355;
