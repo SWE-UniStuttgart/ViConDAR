@@ -67,7 +67,8 @@ input.plot_fullWF_Slices       = 1; % plot slices in time from the grids of wind
 
 %% Lidar parameters
 
-input.PatternY = {[ 26  54 0 -35 -54]}; % Pattern points Y axis (in meters). Each line is a pattern
+
+input.PatternY = {[ 54  54 0 -54 -54]}; % Pattern points Y axis (in meters). Each line is a pattern
 input.PatternZ = {[-54  54 0 -54  54]}; % Pattern points Z axis (in meters). Each line is a pattern
 
 input.PatternNames = {'5P_Rectangular'}; % names of the patterns. Important: number of names should equal number of Y,Z coordinates
@@ -77,12 +78,16 @@ input.timeStep_Measurements = {[1]}; %Time step between each single measured poi
 
 input.ref_plane_dist = [250]; % Reference Plane for LOS (distance[m])
 input.Pos_LiDAR      = [0,0]; % LiDAR position offset from hub center(meters)==> [Y,Z]. It cannot be used to loop over it. It has to be fixed for now
+
 input.distance_av_space = [40]; %[str2num(fileread([input.Rayleigh_distance,'rayleigh_distance.txt']))]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and after the range gate center point (Rayleigh Distance: parameter fed from Qlunc)
+
 
 % previous: input.distance_av_space = [40]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and afer the range gate center point
 input.points_av_slice   = [7]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
 
-input.sample_rate   = [20]; % [Hz] Lidar measurements sample rate (along with the probe length). Sample rate, transformed in distance,  "(1/sample_rate/dt)*distance_slices", must be smaller than the probe volume
+
+input.sample_rate   = [8]; % [Hz] Lidar measurements sample rate (along with the probe length). Sample rate, transformed in distance,  "(1/sample_rate/dt)*distance_slices", must be smaller than the probe volume
+
 input.noise_U = [20]; % magnitude of noise to be applied in U time series (see help of awgn function)
 
 input.noise_V = input.noise_U; % magnitude of noise to be applied in V time series (see help of awgn function)
@@ -106,7 +111,7 @@ input.resampling_factor = 1; % Amount of desired resampling for outputs in Turbs
 input.nComp                = 1;        %1:u, 2:v+u 3:u+v+w. Number of components to process (U,V,W):
 input.type_interpolation   = 'linear'; % (interp1) interpolation between slices line460 (check other options of interpm)
 input.type_interpolation_2 = 'linear'; % (interp2)  interpolation in selected slice for values on the pattern points
-input.interpolation_slices = 0; % 1 - choose interpolattion between slices; 0 - don´t interpolate
+input.interpolation_slices = 0; % 1 - choose interpolattion between slices; 0 - donÂ´t interpolate
 
 %% Directory/path definition
 
@@ -158,7 +163,7 @@ input.CondaEnv                  = 'PyConEnv';
 
 % input options to run pyconturb (passed through the .csv to the python code)
 input.turb_class = 'B';
-input.coh_model  = 'iec'; % coh_model (str, optional) – Spatial coherence model specifier. Default is IEC 61400-1.
+input.coh_model  = 'iec'; % coh_model (str, optional) Â– Spatial coherence model specifier. Default is IEC 61400-1.
 input.wsp_func   = 'data_profile';% wsp_func (function, optional): constant_profile or power_profile
 input.sig_func   = 'data_sig'; %sig_func (function, optional):
 input.spec_func  = 'data_spectrum';%spec_func (function, optional). 'kaimal_spectrum',:

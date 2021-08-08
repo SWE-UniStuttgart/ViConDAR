@@ -1,6 +1,7 @@
 function VFinalTotal_Time=weighting_fun(input,LOS_points,VFinalTotal_TimeInt2)
 
 slices_distance = input.ref_plane_dist+(LOS_points.slicesAv*input.distanceSlices);
+
 if length(LOS_points.slicesAv) ~= 1
     if strcmpi(input.flag_probe_weighting,"mean")
         for ind_mean=1:size(VFinalTotal_TimeInt2,2)
@@ -10,9 +11,11 @@ if length(LOS_points.slicesAv) ~= 1
     elseif strcmpi(input.flag_probe_weighting,"gaussian")
         % Introducing Gaussina weights in the performance of probe volume:
         % First we create the weights:
+
         for ind_points=1:size(VFinalTotal_TimeInt2,2)
         for i=1:size(VFinalTotal_TimeInt2{ind_points},2)
             VFinalTotal_TimeInt3=VFinalTotal_TimeInt2{ind_points}(:,i);
+
             
 %             VFinalTotal_TimeInt_noNAN=VFinalTotal_TimeInt3(~isnan(VFinalTotal_TimeInt3)); % remove nans
 %             weights = linspace (-length(VFinalTotal_TimeInt_noNAN),length(VFinalTotal_TimeInt_noNAN),size(VFinalTotal_TimeInt_noNAN,1));
@@ -29,12 +32,13 @@ if length(LOS_points.slicesAv) ~= 1
 
 %             gaussian       = (1/(sigma*sqrt(2*pi)))*exp(-0.5*((distan-focus_distance)/sigma).^2);
             gaussian = (1/(sigma*sqrt(2*pi)))*exp(-0.5*((distan-250)/sigma).^2);
-    
+
             %Find the points above the fwhm
             half_max       = (min(gaussian) + max(gaussian)) / 2;
             probe_distance = distan(gaussian >= half_max); % distances above the fwhm
             
             % Distances at slices queried by the lidar may not match the distances wihin the probe volume. We take the closest points. Other method might be interpolate        
+
             gaussian_factor = zeros(1, length(slices_distance));% preallocation
             % Round to the millimeter
             distan         = round(distan,4);
@@ -65,6 +69,7 @@ if length(LOS_points.slicesAv) ~= 1
 %             cumulative_probability = cumsum(gaussian)*(distan(2)-distan(1));
 %             for ind_cum=1:length(slices_distance)
 %                 [~,pos_cum]=min(abs(distan-slices_distance(ind_cum)));
+
 %                 index_cum{ind_cum}=[pos_cum,pos_cum+1];
 %             end
 %             
@@ -76,7 +81,9 @@ if length(LOS_points.slicesAv) ~= 1
 %             VFinalTotal_Time2(:,i) = sum(cum_prob'.*VFinalTotal_TimeInt3,'omitnan');
 
         end
+
         end
+
     end
 else
     VFinalTotal_Time = VFinalTotal_TimeInt2;
