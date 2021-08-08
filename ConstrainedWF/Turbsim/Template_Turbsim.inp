@@ -16,20 +16,20 @@ False         Clockwise       - Clockwise rotation looking downwind? (used only 
           0   ScaleIEC        - Scale IEC turbulence models to exact target standard deviation? [0=no additional scaling; 1=use hub scale uniformly; 2=use individual scales]
 
 --------Turbine/Model Specifications-----------------------
-"7"           NumGrid_Z       - Vertical grid-point matrix dimension
-"7"           NumGrid_Y       - Horizontal grid-point matrix dimension
-"0.05"        TimeStep        - Time step [seconds]
-"600"         AnalysisTime    - Length of analysis time series [seconds] (program will add time if necessary: AnalysisTime = MAX(AnalysisTime, UsablTimes+GridWidht/MeanHHWS) )
+"91"           NumGrid_Z       - Vertical grid-point matrix dimension
+"91"           NumGrid_Y       - Horizontal grid-point matrix dimension
+"2"        TimeStep        - Time step [seconds]
+"300"         AnalysisTime    - Length of analysis time series [seconds] (program will add time if necessary: AnalysisTime = MAX(AnalysisTime, UsablTimes+GridWidht/MeanHHWS) )
 "ALL"         UsableTime      - Usable length of output time series [seconds] (program will add GridWidht/MeanHHWS seconds unless UsablTimes is "ALL")
-"76"          HubHt           - Hub height [m] (should be > 0.5*GridHeigth)
-"78"          GridHeight      - Grid height [m]
-"78"          GridWidth       - Grid width [m] (should be >= 2*(RotorRadius+ShaftLength))
+"91"          HubHt           - Hub height [m] (should be > 0.5*GridHeigth)
+"180"          GridHeight      - Grid height [m]
+"180"          GridWidth       - Grid width [m] (should be >= 2*(RotorRadius+ShaftLength))
 0             VFlowAng        - Vertical mean flow (uptilt) angle [degrees]
 0             HFlowAng        - Horizontal mean flow (skew) angle [degrees]
 
 --------Meteorological Boundary Conditions-------------------
-"TIMESR"     TurbModel       - Turbulence model ("IECKAI","IECVKM","GP_LLJ","NWTCUP","SMOOTH","WF_UPW","WF_07D","WF_14D","TIDAL","API","USRINP","TIMESR", or "NONEs")
-"UserTimeSeries/20140113_164000_inertial_MDR.TimeSer"    UserFile        - Name of the file that contains inputs for user-defined spectra or time series inputs (used only for "USRINP" and "TIMESR" models)
+"IECKAI"     TurbModel       - Turbulence model ("IECKAI","IECVKM","GP_LLJ","NWTCUP","SMOOTH","WF_UPW","WF_07D","WF_14D","TIDAL","API","USRINP","TIMESR", or "NONEs")
+"NONE"    UserFile        - Name of the file that contains inputs for user-defined spectra or time series inputs (used only for "USRINP" and "TIMESR" models)
 "1-Ed3"     IECstandard     - Number of IEC 61400-x standard (x=1,2, or 3 with optional 61400-1 edition number (i.e. "1-Ed2") )
 "A"          IECturbc        - IEC turbulence characteristic ("A", "B", "C" or the turbulence intensity in percent) ("KHTEST" option with NWTCUP model, not used for other models)
 "NTM"        IEC_WindType    - IEC turbulence type ("NTM"=normal, "xETM"=extreme turbulence, "xEWM1"=extreme 1-year wind, "xEWM50"=extreme 50-year wind, where x=wind turbine class 1, 2, or 3)
@@ -37,9 +37,9 @@ default      ETMc            - IEC Extreme Turbulence Model "c" parameter [m/s]
 "PL"         WindProfileType - Velocity profile type ("LOG";"PL"=power law;"JET";"H2L"=Log law for TIDAL model;"API";"USR";"TS";"IEC"=PL on rotor disk, LOG elsewhere; or default)
 "unused"     ProfileFile     - Name of the file that contains input profiles for WindProfType="USR" and/or TurbModel="USRVKM" [-]
 "76"         RefHt           - Height of the reference velocity (Uref) [m]
-"22.71"      URef            - Mean (total) velocity at the reference height [m/s] (or default for JET velocity profile) [must be 1-hr mean for API model; otherwise is the mean over AnalisisTime seconds]
+"15"      URef            - Mean (total) velocity at the reference height [m/s] (or default for JET velocity profile) [must be 1-hr mean for API model; otherwise is the mean over AnalisisTime seconds]
 450      ZJetMax         - Jet height [m] (used only for JET velocity profile, valid 70-490 m)
-"default"    PLExp           - Power law exponent [-] (or default)
+"0.15"    PLExp           - Power law exponent [-] (or default)
 "0.03"    Z0              - Surface roughness length [m] (or default)
 
 --------Non-IEC Meteorological Boundary Conditions------------
