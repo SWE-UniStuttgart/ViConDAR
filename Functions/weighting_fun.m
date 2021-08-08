@@ -1,6 +1,5 @@
 function VFinalTotal_Time=weighting_fun(input,LOS_points,VFinalTotal_TimeInt2)
 
-
 slices_distance = input.ref_plane_dist+(LOS_points.slicesAv*input.distanceSlices);
 
 if length(LOS_points.slicesAv) ~= 1
@@ -89,6 +88,3 @@ if length(LOS_points.slicesAv) ~= 1
 else
     VFinalTotal_Time = VFinalTotal_TimeInt2;
 end
-
-
-
