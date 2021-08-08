@@ -66,8 +66,13 @@ input.plot_fullWF_Slices       = 1; % plot slices in time from the grids of wind
 
 %% Lidar parameters
 
+<<<<<<< Updated upstream
 input.PatternY = {[ 54  54 0 -54 -54];[0 -76.5 76.5 -45 45 -45 45]}; % Pattern points Y axis (in meters). Each line is a pattern
 input.PatternZ = {[-54  54 0 -54  54];[0 0 0 63 63 -63 -63]}; % Pattern points Z axis (in meters). Each line is a pattern
+=======
+input.PatternY = {[ 54  54 0 -54 -54]}; % Pattern points Y axis (in meters). Each line is a pattern
+input.PatternZ = {[-54  54 0 -54  54]}; % Pattern points Z axis (in meters). Each line is a pattern
+>>>>>>> Stashed changes
 
 input.PatternNames = {'5P_Rectangular' '7P_Circular' }; % names of the patterns. Important: number of names should equal number of Y,Z coordinates
 
@@ -76,8 +81,17 @@ input.timeStep_Measurements = {[0 1] [0]}; %Time step between each single measur
 
 input.ref_plane_dist = [250]; % Reference Plane for LOS (distance[m])
 input.Pos_LiDAR      = [0,0]; % LiDAR position offset from hub center(meters)==> [Y,Z]. It cannot be used to loop over it. It has to be fixed for now
+<<<<<<< Updated upstream
 input.distance_av_space = [30]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and afer the range gate center point
 input.points_av_slice   = [5]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
+=======
+input.distance_av_space = [25]; %[str2num(fileread([input.Rayleigh_distance,'rayleigh_distance.txt']))]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and after the range gate center point (Rayleigh Distance: parameter fed from Qlunc)
+
+% previous: input.distance_av_space = [40]; % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds. Meters before and afer the range gate center point
+input.points_av_slice   = [7]; % How many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
+
+input.sample_rate   = [8]; % [Hz] Lidar measurements sample rate (along with the probe length). Sample rate, transformed in distance,  "(1/sample_rate/dt)*distance_slices", must be smaller than the probe volume
+>>>>>>> Stashed changes
 input.noise_U = [20]; % magnitude of noise to be applied in U time series (see help of awgn function)
 
 input.noise_V = input.noise_U; % magnitude of noise to be applied in V time series (see help of awgn function)
