@@ -16,7 +16,8 @@ if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later
         for ind_slice=1:size(LOS_points.slices,2)
             for iTSlice = 1:length(LOS_points.slicesAv) % For measured slices in the pattern
 
-                indLoopT =  (LOS_points.slices(i1,ind_slice)+LOS_points.slicesAv(iTSlice))*input.distanceSlices  ;% [m] Distances where the measurements are focused  along the probe length
+                indLoopT  =  (LOS_points.slices(i1,ind_slice)+LOS_points.slicesAv(iTSlice))*input.distanceSlices;% [m] Distances where the measurements are focused  along the probe length
+  
                 indLoopT2 = indLoopT;
                 indNEg = find(indLoopT<=0); % find negative, zeros or Nans
                 indNEg =  [indNEg find(isnan(indLoopT))]; % find negative or Nans
@@ -109,8 +110,8 @@ else %if you don't interpolate get the closest point
         end
         
         % Apply weighting function:
-        VFinalTotal_TimeInt3{i1} =VFinalTotal_TimeInt2;
-        VFinalTotal_Time = weighting_fun(input,LOS_points,VFinalTotal_TimeInt3);
+        VFinalTotal_TimeInt3{i1} = VFinalTotal_TimeInt2;
+        
              
 %         if length(LOS_points.slicesAv) ~= 1
 %             VFinalTotal_Time{i1} = mean(VFinalTotal_TimeInt2,'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in the LOS
@@ -120,4 +121,5 @@ else %if you don't interpolate get the closest point
 
         clear VFinalTotal_TimeInt
     end
+    VFinalTotal_Time    = weighting_fun(input,LOS_points,VFinalTotal_TimeInt3) ;
 end
