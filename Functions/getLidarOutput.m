@@ -168,36 +168,21 @@ for iTra= 1:length(Y)
     %         -sind(angley(iTra))                     0                     cosd(angley(iTra))];
     LOS_2_In_matrix{iTra} =  In_2_LOS_matrix{iTra}^-1; % Inverse transformation: LOS_CS to Inertial_CS
 end
-
 if input.distance_av_space~= 0
-%     SliceVecInt = round((-distance_av_slice:distance_av_slice/points_av_slice:distance_av_slice))*input.distanceSlices  ;
-%     focus_distances = SliceVecInt+ref_plane_dist;
-
-% Recalculate the slices before and after the focus distance: If the slice does not exist we take the previous and the
-% following. to calculate the trajectories
-    
     post=nonzeros(0:distance_sample_rate:distance_av_space)';
     prev=sort(-post);
-    input.focus_distances = [ref_plane_dist+prev,ref_plane_dist,ref_plane_dist+post];
-   
+    input.focus_distances = [ref_plane_dist+prev,ref_plane_dist,ref_plane_dist+post];  
     for ind_foc=1:size(input.focus_distances,2)
-        input.focus_dis{ind_foc}=input.focus_distances(ind_foc);
-        
+        input.focus_dis{ind_foc}=input.focus_distances(ind_foc);        
         if ~ismember(input.focus_dis{ind_foc},input.slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones (the previous and the following) 
             diff_slices                  = (abs(input.focus_dis{ind_foc}-input.slicesDistance));
             [~,ind_min]                  = mink(diff_slices,2,2);
             ind_min3(1,ind_foc)          = ind_min(1); %index for the slices to focus the lidar.
             ind_min2                     = sort(ind_min);
-            
-            input.focus_distances_index{ind_foc}    =[ind_min2];
             input.focus_distances_new{ind_foc} = [input.slicesDistance(ind_min2(1)) input.slicesDistance(ind_min2(2))]; % new vector with the slices (the previous and the following)
         else % (*)
             ind_min3(1,ind_foc)    = find(input.slicesDistance==input.focus_distances(ind_foc));
             input.focus_distances_new{ind_foc} = input.slicesDistance(ind_min3(1,ind_foc));
-%             diff_slices                  = (abs(input.focus_distances_new{ind_foc}-input.slicesDistance));
-%             [~,ind_min]                  = min(diff_slices);
-%             ind_min3(1,ind_foc)          = ind_min(1); %index for the slices to focus the lidar.
-
         end 
 
         % If, in (*), the slice is in the grid, the focus distance
@@ -208,12 +193,11 @@ if input.distance_av_space~= 0
 %             input.focus_distances_new{ind_foc}(1,2) = input.focus_distances_new{ind_foc}(1,1);
 %             input.focus_distances_index{ind_foc}(1,2)    = input.focus_distances_index{ind_foc}(1,1);
 %         end
-
     end
     LOS_points.slicesAv = (ind_min3 - (ind_min3(1,ceil(size(ind_min3,2)/2)))); % measured slices (index) before and after the focus distance
-
 else
-    input.focus_distances_new = ref_plane_dist;  % no slices to be averaged, single point measurement
+    % no slices to be averaged, single point measurement
+    input.focus_distances_new = ref_plane_dist;  
     input.focus_distances     = ref_plane_dist;
     LOS_points.slicesAv = 0;
 end
