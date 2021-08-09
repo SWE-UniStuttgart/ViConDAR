@@ -7,7 +7,7 @@
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 
-function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(input,component,LOS_points,gridy,gridz,fullTime,windfield,dt,type_interpolation_2)
+function [VFinalTotal,VFinalTotal_Time,Y1,Z1] = interpolationFun(input,component,LOS_points,gridy,gridz)
 
 if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later???? Currently we use the closest grid point and the nearest time slice
     for i1 = 1:size(LOS_points.slices,1) % loop over the points of pattern
@@ -16,7 +16,7 @@ if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later
         for ind_slice=1:size(LOS_points.slices,2)
             for iTSlice = 1:length(LOS_points.slicesAv) % For measured slices in the pattern
 
-                indLoopT  =  (LOS_points.slices(i1,ind_slice)+LOS_points.slicesAv(iTSlice))*input.distanceSlices;% [m] Distances where the measurements are focused  along the probe length
+                indLoopT  =  (LOS_points.slices(i1,ind_slice)+LOS_points.slicesAv(iTSlice)-1)*input.distanceSlices;% [m] Distances where the measurements are focused  along the probe length
   
                 indLoopT2 = indLoopT;
                 indNEg = find(indLoopT<=0); % find negative, zeros or Nans

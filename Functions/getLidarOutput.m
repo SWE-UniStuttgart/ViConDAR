@@ -28,7 +28,7 @@ Pos_LiDAR    = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1
 ref_plane_dist = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Fd'))));       % Reference Plane for LOS (distance[m])
 distance_av_space = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'DAv'))));   % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds from pulses meters ahead and afer the point
 points_av_slice   = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SlAv'))));  % how many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
-sample_rate   = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SmpR'))));  % Sample rate [Hz]
+% sample_rate   = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SmpR'))));  % Sample rate [Hz]
 
 Y = input.PatternY{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates lateral (m)
 Z = input.PatternZ{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates vertical (m)
@@ -48,7 +48,7 @@ resampling_factor = input.resampling_factor; % Amount of desired resampling for 
 nComp             = input.nComp;        %#ok<NASGU> %1:u, 2:v+u 3:u+v+w % Number of components to process (U,V,W):
 % Interpolation for time and space
 type_interpolation     = input.type_interpolation; %#ok<NASGU> % (interp1) interpolation between slices [Time] line460 (check other options of interpm)
-type_interpolation_2   = input.type_interpolation_2; % (interp2)  interpolation in grid points for values on the pattern points[Space]
+% type_interpolation_2   = input.type_interpolation_2; % (interp2)  interpolation in grid points for values on the pattern points[Space]
 %Noise magnitude to imitate uncertainty and noise in real measurements (in dB)
 noise_U  = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Ns'))));% magnitude of noise to be applied in U time series (see help of awgn function)
 noise_V  = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Ns')))); % magnitude of noise to be applied in V time series (see help of awgn function)
@@ -73,7 +73,7 @@ gridy                =  windfield.grid.y;
 Uref                 =  windfield.URef; % Mean velocity of the windfied (m/s)
 dz                   =  windfield.grid.dz;
 dy                   =  windfield.grid.dy;
-input.distanceSlices       =  Uref*dt; % Distance step  between consecutive slices(m)
+input.distanceSlices =  Uref*dt; % Distance step  between consecutive slices(m)
 distance_sample_rate =  Uref*(1/input.sample_rate); %[m] Meters between  sample steps along with the probe length
 
 % Manipulation of data before calculations:
@@ -181,22 +181,22 @@ if input.distance_av_space~= 0
     input.focus_distances = [ref_plane_dist+prev,ref_plane_dist,ref_plane_dist+post];
    
     for ind_foc=1:size(input.focus_distances,2)
-        input.focus_distances_index{ind_foc}=input.focus_distances(ind_foc);
+        input.focus_dis{ind_foc}=input.focus_distances(ind_foc);
         
-        if ~ismember(input.focus_distances_index{ind_foc},input.slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones (the previous and the following) 
-            diff_slices                  = (abs(input.focus_distances_index{ind_foc}-input.slicesDistance));
+        if ~ismember(input.focus_dis{ind_foc},input.slicesDistance) % if the focus distance doesn´t exist in the simulated distances, take the closest ones (the previous and the following) 
+            diff_slices                  = (abs(input.focus_dis{ind_foc}-input.slicesDistance));
             [~,ind_min]                  = mink(diff_slices,2,2);
             ind_min3(1,ind_foc)          = ind_min(1); %index for the slices to focus the lidar.
-            ind_min2                      = sort(ind_min);
+            ind_min2                     = sort(ind_min);
             
             input.focus_distances_index{ind_foc}    =[ind_min2];
             input.focus_distances_new{ind_foc} = [input.slicesDistance(ind_min2(1)) input.slicesDistance(ind_min2(2))]; % new vector with the slices (the previous and the following)
         else % (*)
-            input.focus_distances_index{ind_foc}    = find(input.slicesDistance==input.focus_distances(ind_foc));
-            input.focus_distances_new{ind_foc} = input.slicesDistance(input.focus_distances_index{ind_foc});
-            diff_slices                  = (abs(input.focus_distances_index{ind_foc}-input.slicesDistance));
-            [~,ind_min]                  = mink(diff_slices,2,2);
-            ind_min3(1,ind_foc)          = ind_min(1); %index for the slices to focus the lidar.
+            ind_min3(1,ind_foc)    = find(input.slicesDistance==input.focus_distances(ind_foc));
+            input.focus_distances_new{ind_foc} = input.slicesDistance(ind_min3(1,ind_foc));
+%             diff_slices                  = (abs(input.focus_distances_new{ind_foc}-input.slicesDistance));
+%             [~,ind_min]                  = min(diff_slices);
+%             ind_min3(1,ind_foc)          = ind_min(1); %index for the slices to focus the lidar.
 
         end 
 
@@ -256,9 +256,9 @@ end
 % Here is calculated the mean velocity of all the points in the pattern every time LiDAR completes one
 % pattern (frequency of the pattern) taking into account timstep_meas.
 
-[VFinalTotal_U,VFinalTotal_Time_U,~,~] = interpolationFun(input,compU,LOS_points,gridy,gridz,fullTime,windfield,dt,type_interpolation_2);
-[VFinalTotal_V,VFinalTotal_Time_V,~,~] = interpolationFun(input,compV,LOS_points,gridy,gridz,fullTime,windfield,dt,type_interpolation_2);
-[VFinalTotal_W,VFinalTotal_Time_W,~,~] = interpolationFun(input,compW,LOS_points,gridy,gridz,fullTime,windfield,dt,type_interpolation_2);
+[VFinalTotal_U,VFinalTotal_Time_U,~,~] = interpolationFun(input,compU,LOS_points,gridy,gridz);
+[VFinalTotal_V,VFinalTotal_Time_V,~,~] = interpolationFun(input,compV,LOS_points,gridy,gridz);
+[VFinalTotal_W,VFinalTotal_Time_W,~,~] = interpolationFun(input,compW,LOS_points,gridy,gridz);
 
 %% LOS transformations. From cartesian to ray coordinates and back with the cyclops dilema (or something else.. )
 

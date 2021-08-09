@@ -5,7 +5,7 @@ slices_distance = input.ref_plane_dist+(LOS_points.slicesAv*input.distanceSlices
 if length(LOS_points.slicesAv) ~= 1
     if strcmpi(input.flag_probe_weighting,"mean")
         for ind_mean=1:size(VFinalTotal_TimeInt2,2)
-            VFinalTotal_Time{ind_mean} = mean(VFinalTotal_TimeInt2{ind_mean},'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in the LOS
+            VFinalTotal_Time{ind_mean} = mean(VFinalTotal_TimeInt2{ind_mean},'omitnan');
         end
     
     elseif strcmpi(input.flag_probe_weighting,"gaussian")
@@ -15,23 +15,16 @@ if length(LOS_points.slicesAv) ~= 1
         for ind_points=1:size(VFinalTotal_TimeInt2,2)
         for i=1:size(VFinalTotal_TimeInt2{ind_points},2)
             VFinalTotal_TimeInt3=VFinalTotal_TimeInt2{ind_points}(:,i);
-
-            
-%             VFinalTotal_TimeInt_noNAN=VFinalTotal_TimeInt3(~isnan(VFinalTotal_TimeInt3)); % remove nans
-%             weights = linspace (-length(VFinalTotal_TimeInt_noNAN),length(VFinalTotal_TimeInt_noNAN),size(VFinalTotal_TimeInt_noNAN,1));
             
             % For a given fwhm (fwhm = 2*Rayleigh length) we calculate the normal distribution:
             accuracy=1e4;
             fwhm           = 2*input.distance_av_space;
-%             focus_distance = input.ref_plane_dist;
+
             %Sigma and fwhm are simply related as follows:
             sigma          = fwhm/2.355;            
-%             offset = 100;
-%             distan = linspace(focus_distance-offset,focus_distance+offset,1e4);
-            distan = linspace(-5*sigma+250,5*sigma+250,accuracy);
 
-%             gaussian       = (1/(sigma*sqrt(2*pi)))*exp(-0.5*((distan-focus_distance)/sigma).^2);
-            gaussian = (1/(sigma*sqrt(2*pi)))*exp(-0.5*((distan-250)/sigma).^2);
+            distan = linspace(-5*sigma+input.ref_plane_dist,5*sigma+input.ref_plane_dist,accuracy);
+            gaussian = (1/(sigma*sqrt(2*pi)))*exp(-0.5*((distan-input.ref_plane_dist)/sigma).^2);
 
             %Find the points above the fwhm
             half_max       = (min(gaussian) + max(gaussian)) / 2;
@@ -49,6 +42,8 @@ if length(LOS_points.slicesAv) ~= 1
                 if isempty (query_point) % if the queried point is not in the distances vector created to perform the gaussian weights, take the closest
                     [~,ind] =min(abs(probe_distance-slices_distance(ind_dist)));
                     gaussian_factor(1,ind_dist) = gaussian (distan==probe_distance(ind)); % gaussian factors for the distances queried by the lidar within the probe length                                       
+%                     gaussian_factor(1,ind_dist) = interp2();
+                
                 else
                     gaussian_factor(1,ind_dist) = gaussian (query_point);                    
                 end
