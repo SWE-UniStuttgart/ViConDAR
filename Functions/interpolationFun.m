@@ -16,8 +16,8 @@ if input.interpolation_slices==1  %obsolete it shouldn't be used... Fix it later
         for ind_slice=1:size(LOS_points.slices,2)
             for iTSlice = 1:length(LOS_points.slicesAv) % For measured slices in the pattern
 
-                indLoopT  =  (LOS_points.slices(i1,ind_slice)+LOS_points.slicesAv(iTSlice)-1)*input.distanceSlices;% [m] Distances where the measurements are focused  along the probe length
-%                indLoopT  =  (LOS_points.slices(i1,ind_slice)-1)*input.distanceSlices+(input.focus_distances-input.ref_plane_dist);% [m] Distances where the measurements are focused  along the probe length
+%                 indLoopT  =  (LOS_points.slices(i1,ind_slice)+LOS_points.slicesAv(iTSlice)-1)*input.distanceSlices;% [m] Distances where the measurements are focused  along the probe length
+                indLoopT  =  (LOS_points.slices(i1,ind_slice)-1)*input.distanceSlices+(input.focus_distances(iTSlice)-input.ref_plane_dist);% [m] Distances where the measurements are focused  along the probe length
 
                 indLoopT2 = indLoopT;
                 indNEg = find(indLoopT<=0); % find negative, zeros or Nans
