@@ -1,5 +1,7 @@
 # Virtual Constrained turbulence and liDAR measurements (ViConDAR)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4889772.svg)](https://doi.org/10.5281/zenodo.4889772)
+
 ## Introduction
 
 Modular framework allowing to scan a numerical wind field with a virtual lidar and create constrained turbulent wind fields for wind turbine simulations. 
