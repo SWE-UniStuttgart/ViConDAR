@@ -110,7 +110,7 @@ input.interpolation_slices = 1; % 1 - choose interpolattion between slices; 0 - 
 
 % All directories are strings to be concatenated and they should always finish
 % with \. If you run on Mac/Linux definitions should be changed accordingly
-input.OriginalWF_dir  = '..\OriginalWF\';      % Direcotry where original windfileds in .mat format are saved
+input.OriginalWF_dir  = '..\OriginalWF\';      % Directory where original windfileds in .mat format are saved
 input.LidarOutput_dir = '..\LidarOutput\';     % Directory to save the lidar measurement outputs
 input.ConstrainedWF_dir = '..\ConstrainedWF\'; % Directory to save all constrained windfileds
 
@@ -156,7 +156,7 @@ input.CondaEnv                  = 'PyConEnv';
 
 % input options to run pyconturb (passed through the .csv to the python code)
 input.turb_class = 'B';
-input.coh_model  = 'iec'; % coh_model (str, optional) Â– Spatial coherence model specifier. Default is IEC 61400-1.
+input.coh_model  = 'iec'; % coh_model (str, optional) – Spatial coherence model specifier. Default is IEC 61400-1.
 input.wsp_func   = 'data_profile';% wsp_func (function, optional): constant_profile or power_profile
 input.sig_func   = 'data_sig'; %sig_func (function, optional):
 input.spec_func  = 'data_spectrum';%spec_func (function, optional). 'kaimal_spectrum',:

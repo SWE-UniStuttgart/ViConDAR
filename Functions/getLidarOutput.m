@@ -25,10 +25,10 @@ Zh           = input.Zh;           % HubHeight [m]
 Pos_LiDAR    = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pos')))); %#ok<*FNDSB> % LiDAR position offsetfrom hub center(meters)==> [Y,Z] WE NEED TO FIX THE APPLICATION OF OFFSET IN LOS ONLY!!!!
 % Pos_LiDAR  = Pos_LiDARCell{1,1};
 % Lidar parameters
-ref_plane_dist = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Fd'))));       % Reference Plane for LOS (distance[m])
+ref_plane_dist    = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Fd'))));       % Reference Plane for LOS (distance[m])
 distance_av_space = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'DAv'))));   % [m] values to use for imitating range gate averaging in the calcualtion of wind speeds from pulses meters ahead and afer the point
 points_av_slice   = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SlAv'))));  % how many point/slices you want to take in the averaging of distance_av_slice  Totalpoints = distance_av_slice/points_av_slice+1 IT HAS TO BE AN EXACT DIVISION FOR NOW!!!!
-% sample_rate   = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SmpR'))));  % Sample rate [Hz]
+% sample_rate     = cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'SmpR'))));  % Sample rate [Hz] --> I left this here just in case you want to call the variable this way and not include it in the "input." class 
 
 Y = input.PatternY{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates lateral (m)
 Z = input.PatternZ{cell2mat(curFileInfo.values (find(strcmp((curFileInfo.variables{1, 1}),'Pat')))),1}; % lidar pattern coordinates vertical (m)
@@ -74,7 +74,7 @@ Uref                 =  windfield.URef; % Mean velocity of the windfied (m/s)
 dz                   =  windfield.grid.dz;
 dy                   =  windfield.grid.dy;
 input.distanceSlices =  Uref*dt; % Distance step  between consecutive slices(m)
-distance_sample_rate =  Uref*(1/input.sample_rate); %[m] Meters between  sample steps along with the probe length
+distance_sample_rate =  Uref*(1/input.sample_rate); %[m] Meters between  sample steps within the probe length
 
 % Manipulation of data before calculations:
 for i=1:gridtime
