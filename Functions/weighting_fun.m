@@ -17,10 +17,10 @@ if length(LOS_points.slicesAv) ~= 1
             VFinalTotal_TimeInt3=VFinalTotal_TimeInt2{ind_points}(:,i);
             
             % For a given fwhm (fwhm = 2*Rayleigh length) we calculate the normal distribution:
-            accuracy=1e4;
-            fwhm           = 2*input.distance_av_space;
+            accuracy = 1e4;
+            fwhm     = 2*input.distance_av_space;
 
-            %Sigma and fwhm are simply related as follows:
+            %Sigma and fwhm are simply related as follows (by definition):
             sigma          = fwhm/2.355;            
 
             distan = linspace(-5*sigma+input.ref_plane_dist,5*sigma+input.ref_plane_dist,accuracy);
