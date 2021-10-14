@@ -5,7 +5,7 @@ slices_distance = input.ref_plane_dist+(LOS_points.slicesAv*input.distanceSlices
 if length(LOS_points.slicesAv) ~= 1
     if strcmpi(input.flag_probe_weighting,"mean")
         for ind_mean=1:size(VFinalTotal_TimeInt2,2)
-            VFinalTotal_Time{ind_mean} = mean(VFinalTotal_TimeInt2{ind_mean},'omitnan');
+            VFinalTotal_Time{ind_mean} = mean(VFinalTotal_TimeInt2{ind_mean},'omitnan'); %#ok<AGROW>
         end
     
     elseif strcmpi(input.flag_probe_weighting,"gaussian")
@@ -47,16 +47,14 @@ if length(LOS_points.slicesAv) ~= 1
                 else
                     gaussian_factor(1,ind_dist) = gaussian (query_point);                    
                 end
-                      
-    
-            end
+                               end
             
             % probability_weights = gaussian_factor*(distan(2)-distan(1));
             
             % performing weighted mean
             VFinalTotal_TimeInt3_NoNans                  = isnan(VFinalTotal_TimeInt3); %finding nans
             gaussian_factor(VFinalTotal_TimeInt3_NoNans) = nan;
-            VFinalTotal_Time{ind_points}(:,i)            = sum(gaussian_factor'.*VFinalTotal_TimeInt3,'omitnan')/sum(gaussian_factor,'omitnan');
+            VFinalTotal_Time{ind_points}(:,i)            = sum(gaussian_factor'.*VFinalTotal_TimeInt3,'omitnan')/sum(gaussian_factor,'omitnan'); %#ok<AGROW>
              
             
             
