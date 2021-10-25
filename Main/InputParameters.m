@@ -38,7 +38,9 @@ input.fixedInp ={
     };
 
 % This should not be changed. Only when a new lidar feature is added. This is a list of all the parameters requires to run lidar simulator
-input.AllFixed = {'Pat';'Ns';'Tp';'Tm';'Pos';'Fd' ;'DAv';'SmpR';'SlAv'};
+% input.AllFixed = {'Pat';'Ns';'Tp';'Tm';'Pos';'Fd' ;'DAv';'SmpR';'SlAv'};
+input.AllFixed = {'Pat';'Ns';'Tp';'Tm';'Pos';'Fd' ;'DAv';'SlAv'};
+
 %-------------------------------------------------------------------------%
 
 %% Flags for the different functionalities of the framework.
@@ -66,7 +68,6 @@ input.plot_fullWF_Slices       = 0; % plot slices in time from the grids of wind
 %-------------------------------------------------------------------------%
 
 %% Lidar parameters
-
 
 input.PatternY = {[ 54  54 0 -54 -54]}; % Pattern points Y axis (in meters). Each line is a pattern
 input.PatternZ = {[-54  54 0 -54  54]}; % Pattern points Z axis (in meters). Each line is a pattern

@@ -47,7 +47,7 @@ if length(LOS_points.slicesAv) ~= 1
                 else
                     gaussian_factor(1,ind_dist) = gaussian (query_point);                    
                 end
-                               end
+            end
             
             % probability_weights = gaussian_factor*(distan(2)-distan(1));
             

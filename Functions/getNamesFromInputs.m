@@ -91,16 +91,16 @@ for iPat=1:numel(input.PatternNames)
                 error('There is an error with the input ''points_av_slice'' ')
             end
         end
-        if strcmp(curNam,'SmpR')
-            fixedInp{i,2} = [input.sample_rate];
-        elseif any(strcmp(Hidden.Names,'SmpR')) && length(input.sample_rate) ==1
-            index= find(strcmp(Hidden.Names,'SmpR'));
-            Hidden.Val{index,iPat} = input.sample_rate; %#ok<*FNDSB>
-        else
-            if ~isempty(HiddenIndex)  && any(strcmp(Hidden.Names,'SmpR'))
-                error('There is an error with the input ''sample_rate'' ')
-            end
-        end
+%         if strcmp(curNam,'SmpR')
+%             fixedInp{i,2} = [input.sample_rate];
+%         elseif any(strcmp(Hidden.Names,'SmpR')) && length(input.sample_rate) ==1
+%             index= find(strcmp(Hidden.Names,'SmpR'));
+%             Hidden.Val{index,iPat} = input.sample_rate; %#ok<*FNDSB>
+%         else
+%             if ~isempty(HiddenIndex)  && any(strcmp(Hidden.Names,'SmpR'))
+%                 error('There is an error with the input ''sample_rate'' ')
+%             end
+%         end
         if strcmp(curNam,'Ns')
             fixedInp{i,2} = [input.noise_U];
         elseif any(strcmp(Hidden.Names,'Ns')) && length(input.noise_U) ==1
