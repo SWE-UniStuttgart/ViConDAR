@@ -1,12 +1,11 @@
 # Virtual Constrained turbulence and liDAR measurements (ViConDAR)
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4889772.svg)](https://doi.org/10.5281/zenodo.4889772)
-
 ## Introduction
 
 Modular framework allowing to scan a numerical wind field with a virtual lidar and create constrained turbulent wind fields for wind turbine simulations. 
 
-The framework aims to provide an open source base for such tests but also to be used as a platform where other modules (e.g. different velocity vector reconstruction methods) can be easily added and tested. More information on motivation and possible applications can be found in [1].
+The framework aims to provide an open source base for such tests but also to be used as a platform where other modules (e.g. different velocity vector reconstruction methods) can be easily added and tested. More information on motivation and possible applications can be found in [1] and [6]. 
+
 
 ![flowchart](Pictures_repo/vicondar_overview.png)
 
@@ -58,6 +57,7 @@ To report a bug or a feature request as well as any other comment please use the
 3. NWTC Information Portal (Alpha Versions).  https://nwtc.nrel.gov/Alphas. Last modified 14-June-2016 ;
 4. Dimitrov N., Natarajan A., “Application of simulated lidar scanning patterns to constrained Gaussian turbulence fields for load validation”, 2017, Wind Energ., 20: 79– 95. https://doi.org/10.1002/we.1992 .
 5. Conti, D., Pettas, V., Dimitrov, N., and Peña, A.: Wind turbine load validation in wakes using field reconstruction techniques and nacelle lidar wind retrievals, Wind Energ. Sci. Discuss. [preprint], https://doi.org/10.5194/wes-2020-104, in review, 2020.
+6. add refeernce MG paper
 
 ## Citing
 If you use ViConDAR for a publication, use the following citation:
@@ -80,8 +80,3 @@ title = {{A numerical framework for constraining synthetic wind fields with lida
 url = {https://doi.org/10.2514/6.2020-0993 },
 year = {2020}
 }
-
-## Code development and maintenance
-Vasilis Pettas, University of Stuttgart, Stuttgart Wind Energy (SWE) ORCID: 0000-0001-9985-9031
-
-Francisco Costa, University of Stuttgart, Stuttgart Wind Energy (SWE) ORCID: 0000-0001-7822-3317

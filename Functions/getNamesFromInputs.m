@@ -150,6 +150,14 @@ for iAr = 1:size(FinalArrayVar,1)
     perm_cell.OutNames{iAr,1} = CurNam; 
 end
 TotalArrayVarVal = reshape(TotalArrayVarVal,numel(TotalArrayVarVal),1);
+idx_delete=[];
+for i= 1:length(TotalArrayVarVal)
+    if isempty(TotalArrayVarVal{i})
+        idx_delete=[idx_delete,i]; 
+    end
+end
+TotalArrayVarVal(idx_delete)=[];
+
 for i = 1:size(FinalArrayVar,1)
     perm_cell.values(i,:) = TotalArrayVarVal(i,:); 
 end

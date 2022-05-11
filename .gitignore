@@ -5,7 +5,11 @@
 *.csv
 *.mat
 *.bin
-!TestFiles/TEST_Sh25_SD01_V15_TI05.mat #keep only the test file
+
+#keep only the test file
+!TestFiles/TEST_Sh25_SD01_V15_TI05.mat
+!TestFiles/FLTEST_Sh20_SD01_V10_TI09_dynamics.mat
+!TestFiles/FLTEST_Sh20_SD01_V10_TI09.mat
 
 # Ignore the folders with data
 OriginalWF/
@@ -13,6 +17,7 @@ LidarOutput/
 ConstrainedWF/
 InputsForConstrainedTurb/
 Developer/
+Floater_Dynamics/
 
 # matlab asvs
 *.asv

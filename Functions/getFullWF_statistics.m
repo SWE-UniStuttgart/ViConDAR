@@ -6,7 +6,9 @@
 % is no output in the function, it just saves directly to the directory defined
 % from InputParameters file.
 %
-% V.Pettas/F.Costa
+% TODO: Introduce flag for calculation of frequency domain statistics to save time
+%
+% V.Pettas/F.Costa/M.Graefe
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 function getFullWF_statistics(input,curFileInfo)
@@ -21,6 +23,7 @@ dist_REWS_nd = input.dist_REWS_nd; % Non dimentional span position for rotor eff
 Wi           = input.Wi;  %Weight to be applied for rotor effective wind speed calculation
 dist_REWS = rotor_radius*[dist_REWS_nd 2]; %convert ND spanwise to meters and treat the point outside with 0 weight
 Wi        = [Wi 0];
+
 %% Check if these files exist in turbsim and pycoturb folders
 
 % get pyconturb constrained wind field names from the output folder
@@ -88,13 +91,10 @@ for iWF = 1:size(AllWf,2)
     %% Load windfield file
     if ~isempty(AllWf{1,iWF})
         filenameWF =AllWf{1,iWF};
-        load (filenameWF); % windfield variable is loaded
+        load (filenameWF); %#ok<*LOAD> % windfield variable is loaded
         
         %% Obtain and create data
-        %extract components from the windfield variable        
-        compU    =  windfield.u;
-        compV    =  windfield.v;
-        compW    =  windfield.w;
+        %extract components from the windfield variable
         dt       =  windfield.dt; %time step
         gridtime =  windfield.grid.nt;
         gridny   =  windfield.grid.ny;
@@ -106,15 +106,19 @@ for iWF = 1:size(AllWf,2)
         dy       =  windfield.grid.dy;
         
         % Manipulation of data before calculations:
+        compU = zeros(gridnz,gridtime,gridny);
+        compV = zeros(gridnz,gridtime,gridny);
+        compW = zeros(gridnz,gridtime,gridny);
+        
         for i=1:gridtime
-            SqueezeCompU{i} = squeeze(compU(:,i,:));
-            compU(:,i,:) = flipud(SqueezeCompU{i}');
+            SqueezeCompU = squeeze(windfield.u(:,i,:));
+            compU(:,i,:) = flipud(SqueezeCompU');
             
-            SqueezeCompV{i} = squeeze(compV(:,i,:));
-            compV(:,i,:) = flipud(SqueezeCompV{i}');
+            SqueezeCompV = squeeze(windfield.v(:,i,:));
+            compV(:,i,:) = flipud(SqueezeCompV');
             
-            SqueezeCompW{i} = squeeze(compW(:,i,:)); %#ok<*AGROW>
-            compW(:,i,:) = flipud(SqueezeCompW{i}');
+            SqueezeCompW = squeeze(windfield.w(:,i,:));
+            compW(:,i,:) = flipud(SqueezeCompW');
         end
         
         %% Discretization
@@ -128,7 +132,7 @@ for iWF = 1:size(AllWf,2)
         % distances of all points in the turbsim grid from center assuming hub center =0
         for I = 1:gridny
             for II = 1:gridnz
-                Distances_of_Points_In_Plane(I,II) = sqrt((gridy(I)).^2+(gridz(II)).^2); %Matrix of distances from center of rotor to each point in the grid
+                Distances_of_Points_In_Plane(II,I) = sqrt((gridy(I)).^2+(gridz(II)).^2); %#ok<*AGROW> %Matrix of distances from center of rotor to each point in the grid
             end
         end
         
@@ -136,7 +140,7 @@ for iWF = 1:size(AllWf,2)
             % calculate weigths for all the grid points
             for I = 1:gridny
                 for II = 1:gridnz
-                    Weights_of_Points_In_Plane(I,II) = interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(I,II)); %Matrix of weights for all grid points
+                    Weights_of_Points_In_Plane(II,I) = interp1(dist_REWS,Wi,Distances_of_Points_In_Plane(II,I)); %Matrix of weights for all grid points
                 end
             end
             weigthTot_grid = sum(sum(Weights_of_Points_In_Plane)); %sum of weights needed for weighted average
@@ -160,22 +164,23 @@ for iWF = 1:size(AllWf,2)
         
         %% Calculate Shear power law exponent from full windfield
         %maybe add an option to calculate shear on every nth slice of the ful field to reduce time
-        zero_valueY = find(gridy==0);
         zero_valueZ = find(gridz==0);
-        z_vec_Shear = (gridz)+Zh;             %create vector of heights
-        Vhub_HH = compU(zero_valueZ,:,zero_valueY); %#ok<*FNDSB> %Velocity u at the hub height
+        if isempty(zero_valueZ)
+            [~,zero_valueZ] =min(abs(gridz));   % dirty fix for case where the grid does not include (0,0)
+        end
+        
+        z_vec_Shear = (gridz)+Zh;       % create vector of heights
+        Vhub_shear = zeros(gridtime,1); % pre assign variable
         
         % calculate power law for full turbsim data:
         for ind_sliceLaW = 1:gridtime  %for slices
             V_slice = squeeze(compU(:,ind_sliceLaW,:)); % velocity of point in slices
+            Vhub_shear(ind_sliceLaW)  = mean(V_slice(zero_valueZ,:));
             v_hor   = mean (V_slice,2);     % take the average of all points in each horizontal line
             
             % find least square fit for the average vertical line
-            fcn = @(alphaPL) sum((Vhub_HH(ind_sliceLaW)*(z_vec_Shear/Zh).^(alphaPL) - v_hor').^2); % least square defintion f
+            fcn = @(alphaPL) sum((Vhub_shear(ind_sliceLaW)*(z_vec_Shear/Zh).^(alphaPL) - v_hor').^2); % least square defintion f
             [s,~,~] = fminsearch(fcn, 0.14);        % Minimise Least-Squares error
-            if abs(s) < 0.005 || s<0
-                s = 0;
-            end
             ShearPL.TS(ind_sliceLaW) = s; %#ok<*SAGROW>
         end
         ShearPL.mean = mean(ShearPL.TS); % total shear of the wind field
@@ -189,6 +194,17 @@ for iWF = 1:size(AllWf,2)
         Umean.TI   = std(Umean.TS)/ mean(Umean.TS);
         
         %% HH wind speed TS, mean and TI
+        zero_valueY = find(gridy==0); % find the 0,0 point
+        zero_valueZ = find(gridz==0);
+        if isempty(zero_valueZ)
+            [~,zero_valueZ] = min(abs(gridz));   % dirty fix for case where the grid does not include (0,0)
+        end
+        if isempty(zero_valueY)
+            [~,zero_valueY] = min(abs(gridy));   % dirty fix for case where the grid does not include (0,0)
+        end
+        
+        Vhub_HH = compU(zero_valueZ,:,zero_valueY); %#ok<*FNDSB> %Velocity u at the hub height
+        
         HH.TS   = Vhub_HH;
         HH.mean = mean(Vhub_HH);
         HH.TI   = std(Vhub_HH)/mean(Vhub_HH);
@@ -243,18 +259,18 @@ for iWF = 1:size(AllWf,2)
             
             % Calculate errors
             Error.Umean.mean = StatisticsWF.Constrained.Umean.mean-StatisticsWF.Original.Umean.mean;
-            Error.Umean.TS   = StatisticsWF.Constrained.Umean.TS -StatisticsWF.Original.Umean.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.Umean.TS   = StatisticsWF.Constrained.Umean.TS -StatisticsWF.Original.Umean.TS(find(ismembertol(StatisticsWF.Original.time ,StatisticsWF.Constrained.time))); 
             Error.Umean.TI   = StatisticsWF.Constrained.Umean.TI-StatisticsWF.Original.Umean.TI;
             Error.HH.mean    = StatisticsWF.Constrained.HH.mean-StatisticsWF.Original.HH.mean;
-            Error.HH.TS      = StatisticsWF.Constrained.HH.TS -StatisticsWF.Original.HH.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.HH.TS      = StatisticsWF.Constrained.HH.TS -StatisticsWF.Original.HH.TS(find(ismembertol(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
             Error.HH.TI      = StatisticsWF.Constrained.HH.TI-StatisticsWF.Original.HH.TI;
             Error.Shear.mean = StatisticsWF.Constrained.Shear.mean-StatisticsWF.Original.Shear.mean;
-            Error.Shear.TS   = StatisticsWF.Constrained.Shear.TS -StatisticsWF.Original.Shear.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.Shear.TS   = StatisticsWF.Constrained.Shear.TS -StatisticsWF.Original.Shear.TS(find(ismembertol(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
             Error.REWS.mean  = StatisticsWF.Constrained.REWS.mean-StatisticsWF.Original.REWS.mean;
-            Error.REWS.TS    = StatisticsWF.Constrained.REWS.TS -StatisticsWF.Original.REWS.TS(find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
+            Error.REWS.TS    = StatisticsWF.Constrained.REWS.TS -StatisticsWF.Original.REWS.TS(find(ismembertol(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)));
             % Calculate error per slice
             for iTim = 1:size(compU,2)
-                [~,T_OrInd] = ismember(fullslicesTime(iTim),OriginalWF.T); % get the correct time matching in the original wind field
+                [~,T_OrInd] = ismembertol(fullslicesTime(iTim),OriginalWF.T); % get the correct time matching in the original wind field
                 U_Slice_ErrAll = squeeze(compU(:,iTim,:))-squeeze(OriginalWF.U(:,T_OrInd,:));
                 U_Slice_ErrAllPerc = 100* U_Slice_ErrAll./squeeze(OriginalWF.U(:,T_OrInd,:));
                 U_Slice_Err(iTim)  = mean(mean(abs(U_Slice_ErrAll)));
@@ -265,15 +281,15 @@ for iWF = 1:size(AllWf,2)
             vWindowOr  = hamming(floor(length(StatisticsWF.Original.time)/12)*2);
             dtOr       = diff(StatisticsWF.Original.time(1:2))';
             dtCon      = diff(StatisticsWF.Constrained.time(1:2))';
- 
+            
             for iY = 1:length(gridy)
                 for iZ = 1:length(gridz)
                     %                     ii=ii+1;
                     %                     yCons{ii,1}=compU(iY,:,iZ);
                     %                     yOr{ii,1}=OriginalWF.U(iY,find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)),iZ);
-                    [U_coh.coh(iY,iZ,:), U_coh.f(iY,iZ,:)]        = mscohere(OriginalWF.U(iY,find(ismember(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)),iZ),compU(iY,:,iZ),round(size(compU,2)/20),[],[],1/(StatisticsWF.Constrained.time(2)-StatisticsWF.Constrained.time(1)));
-                    [Fdom.Or.S(iY,iZ,:),Fdom.Or.f(iY,iZ,:)]       = pwelch(detrend(OriginalWF.U(iY,:,iZ),'constant'),vWindowOr,[],[],1/dtOr,'onesided');
-                    [Fdom.Const.S(iY,iZ,:),Fdom.Const.f(iY,iZ,:)] = pwelch(detrend(compU(iY,:,iZ),'constant'),vWindowCon,[],[],1/dtCon,'onesided');
+                    [U_coh.coh(iZ,iY,:), U_coh.f(iZ,iY,:)]        = mscohere(OriginalWF.U(iZ,find(ismembertol(StatisticsWF.Original.time ,StatisticsWF.Constrained.time)),iY),compU(iZ,:,iY),round(size(compU,2)/20),[],[],1/(StatisticsWF.Constrained.time(2)-StatisticsWF.Constrained.time(1)));
+                    [Fdom.Or.S(iZ,iY,:),Fdom.Or.f(iZ,iY,:)]       = pwelch(detrend(OriginalWF.U(iZ,:,iY),'constant'),vWindowOr,[],[],1/dtOr,'onesided');
+                    [Fdom.Const.S(iZ,iY,:),Fdom.Const.f(iZ,iY,:)] = pwelch(detrend(compU(iZ,:,iY),'constant'),vWindowCon,[],[],1/dtCon,'onesided');
                 end
             end
             %             warning('off','all')

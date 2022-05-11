@@ -13,7 +13,7 @@ close all;
 clearvars; 
 tmp = matlab.desktop.editor.getActive;
 cd(fileparts(tmp.Filename));
-% Add functions, Main and HelpfulStandAlone folders to the path
+% Add functiwons, Main and HelpfulStandAlone folders to the paths
 addpath(genpath('../Functions'))
 addpath(genpath('../Main'))
 addpath(genpath('../HelpfulStandAlone'))
@@ -73,7 +73,7 @@ if input.flag_getTurbsimInput == 1
         [VFinal,t_lidar,Y1,Z1] = Create_Turbsim_Vinput(Output,input); % Creating time series and information needed for turbsim timeSR file 
         [~,RefNode] = min(abs(Z1-input.Zh)+abs(Y1));
         writeTurbSimTimeSeriesInput([input.TurbSimInput_dir curFileInfo.name '.TimeSer'], curFileInfo.name, VFinal, t_lidar', Y1,Z1,input.nComp,RefNode); % Write time series file for TurbSim
-        CreateInpTurbsim([input.TurbSimInput_dir curFileInfo.name '_ConTurbSim.inp'],[curFileInfo.name '.TimeSer'],t_lidar,input,Output); %create .inp file for turbsim based on the template
+        CreateInpTurbsim([input.TurbSimInput_dir curFileInfo.name '_ConTurbSim.inp'],[curFileInfo.name '.TimeSer'],input,Output); %create .inp file for turbsim based on the template
         disp([curFileInfo.name ' input for turbsim done.' ])
     end
 end

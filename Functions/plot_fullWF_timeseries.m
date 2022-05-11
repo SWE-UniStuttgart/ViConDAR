@@ -20,7 +20,7 @@ end
 
 for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested points in space
     Ypoint = input.points_plot_WF_timeseries(1,iPoint); %Y point in meters
-    Zpoint = input.points_plot_WF_timeseries(2,iPoint); %Z  point in meters    
+    Zpoint = input.points_plot_WF_timeseries(2,iPoint); %Z  point in meters
     
     %Go through orginal wind field folders to match the names
     for iNamOr = 1:length(perm_cell.namesOWF) % loop over orifinal windfields
@@ -37,7 +37,7 @@ for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested poi
         
         % loop over constrained wind fields with pyconturb that come from the same
         % original windfield
-        if input.plot_WF_timeseries_Pyconturb == 1 ;
+        if input.plot_WF_timeseries_Pyconturb == 1 
             pyconWFsInd = ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); %
             pyconWFs = pyconturbWF_names(pyconWFsInd);
             for ipyconWF = 1:size(pyconWFs,2)
@@ -54,7 +54,7 @@ for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested poi
         
         % loop over constrained wind fields with turbsim that come from the same
         % original windfield
-        if input.plot_WF_timeseries_Turbsim == 1 ;
+        if input.plot_WF_timeseries_Turbsim == 1 
             turbsimWFsInd = ~cellfun(@isempty,strfind(turbsimWF_names,curNamOr)); %
             turbsimWFs = turbsimWF_names(turbsimWFsInd);
             for iturbsimWF = 1:size(turbsimWFs,2)
@@ -67,7 +67,7 @@ for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested poi
                 legCell{1,end+1} = curNamTurbsim(1:end-4);
                 hold on
             end
-        end    
+        end
         grid on
         title (['Timeseries at Y:' num2str(Ypoint) 'm Z:' num2str(Zpoint) 'm'])
         xlabel ('Time [s]')

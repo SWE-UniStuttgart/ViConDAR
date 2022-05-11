@@ -4,7 +4,7 @@
 % field to store them in the Output variable. This function can be modified to
 % introduce new desired outputs.
 %
-% V.Pettas/F.Costa
+% V.Pettas/F.Costa/M.Graefe
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
 
 
