@@ -56,8 +56,8 @@ To report a bug or a feature request as well as any other comment please use the
 1037, 2018, p. 062032. URL http://stacks.iop.org/1742-6596/1037/i=6/a=062032?key=crossref.e906e6eebbe4b3f8b1b8ad8e740718b1.
 3. NWTC Information Portal (Alpha Versions).  https://nwtc.nrel.gov/Alphas. Last modified 14-June-2016 ;
 4. Dimitrov N., Natarajan A., “Application of simulated lidar scanning patterns to constrained Gaussian turbulence fields for load validation”, 2017, Wind Energ., 20: 79– 95. https://doi.org/10.1002/we.1992 .
-5. Conti, D., Pettas, V., Dimitrov, N., and Peña, A.: Wind turbine load validation in wakes using field reconstruction techniques and nacelle lidar wind retrievals, Wind Energ. Sci. Discuss. [preprint], https://doi.org/10.5194/wes-2020-104, in review, 2020.
-6. add refeernce MG paper
+5. Conti, D., Pettas, V., Dimitrov, N., and Peña, A.: Wind turbine load validation in wakes using wind field reconstruction techniques and nacelle lidar wind retrievals, Wind Energ. Sci., 6, 841–866, https://doi.org/10.5194/wes-6-841-2021, 2021.
+7. add refeernce MG paper
 
 ## Citing
 If you use ViConDAR for a publication, use the following citation:
