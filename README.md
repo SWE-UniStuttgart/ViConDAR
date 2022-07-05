@@ -54,10 +54,11 @@ To report a bug or a feature request as well as any other comment please use the
 1. Pettas V., Costa García F., Kretschmer M., Rinker J.M., Clifton A., Cheng P.W., “A numerical framework for constraining synthetic wind fields with lidar measurements for improved load simulations”. In: AIAA Scitech 2020 Forum. American Institute of Aeronautics and Astronautics; 2020:1-6. https://doi.org/10.2514/6.2020-0993
 2. Rinker, J. M., “PyConTurb: an open-source constrained turbulence generator”, Journal of Physics: Conference Series, Vol.
 1037, 2018, p. 062032. URL http://stacks.iop.org/1742-6596/1037/i=6/a=062032?key=crossref.e906e6eebbe4b3f8b1b8ad8e740718b1.
-3. NWTC Information Portal (Alpha Versions).  https://nwtc.nrel.gov/Alphas. Last modified 14-June-2016 ;
+3. NWTC Information Portal (Alpha Versions).  https://www.nrel.gov/wind/nwtc/turbsim.html. Last modified 14-June-2016 ;
 4. Dimitrov N., Natarajan A., “Application of simulated lidar scanning patterns to constrained Gaussian turbulence fields for load validation”, 2017, Wind Energ., 20: 79– 95. https://doi.org/10.1002/we.1992 .
 5. Conti, D., Pettas, V., Dimitrov, N., and Peña, A.: Wind turbine load validation in wakes using wind field reconstruction techniques and nacelle lidar wind retrievals, Wind Energ. Sci., 6, 841–866, https://doi.org/10.5194/wes-6-841-2021, 2021.
-7. add refeernce MG paper
+7. Gräfe, M., Pettas, V., and Cheng, P. W.: Wind field reconstruction using nacelle based lidar measurements for floating wind turbines, Journal
+of Physics: Conference Series, 2265, 042 022, https://doi.org/10.1088/1742-6596/2265/4/042022, 2022.
 
 ## Citing
 If you use ViConDAR for a publication, use the following citation:
