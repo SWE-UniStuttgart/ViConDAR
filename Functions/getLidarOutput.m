@@ -443,12 +443,12 @@ for ind_LiDAR_REWS = 1:size(slicesTime,2) % here there is something to fix:  poi
 end
 REWS.lidar.mean = mean(REWS.lidar.TS,'omitnan');
 if timeStep_Measurements ~= 0
-    REWS.lidar.TSTime = min(min(slicesTime))+ timestep_pat_vec/2:timestep_pat_vec:max(max(slicesTime))+timeStep_Measurements; % We suppose that measurements are in the center of the pattern (half the time of pattern time step). If do not create the same number of points in time we add the points(*)
+    REWS.lidar.TSTime = min(min(slicesTime))+ timestep_pat_vec/2:timestep_pat_vec:max(max(slicesTime))+timeStep_Measurements; % We suppose that measurements are in the center of the pattern (half the time of pattern time step). If do not create the same number of points in time we add the points
     REWS.lidar.TSTime = interp1(fullslicesTime,fullslicesTime,REWS.lidar.TSTime,'nearest');
     if length(REWS.lidar.TSTime)<length(slicesTime) && length(REWS.lidar.TSTime)<length(REWS.lidar.TS) % Consider to clean this up and merge with the floating case above
         No_difference_points = length(slicesTime)-length(REWS.lidar.TSTime);
         for idifpoint = 1:No_difference_points
-            REWS.lidar.TSTime = [REWS.lidar.TSTime REWS.lidar.TSTime(end)+ timestep_pat_vec]; % (*)
+            REWS.lidar.TSTime = [REWS.lidar.TSTime REWS.lidar.TSTime(end)+ timestep_pat_vec]; % 
         end
     end
 else   % when we have all beams synchronized we dont need to average time
@@ -543,12 +543,12 @@ for indSlice = 1:size(VFinalTotal_Time_U{1},2)
 end
 ShearPL.lidar.Mean = mean(ShearPL.lidar.TS,'omitnan'); % total shear of the wind field
 if timeStep_Measurements ~= 0
-    ShearPL.lidar.TSTime = min(min(slicesTime))+ timestep_pat_vec/2:timestep_pat_vec:max(max(slicesTime))+timeStep_Measurements; % We suppose that measurements are in the center of the pattern (half the time of pattern time step). If do not create the same number of points in time we add the points(*)
+    ShearPL.lidar.TSTime = min(min(slicesTime))+ timestep_pat_vec/2:timestep_pat_vec:max(max(slicesTime))+timeStep_Measurements; % We suppose that measurements are in the center of the pattern (half the time of pattern time step). If do not create the same number of points in time we add the points
     ShearPL.lidar.TSTime = interp1(fullslicesTime,fullslicesTime,ShearPL.lidar.TSTime,'nearest');
     if length(ShearPL.lidar.TSTime)<length(slicesTime) && length(ShearPL.lidar.TSTime)<length(ShearPL.lidar.TS)
         No_difference_points = length(slicesTime)-length(ShearPL.lidar.TSTime);
         for idifpoint = 1:No_difference_points
-            ShearPL.lidar.TSTime = [ShearPL.lidar.TSTime ShearPL.lidar.TSTime(end)+ timestep_pat_vec]; % (*)
+            ShearPL.lidar.TSTime = [ShearPL.lidar.TSTime ShearPL.lidar.TSTime(end)+ timestep_pat_vec]; % 
         end
     end
 else   % when we have all beams synchronized we dont need to average time
