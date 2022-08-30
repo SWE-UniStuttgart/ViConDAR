@@ -34,12 +34,12 @@ for indstat=1:length(Y)
     TI_LiDAR(indstat)       = STDV_LiDAR(indstat) / MeanTS_LiDAR(indstat,:)    ;
     TI_TS(indstat)          = STDV_TS(indstat) / MeanTS(indstat,:)    ; %#ok<*NASGU>
 end
-MeanTotal_Full_TS  = mean(MeanTS); %Mean of the LiDAR pattern
+MeanTotal_Full_TS  = mean(MeanTS); %Mean of the Full TimeSeries pattern
 MeanTotal_LiDAR_TS = mean(MeanTS_LiDAR); %Mean of the LiDAR pattern
-Mean_STDV_LiDAR    = mean(STDV_LiDAR(indstat));% Mean STDV LiDAR pattern
-Mean_STDV_Full_TS  = mean( STDV_TS(indstat));% Mean STDV LiDAR pattern
+Mean_STDV_LiDAR    = mean(STDV_LiDAR);% Mean STDV LiDAR pattern
+Mean_STDV_Full_TS  = mean(STDV_TS);% Mean STDV Full TimeSeries pattern
 TI_mean_LiDAR_TS   = Mean_STDV_LiDAR/MeanTotal_LiDAR_TS; % TI LiDAR pattern
-TI_mean_Full_TS    = Mean_STDV_Full_TS/MeanTotal_Full_TS;  % TI Full TimeSerie
+TI_mean_Full_TS    = Mean_STDV_Full_TS/MeanTotal_Full_TS;  % TI Full TimeSeries
 
 %% Outputs
 
@@ -69,7 +69,7 @@ statisticsFunOut.fullWF.Mean_points_full = MeanTS';
 statisticsFunOut.fullWF.Mean_all_full    = MeanTotal_Full_TS;
 statisticsFunOut.fullWF.STDV_TS = STDV_TS;
 statisticsFunOut.fullWF.VAR_TS  = VAR_TS;
-statisticsFunOut.fullWF.TI      = TI_LiDAR;
+statisticsFunOut.fullWF.TI      = TI_TS;
 statisticsFunOut.fullWF.TI_mean = TI_mean_Full_TS;
 statisticsFunOut.fullWF.Mean_STDV = Mean_STDV_Full_TS;
 

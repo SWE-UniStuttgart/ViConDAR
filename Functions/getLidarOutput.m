@@ -617,8 +617,8 @@ Output.Parameter.Pos_Lidar    = input.Pos_LiDAR;
 
 for iPat= 1:length(Y)
     Output.TS.fullWF.Uval{iPat} = VFinalTotal_U{iPat};
-    Output.TS.fullWF.Vval{iPat} = VFinalTotal_U{iPat};
-    Output.TS.fullWF.Wval{iPat} = VFinalTotal_U{iPat};
+    Output.TS.fullWF.Vval{iPat} = VFinalTotal_V{iPat};
+    Output.TS.fullWF.Wval{iPat} = VFinalTotal_W{iPat};
     Output.TS.lidar.Uval{iPat}  = VFinalTotal_Time_U{iPat};
     Output.TS.lidar.Vval{iPat}  = VFinalTotal_Time_V{iPat};
     Output.TS.lidar.Wval{iPat}  = VFinalTotal_Time_W{iPat};
