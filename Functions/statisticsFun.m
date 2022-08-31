@@ -34,12 +34,17 @@ for indstat=1:length(Y)
     TI_LiDAR(indstat)       = STDV_LiDAR(indstat) / MeanTS_LiDAR(indstat,:)    ;
     TI_TS(indstat)          = STDV_TS(indstat) / MeanTS(indstat,:)    ; %#ok<*NASGU>
 end
-MeanTotal_Full_TS  = mean(MeanTS); %Mean of the Full TimeSeries pattern
-MeanTotal_LiDAR_TS = mean(MeanTS_LiDAR); %Mean of the LiDAR pattern
-Mean_STDV_LiDAR    = mean(STDV_LiDAR);% Mean STDV LiDAR pattern
-Mean_STDV_Full_TS  = mean(STDV_TS);% Mean STDV Full TimeSeries pattern
-TI_mean_LiDAR_TS   = Mean_STDV_LiDAR/MeanTotal_LiDAR_TS; % TI LiDAR pattern
-TI_mean_Full_TS    = Mean_STDV_Full_TS/MeanTotal_Full_TS;  % TI Full TimeSeries
+MeanTotal_Full_TS    = mean(MeanTS); %Mean of the Full TimeSeries pattern
+MeanTotal_LiDAR_TS   = mean(MeanTS_LiDAR); %Mean of the LiDAR pattern
+Mean_STDV_LiDAR      = mean(STDV_LiDAR);% Mean STDV LiDAR pattern
+Mean_STDV_Full_TS    = mean(STDV_TS);% Mean STDV Full TimeSeries pattern
+Mean_VAR_LiDAR       = mean(VAR_LiDAR); % Mean variance LiDAR pattern
+Mean_VAR_Full_TS     = mean(VAR_TS); % Mean variance Full TimeSeries pattern
+TI_mean_LiDAR_TS_std = Mean_STDV_LiDAR/MeanTotal_LiDAR_TS; % mean TI LiDAR pattern based on std averaging
+TI_mean_Full_TS_std  = Mean_STDV_Full_TS/MeanTotal_Full_TS; %  mean TI Full TimeSeries based on std averaging
+TI_mean_LiDAR_TS     = sqrt(Mean_VAR_LiDAR)/MeanTotal_LiDAR_TS; % TI LiDAR pattern based on variance averaging
+TI_mean_Full_TS      = sqrt(Mean_VAR_Full_TS)/MeanTotal_Full_TS; % TI Full TimeSeries based on variance averaging
+
 
 %% Outputs
 
@@ -62,7 +67,9 @@ statisticsFunOut.lidar.VAR_LiDAR         = VAR_LiDAR;
 statisticsFunOut.lidar.RMSE              = RMSE;
 statisticsFunOut.lidar.TI                = TI_LiDAR;
 statisticsFunOut.lidar.TI_mean           = TI_mean_LiDAR_TS;
+statisticsFunOut.lidar.TI_mean_stdMean   = TI_mean_LiDAR_TS_std;
 statisticsFunOut.lidar.Mean_STDV         = Mean_STDV_LiDAR;
+
 
 % FullWF
 statisticsFunOut.fullWF.Mean_points_full = MeanTS';
@@ -71,6 +78,7 @@ statisticsFunOut.fullWF.STDV_TS = STDV_TS;
 statisticsFunOut.fullWF.VAR_TS  = VAR_TS;
 statisticsFunOut.fullWF.TI      = TI_TS;
 statisticsFunOut.fullWF.TI_mean = TI_mean_Full_TS;
-statisticsFunOut.fullWF.Mean_STDV = Mean_STDV_Full_TS;
+statisticsFunOut.fullWF.TI_mean_stdMean = TI_mean_Full_TS_std;
+statisticsFunOut.fullWF.Mean_STDV       = Mean_STDV_Full_TS;
 
 end
