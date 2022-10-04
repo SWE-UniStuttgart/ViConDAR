@@ -257,14 +257,14 @@ for iTra = 1:length(Y)
     if input.flag_floating
         for i_point=1:length(angley_fl)
             In_2_LOS_matrix_fl{iTra,i_point} = [cosd(anglez_fl(iTra,i_point))*cosd(angley_fl(iTra,i_point))   -sind(anglez_fl(iTra,i_point))   cosd(anglez_fl(iTra,i_point))*sind(angley_fl(iTra,i_point));
-                sind(anglez_fl(iTra,i_point))*cosd(angley_fl(iTra,i_point))    cosd(anglez_fl(iTra,i_point))   sind(anglez_fl(iTra,i_point))*sind(angley_fl(iTra,i_point)) ;
-                -sind(angley_fl(iTra,i_point))                     0                     cosd(angley_fl(iTra,i_point))];
-        end
+                                                sind(anglez_fl(iTra,i_point))*cosd(angley_fl(iTra,i_point))    cosd(anglez_fl(iTra,i_point))   sind(anglez_fl(iTra,i_point))*sind(angley_fl(iTra,i_point)) ;
+                                                               -sind(angley_fl(iTra,i_point))                             0                     cosd(angley_fl(iTra,i_point))];
+        end 
     end
     % %get the transformation matrices for each pattern point. look at https://en.wikipedia.org/wiki/Rotation_matrix
     In_2_LOS_matrix{iTra} = [cosd(anglez(iTra))*cosd(angley(iTra))   -sind(anglez(iTra))   cosd(anglez(iTra))*sind(angley(iTra));
-        sind(anglez(iTra))*cosd(angley(iTra))    cosd(anglez(iTra))   sind(anglez(iTra))*sind(angley(iTra)) ;
-        -sind(angley(iTra))                     0                     cosd(angley(iTra))];
+                             sind(anglez(iTra))*cosd(angley(iTra))    cosd(anglez(iTra))   sind(anglez(iTra))*sind(angley(iTra)) ;
+                                       -sind(angley(iTra))                     0                     cosd(angley(iTra))];
     LOS_2_In_matrix{iTra} =  In_2_LOS_matrix{iTra}^-1; % Inverse transformation: LOS_CS to Inertial_CS for reconstruction
 end
 
@@ -322,10 +322,9 @@ for num_tr3 = 1:length (Y)
     end
 end
 
-% extract the measured slices as well as the full time series. Here is also
-% the averaging (or any other mnanipulation) for the multiple slices. NO LOS here
-% Here is calculated the mean velocity of all the points in the pattern every time LiDAR completes one
-% pattern (frequency of the pattern) taking into account timstep_meas.
+% extract the measured slices as well as the full time series. NO LOS here
+% The output has a vector of values for each measured point representing 
+% the inertial values of the wind speed in the inertial frame
 
 [VFinalTotal_U,VFinalTotal_Time_U,~,~] = interpolationFun(compU,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2, Y, Z);
 [VFinalTotal_V,VFinalTotal_Time_V,~,~] = interpolationFun(compV,LOS_points,gridy,gridz,fullTime,dt,type_interpolation_2, Y, Z);
@@ -334,47 +333,67 @@ end
 %add translational velocity for floating case
 if input.flag_floating
     for num_tr = 1:length (Y)
-        VFinalTotal_Time_U{1,num_tr} = VFinalTotal_Time_U{1,num_tr}-x_vel{1,num_tr};
-        VFinalTotal_Time_V{1,num_tr} = VFinalTotal_Time_V{1,num_tr}-y_vel{1,num_tr};
-        VFinalTotal_Time_W{1,num_tr} = VFinalTotal_Time_W{1,num_tr}-z_vel{1,num_tr};
+        VFinalTotal_Time_U{1,num_tr} = VFinalTotal_Time_U{1,num_tr}-repmat(x_vel{1,num_tr},length(LOS_points.slicesAv),1);
+        VFinalTotal_Time_V{1,num_tr} = VFinalTotal_Time_V{1,num_tr}-repmat(y_vel{1,num_tr},length(LOS_points.slicesAv),1);
+        VFinalTotal_Time_W{1,num_tr} = VFinalTotal_Time_W{1,num_tr}-repmat(z_vel{1,num_tr},length(LOS_points.slicesAv),1);
     end
 end
 
 %% LOS transformations for all cases
 
-for ind_LOS = 1:length(Y)
-    for ind_slice = 1:length(VFinalTotal_Time_U{ind_LOS})
-        if input.flag_floating
-            %multiplyng all the slice with the transformation matrix
-            VFinalTotal_Time_LOS_vec{ind_LOS, ind_slice} =  In_2_LOS_matrix_fl{ind_LOS,ind_slice} * ...
-                [VFinalTotal_Time_U{ind_LOS}(ind_slice);VFinalTotal_Time_V{ind_LOS}(ind_slice);VFinalTotal_Time_W{ind_LOS}(ind_slice)];
-            %      Get the measured wind speeds in LOS coordinates
-            VFinalTotal_Time_LOS_U{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(1);
-            VFinalTotal_Time_LOS_V{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(2);
-            VFinalTotal_Time_LOS_W{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(3);
-        else
-            %multiplyng all the slice with the transformation matrix
-            VFinalTotal_Time_LOS_vec{ind_LOS, ind_slice} =  In_2_LOS_matrix{ind_LOS} * ...
-                [VFinalTotal_Time_U{ind_LOS}(ind_slice);VFinalTotal_Time_V{ind_LOS}(ind_slice);VFinalTotal_Time_W{ind_LOS}(ind_slice)];
-            %      Get the measured wind speeds in LOS coordinates
-            VFinalTotal_Time_LOS_U{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(1);
-            VFinalTotal_Time_LOS_V{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(2);
-            VFinalTotal_Time_LOS_W{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(3);
+for ind_LOS = 1:length(Y) % loop over the beam
+    for ind_slice = 1:length(VFinalTotal_Time_U{ind_LOS}) % loop over the measurements in time e.g 200  
+        for P_av= 1:length(LOS_points.slicesAv) % loop over all points along probe volume LOS e.g. 20
+            if input.flag_floating
+                %multiplyng all the slice with the transformation matrix
+                VFinalTotal_Time_LOS_vec{ind_LOS, ind_slice}(:,P_av) =  In_2_LOS_matrix_fl{ind_LOS,ind_slice} * ...
+                    [VFinalTotal_Time_U{ind_LOS}(P_av,ind_slice);VFinalTotal_Time_V{ind_LOS}(P_av,ind_slice);VFinalTotal_Time_W{ind_LOS}(P_av,ind_slice)];
+                                                                                                     
+            else
+                %multiplyng all the slice with the transformation matrix
+                VFinalTotal_Time_LOS_vec{ind_LOS, ind_slice}(:,P_av) =  In_2_LOS_matrix{ind_LOS} * ...
+                    [VFinalTotal_Time_U{ind_LOS}(P_av,ind_slice);VFinalTotal_Time_V{ind_LOS}(P_av,ind_slice);VFinalTotal_Time_W{ind_LOS}(P_av,ind_slice)];
+            end                                                                                                      
+        end
+    end
+end
+% VFinalTotal_Time_U includes: Each cell is row1:u row2:v, row2:w coulumns
+% are points in the probe volume. The rows of the struct are the beams and
+% colums are the measurements in time. No probe volume averaging until here
+
+
+%% Apply probe volume weighting                                                                                                                                                                            
+[VFinalTotal_Time_LOS_vec] = Weighting_Probe(VFinalTotal_Time_LOS_vec, Y); % here VFinalTotal_Time_U changes so that each cell has only 1 column 
+%using the average. If the raw scatter is required has to be retrieved here.  
+
+%% Application of noise to the measured points. This should be a function
+% noise
+if input.flag_apply_noise == 1
+    for ind_LOS= 1:length(Y)
+           LOS_vec= cell2mat(VFinalTotal_Time_LOS_vec(ind_LOS,:)); % create each beam individually in one variable
+           LOS_vec(1,:) = awgn(LOS_vec(1,:),noise_U);
+           LOS_vec(2,:) = awgn(LOS_vec(2,:),noise_V);
+           LOS_vec(3,:) = awgn(LOS_vec(3,:),noise_W);
+        for ind_slice=1:size(VFinalTotal_Time_LOS_vec,2) % converting back to the cell format as before. Could be done faster..
+            VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(1,1) = LOS_vec(1,ind_slice);
+            VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(2,1) = LOS_vec(2,ind_slice);
+            VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(3,1) = LOS_vec(3,ind_slice);
         end
     end
 end
 
-%% Wind Field Reconstruction
-[VFinalTotal_Time_U, VFinalTotal_Time_V, VFinalTotal_Time_W] = WindFieldReconstruction(VFinalTotal_Time_LOS_vec, LOS_2_In_matrix, input, trajectory_forAng, ref_plane_dist,Y);
-
-%% Application of noise to the measured points. This should be a function
-if input.flag_apply_noise == 1
-    for ind_noise = 1:length(Y)
-        VFinalTotal_Time_U{ind_noise} = awgn(VFinalTotal_Time_U{ind_noise},noise_U);
-        VFinalTotal_Time_V{ind_noise} = awgn(VFinalTotal_Time_V{ind_noise},noise_V);
-        VFinalTotal_Time_W{ind_noise} = awgn(VFinalTotal_Time_W{ind_noise},noise_W);
+%% decompose to components. Not use at the moment but useful for future applicaitons
+for ind_LOS = 1:length(Y)
+    for ind_slice = 1:length(VFinalTotal_Time_U{ind_LOS})
+        VFinalTotal_Time_LOS_U{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(1); %#ok<NASGU>
+        VFinalTotal_Time_LOS_V{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(2); %#ok<NASGU>
+        VFinalTotal_Time_LOS_W{ind_LOS}(ind_slice) = VFinalTotal_Time_LOS_vec{ind_LOS,ind_slice}(3); %#ok<NASGU>
     end
 end
+
+%% Wind Field Reconstruction
+[VFinalTotal_Time_U, VFinalTotal_Time_V, VFinalTotal_Time_W] = WindFieldReconstruction(VFinalTotal_Time_LOS_vec, LOS_2_In_matrix, input, Y);
+
 
 %% Calculate REWS
 

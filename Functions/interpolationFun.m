@@ -2,7 +2,6 @@
 %
 % Interpolate to get all points (even when we are not in the grid) taking
 % into account LOS and position of LiDAR.
-% TODO: 1) seperate the weighting function option to external function
 %
 % V.Pettas/F.Costa/M.Graefe
 % University of Stuttgart, Stuttgart Wind Energy (SWE) 2019
@@ -87,11 +86,8 @@ else %if you don't interpolate get the closest point
                 VFinalTotal_TimeInt2(iTSlice) = [nan(1,NansStart) VFinalTotal_TimeInt{iTSlice} nan(1,NansEnd) ];
             end
             
-            if length(LOS_points.slicesAv) ~= 1
-                VFinalTotal_Time{i1}(1,i_slice) = mean(VFinalTotal_TimeInt2,'omitnan');% Change it for a gaussian mean!!! Averaging columns which contain all the volume averaging ppins in th LOS
-            else
-                VFinalTotal_Time{i1}(1,i_slice) = VFinalTotal_TimeInt2;
-            end
+            VFinalTotal_Time{i1}(:,i_slice) = VFinalTotal_TimeInt2; % Each cell is one beam. Rows in the cell are the points in hhe probe volume. Each column measurement type step of the beam 
+
             clear VFinalTotal_TimeInt
         end % slice loop
         
