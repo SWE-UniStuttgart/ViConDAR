@@ -29,7 +29,7 @@ dt = Dynamics.sim.dt;
 num = floor((ref_plane_dist/ URef)/dt);
 Dynamics.num_chunk = num;
 
-for ch = 1: length((fNames))
+for ch = 1:length((fNames))
     if num > 2 % only do the extension if more than two samples are added
         chunk = Dynamics.sim.channels.(fNames{ch})(num:2*num-1,1); % find chunk of channel
         Dynamics.sim.channels.(fNames{ch}) = [chunk;Dynamics.sim.channels.(fNames{ch})]; % add in the beginning
@@ -104,7 +104,7 @@ for ch = 1:length((fNames))-1 % all channels besides time
         time_Measurement=((i-1)*timeStep_Measurements : timestep_pat_vec : fullTime);
         % find correct value in dynamics time series by 'nearest'
         % interpolation based on measurement time per beam
-        channel_temp = interp1(Dynamics.sim.channels.(channelnames{10})(i,:),Dynamics.sim.channels.(channelnames{ch})(i,:),time_Measurement,'nearest');
+        channel_temp = interp1(Dynamics.sim.channels.(channelnames{10})(i,:),Dynamics.sim.channels.(fNames{ch})(i,:),time_Measurement,'nearest');
         if length(channel_temp)<num_measurements % extend with NaN if necessary
             channel_temp(1,end+1:num_measurements) = NaN;
         end

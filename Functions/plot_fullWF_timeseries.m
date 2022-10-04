@@ -38,7 +38,7 @@ for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested poi
         % loop over constrained wind fields with pyconturb that come from the same
         % original windfield
         if input.plot_WF_timeseries_Pyconturb == 1 
-            pyconWFsInd = ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); %
+            pyconWFsInd = ~cellfun(@isempty,strfind(pyconturbWF_names,curNamOr)); %#ok<*STRCLFH> %
             pyconWFs = pyconturbWF_names(pyconWFsInd);
             for ipyconWF = 1:size(pyconWFs,2)
                 curNamPycon = pyconWFs{ipyconWF};
@@ -59,7 +59,7 @@ for iPoint = 1:size(input.points_plot_WF_timeseries,2) % loop over requested poi
             turbsimWFs = turbsimWF_names(turbsimWFsInd);
             for iturbsimWF = 1:size(turbsimWFs,2)
                 curNamTurbsim = turbsimWFs{iturbsimWF};
-                load([input.TurbSimOut_dir curNamTurbsim]); % variable windfield loaded
+                load([input.TurbSimOut_dir curNamTurbsim]); %#ok<*LOAD> % variable windfield loaded
                 % find the closesrt point in the grid as requeted by the user
                 YpointGrid = find(abs(Ypoint-windfield.grid.y) == min(abs(Ypoint-windfield.grid.y)),1); %Y point as index
                 ZpointGrid = find(abs(Zpoint-windfield.grid.z) == min(abs(Zpoint-windfield.grid.z)),1); %z point as index

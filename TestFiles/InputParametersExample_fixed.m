@@ -103,7 +103,7 @@ input.resampling_factor = 2; % Amount of desired resampling for outputs in Turbs
 input.nComp                = 1;        % 1:u, 2:v+u 3:u+v+w. Number of components to process (U,V,W):
 input.type_interpolation   = 'linear'; % (interp1) interpolation between slices line460 (check other options of interpm)
 input.type_interpolation_2 = 'linear'; % (interp2)  interpolation in selected slice for values on the pattern points
-input.ReconstructionMethod = 'simple'; % 'simple': v=0,w=0 assumption %'global_projection': Pseudo-inverse method.
+input.ReconstructionMethod = 'simple'; % 'simple': v=0,w=0 assumption 
 
 %% Directory/path definition
 
