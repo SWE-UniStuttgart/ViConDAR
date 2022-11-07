@@ -1,6 +1,6 @@
 # Test case 
 
-The files provided here are meant to be used as a test to make sure everything works qwith the framework. In order to run the example:
+The files provided here are meant to be used as a test to make sure everything works with the framework. In order to run the example:
 
 1. Copy `InputParametersExample_fixed.m` or the `InputParametersExample_floating.m` to the *Main* folder. The former is an example of a forward scanning nacelle lidar application considering no dynamic motion of the lidar. The latter is an example of a forward scanning nacelle lidar application considering also the dynamic motions of the lidar, in this case created based on a floating wind turbine simulation using the openFAST tool from NREL. 
 2. Rename it to `InputParameters.m` and keep the original `InputParameters.m` file as a backup
