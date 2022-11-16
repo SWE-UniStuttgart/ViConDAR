@@ -26,25 +26,21 @@ URef = windfield.URef;
 dt = Dynamics.sim.dt;
 
 % find number of samples which need to added to account for measurement Distance
-num = floor((ref_plane_dist/ URef)/dt);
-Dynamics.num_chunk = num;
-
-for ch = 1:length((fNames))
-    if num > 2 % only do the extension if more than two samples are added
-        chunk = Dynamics.sim.channels.(fNames{ch})(num:2*num-1,1); % find chunk of channel
+num_chunk = floor((ref_plane_dist/ URef)/dt);
+Dynamics.num_chunk = num_chunk;
+ for ch = 1: length((fNames))
+    if num_chunk >= 1 % extent if one ore more timesteps need to be added
+        % create chunk of NaNs
+        chunk = NaN(num_chunk,1);
         Dynamics.sim.channels.(fNames{ch}) = [chunk;Dynamics.sim.channels.(fNames{ch})]; % add in the beginning
-        % Smooth transition by replacing with moving  vaverage
-        num_av = 10;% find number of points to be averaged on each side of transition based on time of 5s. Make this a parameter?
-        if num<num_av % if chunk is smaller than intended number replace
-            num_av = num-1;
-        end
-        Dynamics.sim.channels.(fNames{ch})((num-num_av:num+num_av),1) = movmean(Dynamics.sim.channels.(fNames{ch})(num-num_av:num+num_av,1),(num_av/2));
+        % Overwrite NaNs with matlab gap filling function
+        Dynamics.sim.channels.(fNames{ch}) = fillgaps(Dynamics.sim.channels.(fNames{ch}));
     end
-    Dynamics.sim.channels.(fNames{ch}) = repmat(Dynamics.sim.channels.(fNames{ch})',beams,1); % create matrix with one row per beam
-    
-end
-
-% resample time to account for extended dynamics
+     Dynamics.sim.channels.(fNames{ch}) = repmat(Dynamics.sim.channels.(fNames{ch})',beams,1); % create matrix with one row per beam     
+ 
+ end
+% 
+% % resample time to account for extended dynamics
 for i = 1:beams
     Dynamics.sim.channels.(fNames{10})(i,:) = (0:(length(Dynamics.sim.channels.(fNames{10})(i,:))-1))*dt;
 end
